@@ -1,0 +1,80 @@
+/* Sass Declaration */
+
+$desktop-width: 800px;
+$tablet-width: 640px;
+$mobile-width: 320px;
+
+
+
+//left and right rules for public area
+
+%left{		
+		float: left;
+		margin-right: 0.5em;
+		padding: 0.5em 1em;
+		width: 50%; 
+		}
+
+%right{
+		float: right;
+		margin-left: 0.5em;
+		padding: 0.5em 1em;
+		width: 30%;
+		}
+
+
+
+//main navigation rules begins;
+
+$nav-text: white;
+$nav-li-bg: #00388c;
+$nav-bg: #3f5e8c;
+$nav-font: serif;
+
+//body
+
+body{
+	font-size: 14.8px !important;
+	line-height: 24px !important;
+}
+
+
+//login page rules begins
+div.loginContent{
+	@extend %left;
+	border-right: 1px solid black;
+
+}
+
+div.loginForm{
+	@extend %right;
+}
+
+
+//login page rules end;
+
+
+//app logo
+#header{
+	width: inherit;
+	position: fixed;
+	background-color: #df421e;
+	background-color: rgba(223, 66, 30, 0.9); //#df421e
+	color: white;
+	z-index: 999;
+	.row{
+		.logo{
+			max-width: 70px;
+			padding: 5px;
+			img{
+				border-radius: 5px;
+			}
+		}
+	}
+}
+
+footer{
+	width: inherit;
+	background-color: #003366;
+	background-color: rgba(0, 51, 102, 0.9); //#003366
+}

@@ -1,0 +1,175 @@
+body{
+
+}
+
+.insertNotice{
+	position: fixed;
+	color: white;
+	background-color: #000;
+	padding: 10px;
+	z-index: 999;
+	border-radius-left: 4px; 
+	font-size: 18px;
+	display: none;
+	bottom: 10px;
+	right: 0;
+	opacity: 0.8;
+}
+
+/* .overlay{
+	display: block;
+	background-color: black;
+	min-width: 50%;
+	min-height: 100%;
+	top: 0;
+	z-index: 99;
+	position: fixed;
+	overflow: scroll;
+	margin: auto;
+} */
+
+button#uploadBtn{
+	display: none;
+}
+#uploadPreview{
+	max-width: 250px;
+	max-height: 310px;
+}
+
+table{
+	margin: 5px;
+	border-collapse: collapse;
+
+	tr{
+		border: 1px solid grey;
+	}
+	tr:nth-child(even){
+		background-color: #def;
+	}
+	tr:hover{
+		background-color: #eee;
+		cursor: pointer;
+	}
+
+	th{
+		text-align: center;
+		border: 1px solid grey;
+		font-size: 1em;
+
+	}
+
+	td{
+		padding: 5px;
+		border: 1px solid black;
+		white-space: nowrap;
+
+		img{
+			max-width: 100px;
+			max-height: 100px;
+			border: 1px solid black;
+			border-radius: 2px;
+			padding: 2px;
+		} 
+	}
+}
+
+#Profile, #singleStudent, #singleStaff{
+	table{
+		caption{
+			font-size: 2em;
+			font-weight: bold;
+		}
+		tr,td{
+			padding: 3px;
+			border: 1px solid black;
+
+		}
+		td:first-child{
+			font-weight: bold;
+		}
+	}
+}
+
+table.serial {
+    counter-reset: rowNumber;
+    
+    tr:not(:first-child) {
+    	counter-increment: rowNumber;
+		
+		td:first-child::before {
+    		content: counter(rowNumber);
+			}
+
+	}
+
+	
+}
+
+
+.setting{
+	.setting-row{
+		margin: 1em 0;
+		border-radius: 3px;
+		padding: 5px;
+		border: 1px dashed black;
+
+		h4{
+			background-color: #eee;
+			padding: 5px;
+		}
+	}
+}
+
+.assignmentList{
+	.badge{
+		background-color: #ddd;
+		color: black;
+	}
+	div{
+		span{
+		
+		padding: 4px;
+		margin: 3px;
+		display: inline-block;
+		cursor: pointer;
+	}
+		span:hover{
+			background-color: #eee;
+		}
+	}
+	
+}
+
+
+.assignment{
+	border-bottom: 1px inset #eeeeee;
+	h3{
+		text-transform: uppercase;
+	}
+	
+
+	article{
+		padding: 1em;
+		border: 1px solid #dddddd;
+		p{
+			font-size: 1.2em;
+			font-family: calbri, tahoma;
+		}
+
+		span{
+			background-color: #ddd;
+			padding: 3px;
+			margin: 3px;
+			display: inline-block;
+			cursor: pointer;
+		}
+		span:hover{
+			background-color: #eee;
+		}
+		.answer{
+			p, span{
+				margin-left: 2em;
+			}
+		}
+	}
+}

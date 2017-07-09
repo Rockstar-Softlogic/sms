@@ -1,0 +1,88 @@
+
+<template name="header">
+		
+				<header id="header">
+					<div class="row">
+						<div class="col-sm-3 col-md-3">
+							<div class="logo">
+								<img src="http://localhost:3000/logo.jpg" alt="school logo" style="max-width: 50px">
+							</div>
+						</div>
+						<div class="col-sm-7 col-md-7">
+							<p>Navigation</p>
+						</div>
+						<div class="col-sm-2 col-md-2">
+							
+							<p>{{> loginButtons}}</p>
+						</div>
+					</div>
+				</header>
+			
+		
+</template>
+
+
+
+<template name="publicNav">
+	
+		<nav class="main">
+			<ul>
+				
+				<li><a href="/">Home</a></li>
+				<li><a href="#">Admission</a></li>
+				<li><a href="#">Management</a></li>
+				<li><a href="#">Contact</a></li>
+				{{#if currentUser}}
+					{{> loginButtons}}
+
+				{{else}}
+					<li><a href="login">login</a></li>
+					
+				{{/if}}
+			</ul>
+		</nav>
+
+</template>
+
+
+<template name="home">
+	<section style="margin-top: 70px; ">
+
+		<h1>Welcome to the School Management Systems</h1>
+
+		<p>This is the home page</p>
+	</section>
+
+
+</template>
+	
+
+
+<template name="footer">
+
+	<footer style = "padding: 1em;">
+		<div class="row">
+			<div class="col-xs-12 col-sm-7 col-md-7">
+				<p>terms and conditions</p>
+			</div>
+			<div class="col-xs-12 col-sm-5 col-md-5">
+				<p>copyright</p>
+			</div>
+		</div>
+
+	</footer>
+
+</template>
+
+<template name="notFound">
+	<content style="height: 100px; background-color: skyblue;">
+		<h2>The resource you requested was not found</h2>
+		<p>click <a href="login">here</a> to login <br/>
+			go <a href="/">home</a> here.
+		</p>
+
+
+	</content>
+	
+
+</template>

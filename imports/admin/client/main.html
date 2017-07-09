@@ -1,0 +1,2080 @@
+							
+<template name="admin">
+	<h4>Admin actions only!</h4>
+	{{#if isInRole 'admin'}}
+		{{#if Template.subscriptionsReady}}
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+							Session
+							</h3>	
+						</div>
+						
+						<article class="panel-body">
+							<p>Current session: 
+							{{#if currentSession}}
+								{{currentSession}}
+							{{else}}
+								<span>School not in any session, click below button to create one.</span>
+							{{/if}}
+							</p>
+							<button>New session</button>
+						</article>
+
+					</div>
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Students summary
+							</h3>
+						</div>
+						<article class="panel-body">
+							<ol>
+								<li>All => 788</li>
+								<li>JSS1 => 88</li>
+								<li>JSS2 => 48</li>
+								<li>JSS3 => 78</li>
+								<li>SSS1 => 39</li>
+								<li>SSS2 => 10</li>
+								<li>SSS3 => 188</li>
+							</ol>
+						</article>
+
+					</div>
+					
+				</div>
+
+				<div class="col-sm-6">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								General Information
+							</h3>
+						</div>
+						<article class="panel-body">
+							<p>Current session: 
+							{{#if currentSession}}
+								{{currentSession}}
+							{{else}}
+								<span>School not in any session, click below button to create one.</span>
+							{{/if}}
+							</p>
+							<button type="button" class="btn btn-primary btn-sm" id="addSession" >New session</button>
+	
+							
+						</article>
+
+						<article class="panel-body">
+							<p>Current term: 
+							{{#if currentTerm}}
+								{{currentTerm}}
+							{{else}}
+								<span>School not in any term, click "New session" button to start with term 1.</span>
+							{{/if}}
+							</p>
+							<button type="button" class="btn btn-primary btn-sm" id="addTerm" >New term</button>
+						</article>
+
+					</div>
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Current term school fees
+							</h3>
+						</div>
+						{{#if termSchoolFees}}
+							{{#with termSchoolFees}}
+						<article class="panel-body">
+							<ul>
+								<p>Term: {{currentTerm}}</p>
+								<li>JSS1 => {{schoolFees.JSS1}}</li>
+								<li>JSS2 => {{schoolFees.JSS2}}</li>
+								<li>JSS3 => {{schoolFees.JSS3}}</li>
+								<li>SSS1 => {{schoolFees.SSS1}}</li>
+								<li>SSS2 => {{schoolFees.SSS2}}</li>
+								<li>SSS3 => {{schoolFees.SSS3}}</li>
+							</ul>
+							<button>Change</button>	
+							{{> quickForm schema="g.Schemas.SchoolFees" id="updateSchoolFees" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur' doc=termSchoolFees}}
+
+						</article>
+							{{/with}}
+						{{else}}
+							<p>Term school fees not yet set</p>
+						{{/if}}
+
+					</div>
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Recent activity
+							</h3>
+						</div>
+						<article class="panel-body">
+							
+							<h5>Payment made</h5>
+							<p>
+								this made a payment<br/>
+							</p>
+						
+						</article>
+
+					</div>
+
+				</div>
+
+			</div>
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}} 
+
+</template>
+
+<template name="newSessionModal">
+		<!-- Moddal start -->
+			<div class="modal fade">
+					<div class="modal-dialog" role='document'>
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss='modal' arial-label='Close'>
+									<span arial-hidden='true'>&times;</span>
+								</button>
+								<h4 class="modal-title" id='myModalLabel'>
+									New session
+								</h4>
+							</div>
+							<div class="modal-body">
+								<p>Creating a new session</p>
+									{{#if sessionInfo}}
+										{{#with sessionInfo}}
+									<ol>
+										<li><em>Session: {{session}}</em></li>
+										<li><em>Term : {{term}}</em></li>
+									</ol>
+										{{/with}}
+									{{else}}
+										<p>No session or term available</p>
+									{{/if}}
+
+
+
+									{{>quickForm schema="g.Schemas.SchoolFees" id="newSession" type="normal" validation='blur' afFieldInput-placeholder="schemaLabel"}}
+							</div>
+							
+							<div class="modal-footer">
+								<button type="button" class="btn btn-danger" data-dismiss='modal'>Close</button>
+								
+							</div>
+						</div>
+						
+					</div>
+					
+			</div>
+
+		<!-- Modal end -->
+
+</template>
+
+<template name="setTermAndSchoolFees">
+		<!-- Moddal start -->
+			<div class="modal fade">
+					<div class="modal-dialog" role='document'>
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss='modal' arial-label='Close'>
+									<span arial-hidden='true'>&times;</span>
+								</button>
+								<h4 class="modal-title" id='myModalLabel'>
+									New term
+								</h4>
+							</div>
+							<div class="modal-body">
+								<p>Creating a new term</p>
+									{{#if sessionInfo}}
+										{{#with sessionInfo}}
+									<ol>
+										<li><em>Session: {{session}}</em></li>
+										<li><em>Term : {{term}}</em></li>
+									</ol>
+										{{/with}}
+									{{else}}
+										<p>No session or term available</p>
+									{{/if}}
+									
+									{{> quickForm schema="g.Schemas.SchoolFees" id="setTermAndSchoolFees" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+							</div>
+							
+							<div class="modal-footer">
+								<button type="button" class="btn btn-danger" data-dismiss='modal'>Close</button>
+								
+							</div>
+						</div>
+						
+					</div>
+					
+			</div>
+
+		<!-- Modal end -->
+
+</template>
+
+
+<template name="editorList">
+	{{#if isInRole 'admin'}}
+
+
+	{{/if}}
+
+</template>
+
+
+<template name="staffProfile">
+	{{#if Template.subscriptionsReady}}
+		{{#if isInRole 'admin,  editor, staff'}}
+			{{#with staffInfo}}
+
+
+				<h3>Welcome {{lastName}} {{firstName}}</h3> <hr/>
+					<div class="row">
+						<div class="col-md-8 col-sm-8 col-xs-12">
+							
+							<table>
+								<tr>
+									<th colspan="2" class="customHead">Employment Data</th>
+								</tr>
+								<tr>
+									<td><strong>Name: </strong></td>
+									<td> {{lastName}}, {{firstName}} {{otherName}}</td>
+								</tr>
+								<tr>
+									<td><strong>staff Id</strong></td>
+									<td>{{staffId}}</td>
+								</tr>
+								<tr>
+									<td><strong>Email</strong></td>
+									<td>{{email}}</td>
+								</tr>
+								<tr>
+									<td><strong>Gender</strong></td>
+									<td>{{gender}}</td>
+								</tr>
+								<tr>
+									<td><strong>Date of birth</strong></td>
+									<td>{{dob}}</td>
+								</tr>
+								<tr>
+									<td><strong>State of origin</strong></td>
+									<td>{{state}}</td>
+								</tr>
+								<tr>
+									<td><strong>Town</strong></td>
+									<td>{{town}}</td>
+								</tr>
+								<tr>
+									<td><strong>Club and Soceity</strong></td>
+									<td>{{club}}</td>
+								</tr>
+								<tr>
+									<td><strong>Subject taught</strong></td>
+									<td>{{subjectTaught}}</td>
+								</tr>										
+							</table>
+								<br/>
+
+							<table>
+								<tr>
+									<th colspan="2" class="customHead">Staff Profile</th>
+								</tr>
+								<tr>
+									<td><strong>Contact phone</strong></td>
+									<td>{{phone}}</td>
+								</tr>
+								<tr>
+									<td><strong>Home Address</strong></td>
+									<td>{{homeAddress}}</td>
+								</tr>
+								<tr>
+									<td><strong>Present Address</strong></td>
+									<td>{{presentAddress}}</td>
+								</tr>
+								<tr>
+									<td><strong>Hobby</strong></td>
+									<td>{{hobby}}</td>
+								</tr>
+								<tr>
+									<th colspan="2" class="customHead">Next of Kin details</th>
+									
+								</tr>
+								<tr>
+									<td><strong>Name</strong></td>
+									<td>{{nok.name}}</td>
+								</tr>
+								<tr>
+									<td><strong>Address</strong></td>
+									<td>{{nok.address}}</td>
+								</tr>
+								<tr>
+									<td><strong>Phone contact</strong></td>
+									<td>{{#each nok.phone}} {{this}} {{/each}}</td>
+								</tr>	
+								<tr>
+									<td><strong>Relationship</strong></td>
+									<td>{{nok.relationship}}</td>
+								</tr>
+								<tfoot>
+									<a href="/profile/edit" class="btn btn-primary"><span class="fa fa-edit"></span> edit profile</a>
+								</tfoot>										
+							</table>
+
+						</div>
+						<div class="col-md-4 col-sm-4 col-xs-12" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
+							<div class="passport" style="text-align: center;">
+								<img src="http://localhost:3000/staff5.png" alt="{{lastName}} {{firstName}} passport">
+								<p><strong>{{studentId}}</strong></p>
+							</div><hr/>
+							<div>
+								<p><a href="#">Assignments</a></p><hr/>
+								<p><a href="#">Subjects</a></p><hr/>
+								<p><a href="#">Messages</a></p><hr/>
+								<p><a href="#">Send feedback</a></p><hr/>
+							</div>
+								
+								
+						</div>
+
+
+					</div>
+			{{/with}}
+		{{/if}}
+	{{else}}
+		{{> spinner}}
+	{{/if}}
+	
+</template>
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- Staff Template begin -->
+
+
+
+<template name="staffList">
+
+	{{#if isInRole 'admin, editor'}}
+	<p> <a href="{{pathFor '/staff/new'}}" class="btn btn-primary"><span class="fa fa-plus"></span> Add new staff</a> </p>
+	{{#if Template.subscriptionsReady}}
+		<form class="filter">
+			<input type="text" name="name" placeholder="staff name">	
+			<input type="text" name="staffId" placeholder="staff Id">
+			<button type="submit" class="btn btn-primary">filter staff</button>
+		</form>
+			<table class="table table-striped serial">
+				<tr>
+					<th>S/N</th>
+					<th>Name</th>
+					<th>Staff ID</th>
+					<th>Subjects</th>
+					<th>Gender</th>
+					<th>Club</th>
+					<th>Actions</th>
+				</tr>
+			{{#each staffs}}
+				<tr>
+					<td></td>
+					<td>{{lastName}}, {{firstName}} {{otherName}}</td>
+					<td>{{staffId}}</td>
+					<td>{{subjectTaught}} <br/></td> 
+					<td>{{gender}}</td>
+					<td>{{club}}</td>
+					<td><a href="/staff/view/{{staffId}}" class="btn btn-info btn-xs"> <span class="fa fa-info-circle"></span> More Details</a></td>
+					
+
+				</tr>
+
+			{{/each}}
+			</table>
+		
+	{{else}}
+		{{> spinner}}
+	{{/if}}
+
+	{{/if}}
+	
+
+</template>
+
+<template name="singleStaff">
+	{{#if isInRole 'admin, editor, staff'}}
+	{{#if Template.subscriptionsReady}}
+
+	{{#with staff}}	
+	<section id="singleStaff" class="row">
+			<h1>{{lastName}}, {{firstName}} {{otherName}} profile</h1><hr style="border-bottom: 3px dashed orangered; border-top: 3px dotted orangered;" />
+					<div class="col-md-8 col-sm-8">	
+						<table class="table">
+							<caption>Employment Data</caption>
+
+							<tr>
+								<td>Name</td><td>{{lastName}}, {{firstName}} {{otherName}}</td>
+							</tr>
+							<tr>	
+								<td>Gender</td> <td>{{gender}}</td>
+							</tr>
+							<tr>
+								<td>Date of Birth</td> <td>{{dob}}</td>
+							</tr>
+							<tr>
+								<td>Staff ID</td> <td>{{staffId}}</td>
+							</tr>
+						
+							<tr>
+								<td>Email</td> <td>{{email}}</td>
+							</tr>
+						
+							<tr>
+								<td>Origin</td> <td>{{town}}, {{state}} State</td>
+							</tr>
+							<tr>
+								<td>Present Address</td> <td>{{presentAddress}}</td>
+							</tr>
+							<tr>
+								<td>Home Address</td> <td>{{homeAddress}}</td>
+							</tr>
+
+							
+							
+							
+							<tfoot><span><a href="/staff/edit/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></span></tfoot>
+						</table>
+
+
+						<!-- Other Information -->
+						<table class="table">
+							<caption>Other Information</caption> 
+							
+							<tr>
+								<td>Subject Taught</td> <td>{{subjectTaught}}</td>
+							</tr>
+							<tr>
+								<td>Club and Society</td> <td>{{club}}</td>
+							</tr>
+							<tr>
+								<td>Hobbies</td> <td>{{hobby}}</td>
+							</tr>
+								<tr>
+								<td>Contact Number</td> <td>{{phone}}</td>
+							</tr>
+							<tr>
+								<td>Next of kin name</td> <td>{{nok.name}}</td>
+							</tr>
+							<tr>
+								<td>Next of kin address</td> <td>{{nok.address}}</td>
+							
+							</tr>
+							
+							<tr>
+								<td>Next of kin contact</td> <td>{{nok.phone}}</td>
+							</tr>
+							<tr>
+								<td>Next of kin relationship</td> <td>{{nok.relationship}}</td>
+							</tr>
+							
+							<tfoot><span><a href="/staff/update/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a></span></tfoot>
+						</table>
+				</div>
+				<div class="col-md-4 col-sm-4">
+					<p><img src="http://localhost:3000/{{staffId}}.png" alt="Staff Passport Photograph"></p>
+					<p><a href="#">View Assignments</a></p>
+					<p><a href="#">Send a Message</a></p>
+				</div>		
+	</section>
+	{{/with}}
+
+
+
+	{{else}}
+		{{> spinner}}
+	{{/if}}
+	{{/if}}
+
+</template>
+
+
+
+<template name="insertStaff">
+{{#if isInRole 'admin, editor'}}
+	<progress value="70" max="100"></progress>
+
+	
+	{{> quickForm collection="g.Staffs" id="insertStaff" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+
+{{/if}}
+</template>
+
+
+<template name="editStaff">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		{{#with editStaffInfo}}
+			<table style="margin: 5px auto;">
+				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/staff5.png" alt="{{firstName}} passport"></td></tr>
+
+				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
+				
+				<tr><td><strong>Staff Id</strong></td><td>{{staffId}}</td></tr>
+			</table>
+		{{/with}}
+
+			{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
+				{{> afQuickField name="firstName"}}
+				{{> afQuickField name="lastName"}}
+				{{> afQuickField name="otherName"}}
+				{{> afQuickField name="dob"}}
+				{{> afQuickField name="gender" options="allowed" firstOption="Gender"}}
+				{{> afQuickField name="state" options="allowed" firstOption="State of origin"}}
+				{{> afQuickField name="town"}}
+				{{> afQuickField name="subjectTaught"}}
+				{{> afQuickField name="club" options="allowed" firstOption="Club and Soceity"}}
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Update</button>
+				</div>
+
+			{{/autoForm}}
+
+		{{else}}
+				{{> spinner}}
+		{{/if}}
+	{{/if}}
+
+</template>
+
+
+
+<template name="updateStaff">
+		{{#if isInRole 'admin, editor'}}
+			{{#if Template.subscriptionsReady}}
+			{{#with updateStaffInfo}}
+			<table style="margin: 5px auto;">
+				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/staff5.png" alt="{{firstName}} passport"></td></tr>
+
+				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
+				
+				<tr><td><strong>Staff Id</strong></td><td>{{staffId}}</td></tr>
+			</table>
+		{{/with}}
+		{{#autoForm schema="g.Schemas.UpdateStaff" id="editStaff" type="normal" doc=updateStaffInfo validation='blur'}} 
+			{{> afQuickField name = "presentAddress"}}
+			{{> afQuickField name = "homeAddress"}}
+			{{> afQuickField name = "phone"}}
+			{{> afQuickField name = "hobby"}}
+			{{> afQuickField name = "club" options="allowed" firstOption="Club and Society"}}
+			{{> afQuickField name = "nok"}}
+
+
+			<div class="form-group">
+					<button type="submit" class="btn btn-primary">Update</button>
+			</div>
+		{{/autoForm}}
+
+
+			{{else}}
+				{{> spinner}}
+			{{/if}}
+		{{/if}}
+</template>
+
+<!-- Staff Template end -->
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- *************Break Break Break************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- Passport upload -->
+
+<template name="passportUpload">
+<div class="progress">
+	<progress value="70" max="100"></progress>
+</div>
+	<div class="row">
+		<div class="col-md-7 col-sm-7">
+			<h3>Upload Passport for</h3>
+				<div class="text-info">
+					{{#with uploadInfo}}
+						<p><strong>Name: </strong>{{name}}</p>
+						<p><strong>Id: </strong>{{id}}</p>
+						<p><strong>Role: </strong>{{diff}}</p>
+					{{/with}}
+				</div>
+				<div class="alert-warning" style="padding: 10px;">
+					<p>(a). Format: .png, .jpg only</p>
+					<p>(b). Size: less than 50kb and greater than 5kb</p>
+					<p>(c). Dimension: Width &lt;&equals; 250, Height &lt;&equals; 310</p>
+				</div>
+
+				<label>Select file to upload</label><br/>
+				<input type="file" name="file" id="file" value="Select passport"><br/>
+
+			<button>Take a picture</button>
+		</div>
+		
+		<div class="col-md-5 col-sm-5">
+
+			<h3>Upload Preview</h3>
+			<div id="passportPreview">Upload Preview</div><br/>
+			
+			<button id="uploadBtn" class="btn btn-danger">Upload</button>	
+			
+ 
+		</div>
+		
+	</div>
+</template>
+
+
+
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- *************Break Break Break************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- students templates begin -->
+
+<template name="studentList">
+	{{#if isInRole 'admin, editor, staff'}}
+	<p> <a href="{{pathFor '/student/new'}}" class="btn btn-primary"><span class="fa fa-plus"></span> create new student</a> </p>
+	{{#if Template.subscriptionsReady}}
+		<form class="filter">
+			<input type="text" name="name" placeholder="name">	
+			<input type="text" name="studentId" placeholder="student Id">
+			<select name='class'>
+				<option>JSS1</option>
+				<option>JSS2</option>
+				<option>JSS3</option>
+				<option>SSS1</option>
+				<option>SSS2</option>
+				<option>SSS3</option>
+			</select>
+			<input type="submit" name="submit" class="btn btn-primary" value="filter student">
+		</form>
+		<table class="table table-bordered serial">
+			<tr>
+				<th>S/N</th>
+				<th>Name</th>
+				<th>Class</th>
+				<th>ID</th>
+				<th>Email</th>
+				<th>Gender</th>
+				<th>Club</th>
+				<th>View</th>
+			</tr>
+		{{#each students}}
+			<tr>
+				<td></td>
+				<td>{{lastName}}, {{firstName}} {{otherName}}</td>
+				<td>{{currentClass}} </td>
+				<td>{{studentId}}</td>
+				<td>{{email}}</td>
+				<td>{{gender}}</td>
+				<td>{{club}}</td>
+				<td style="text-align: center;"><a href="/student/view/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info-circle"></span> More Details</a> <br/>
+				<a href="/result/view/{{studentId}}">Result</a> | 
+				<a href="/payment/view/{{studentId}}">Payments</a></td>
+			</tr>
+
+		{{/each}}
+		</table>
+	{{else}}
+		{{> spinner}}
+	{{/if}}
+
+	{{/if}}
+	
+
+</template>
+<template name="singleStudent">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		<!-- Admission Information -->
+		{{#with student}}	
+		<section id="singleStudent" class="row">
+				<h1>{{lastName}}, {{firstName}} {{otherName}} profile</h1><hr style="border-bottom: 3px dashed #abcdef;" />
+						<div class="col-md-8 col-sm-8">	
+							<table class="table">
+								<caption>Admission Data</caption>
+
+								<tr>
+									<td>Last Name</td><td>{{lastName}}</td>
+								</tr>
+								<tr>
+									<td>First Name</td><td>{{firstName}}</td>
+								</tr>
+								<tr>
+									<td>Other Name</td><td>{{otherName}}</td>
+								</tr>
+								<tr>	
+									<td>Gender</td> <td>{{gender}}</td>
+								</tr>
+								<tr>
+									<td>Class</td>	<td>{{currentClass}}</td>
+								</tr>
+								<tr>
+									<td>Student ID</td> <td>{{studentId}}</td>
+								</tr>
+								<tr>
+									<td>Email</td> <td>{{email}}</td>
+								</tr>
+								<tr>
+									<td>Date of Birth</td> <td>{{dob}}</td>
+								</tr>
+								<tr>
+									<td>State</td> <td>{{state}} State</td>
+								</tr>
+								<tr>
+									<td>Town</td> <td>{{town}}</td>
+								</tr>
+								
+								<tr>
+									<td>Club and Society</td> <td>{{club}}</td>
+								</tr>
+								<tfoot><span class="edit"><a href="/student/edit/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit admission info</a></span></tfoot>
+							</table>
+							<!-- Other Information -->
+							<table class="table">
+								<caption>Other Information</caption> 
+								<tr>
+									<td>Contact Number</td> <td>{{phone}}</td>
+								</tr>
+								<tr>
+									<td>Present Address</td> <td>{{presentAddress}}</td>
+								</tr>
+								<tr>
+									<td>Home Address</td> <td>{{homeAddress}}</td>
+								</tr>
+								<tr>
+									<td>Hobbies</td> <td>{{hobby}}</td>
+								</tr>
+								
+								<tr>
+									<td>Next of kin name</td> <td>{{nok.name}}</td>
+								</tr>
+								<tr>
+									<td>Next of kin address</td> <td>{{nok.address}}</td>
+								
+								</tr>
+								
+								<tr>
+									<td>Next of kin contact</td> <td>{{nok.phone}}</td>
+								</tr>
+								<tr>
+									<td>Next of kin relationship</td> <td>{{nok.relationship}}</td>
+								</tr>
+								<tfoot><span class="edit"><a href="/student/update/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a></span></tfoot>
+							</table>
+					</div>
+					<div class="col-md-4 col-sm-4">
+						<p><img src="http://localhost:3000/{{studentId}}.png" alt="Student Passport Photograph"></p>
+						<p><a href="/result/view/{{studentId}}" class="btn btn-primary"><span class="fa fa-check-circle"></span> View Results</a></p>
+						<p><a href="/payment/view/{{studentId}}" class="btn btn-primary"><span class="fa fa-money"></span> View Payments</a></p>
+						<p><a href="/payment/view/{{studentId}}" class="btn btn-primary"><span class="fa fa-bar-chart-o"></span> View Performance</a></p>
+					</div>		
+		</section>
+		{{/with}}
+		
+		{{else}}
+		{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+
+</template>
+
+<template name="insertStudent">
+	
+	{{#if isInRole 'admin, editor'}}
+		{{#if Template.subscriptionsReady}}
+
+			<progress value="70" max="100"></progress>
+
+				
+			{{> quickForm collection="g.Students" id="insertStudent" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+		{{else}}
+				{{> spinner}}
+		{{/if}}
+	{{/if}}
+</template>
+
+
+<template name="editStudent">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		{{#with editStudentInfo}}
+			<table style="margin: 5px auto;">
+				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/student10.png" alt="{{firstName}} passport"></td></tr>
+
+				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
+				
+				<tr><td><strong>Student Id</strong></td><td>{{studentId}}</td></tr>
+			</table>
+		{{/with}}
+				{{#autoForm schema="g.Schemas.EditStudent" id="editStudent" type="normal" doc=editStudentInfo validation='blur'}}
+
+				{{> afQuickField name="firstName"}}
+				{{> afQuickField name="lastName"}}
+				{{> afQuickField name="otherName"}}
+				{{> afQuickField name="currentClass" options="allowed" firstOption="Current class"}}
+				{{> afQuickField name="gender" options="allowed" firstOption="Gender"}}
+				{{> afQuickField name="dob"}}
+				{{> afQuickField name="state" options="allowed" firstOption="State of origin"}}
+				{{> afQuickField name="town"}}
+				{{> afQuickField name="club" options="allowed" firstOption="Club and Soceity"}}
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Update</button>
+					
+				</div>
+
+
+			{{/autoForm}}	
+		{{else}}
+				{{> spinner}}
+		{{/if}}
+	{{/if}}
+
+</template>
+
+<!-- 
+
+
+ -->
+
+
+<template name="updateStudent">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		{{#with updateStudentInfo}}
+			<table style="margin: 5px auto;">
+				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/student10.png" alt="{{firstName}} passport"></td></tr>
+
+				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
+				
+				<tr><td><strong>Student Id</strong></td><td>{{studentId}}</td></tr>
+			</table>
+		{{/with}}
+			{{#autoForm schema="g.Schemas.UpdateStudent" id="updateStudent" type="normal" doc=updateStudentInfo validation='blur'}}
+				{{> afQuickField name="homeAddress"}}
+				{{> afQuickField name="presentAddress"}}
+				{{> afQuickField name="phone"}}
+				{{> afQuickField name = "club" options="allowed" firstOption="club and soceity"}}
+				{{> afQuickField name="hobby"}}
+				{{> afQuickField name="nok"}}
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Update</button>	
+				</div>
+			{{/autoForm}}
+		{{else}}
+				{{> spinner}}
+		{{/if}}
+	{{/if}}
+
+</template>
+
+
+
+<!-- Student templates end -->
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+
+
+<!-- Result templates begin -->
+
+<template name="resultList">
+	{{#if isInRole 'admin, editor, staff'}}
+
+	{{#if Template.subscriptionsReady}}
+		<form class="filter">
+			<input type="text" name="name" placeholder="name">	
+			<input type="text" name="studentId" placeholder="student Id">
+			<select name='class'>
+				<option selected disabled>select class</option>
+				<option>JSS1</option>
+				<option>JSS2</option>
+				<option>JSS3</option>
+				<option>SSS1</option>
+				<option>SSS2</option>
+				<option>SSS3</option>
+			</select>
+			<input type="submit" class="btn btn-primary" name="submit" value="filter result">
+		</form>
+
+		<table class="serial table table-striped">
+			<tr>
+				<th>S/N</th>
+				<th>Name</th>
+				<th>Student ID</th>
+				<th>Class</th>
+				<th>Last Result added</th>
+				<th>Action</th>
+			</tr>
+		{{#each results}}
+
+			<tr>
+				<td></td>
+				<td>{{firstName}}, {{lastName}} {{otherName}}</td>
+				<td>{{studentId}}</td>
+				<td>{{currentClass}}</td>
+				{{#if result}}
+					{{#each result}}
+					<td>
+						
+							{{class}} | {{term}} | {{session}}
+						
+					</td>
+					{{/each}}
+				{{else}}
+					<td>Not avail</td>
+					
+
+				{{/if}}
+				<td style="text-align: center;">
+				
+				<a href="/result/view/{{studentId}}" class="btn btn-info"><span class="fa fa-info"></span> View Results</a> ||
+
+				<a href="{{pathFor '/result/new'}}" class="addResult btn btn-info"><span class="fa fa-plus"></span> Add result</a>
+				</td>
+
+			</tr>
+
+		{{/each}}
+		</table>
+
+	{{else}}
+		{{> spinner}}
+
+
+	{{/if}}
+	{{/if}}
+	
+</template>
+
+<template name="singleResult">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+				
+				{{#with studentInfo}}
+
+					<h2>{{firstName}}, {{lastName}} {{otherName}} result</h2>
+					<hr style="border-bottom: 3px dashed #abcdef;"/>
+					
+					<form class='searchResult'>
+						
+						<select name="class">
+						{{#if availableClass}}
+							{{#each availableClass}}	
+									<option value="{{this}}">{{this}}</option>
+							{{/each}}
+						{{/if}}
+
+						</select>
+
+						<select name="term">
+							<option value="1">1st term</option>
+							<option value="2">2nd term</option>
+							<option value="3">3rd term</option>
+							
+						</select>
+						
+						<input type="submit" class="btn btn-primary" name="submit" value="Show result">
+
+					</form>
+
+					<table class="table table-striped">
+						<tr>
+							<td><strong>First Name</strong></td>
+							<td>{{firstName}}</td>
+							<td><strong>Other Name(s)</strong></td>
+							<td>{{lastName}} {{otherName}}</td>
+							<td rowspan="3" style="border: 1px solid black">
+								<img src="http://localhost:3000/student10.png" alt="{{studentId}} passport">
+
+							</td>
+						</tr>
+						<tr>
+							<td><strong>Student ID</strong></td>
+							<td>{{studentId}}</td>
+							<td><strong>Email</strong></td>
+							<td>{{email}}</td>
+						</tr>
+						<tr>
+							<td><strong>Current Class</strong></td>
+							<td>{{currentClass}}</td>
+							<td><strong>Current Term</strong></td>
+							<td>{{currentTerm}}</td>
+						</tr>
+						
+					</table>
+					{{/with}}<!-- end first student Info -->
+				{{#if singleRes}}
+					{{#with singleRes}}
+						<h2>Result details</h2>
+						<table class="table table-striped">
+
+							<tr>
+								<td><strong>Class</strong></td> <td>{{class}}</td>
+								<td><strong>Term</strong></td> <td>{{term}}</td>
+								<td><strong>Session</strong></td><td>{{session}}</td>
+							</tr>
+
+						</table>
+
+						<table class="table table-striped serial">
+							<tr>
+								<th>S/N</th>
+								<th>Subjects</th>
+								<th>CA</th>
+								<th>Exam</th>
+								<th>Total</th>
+								<th>Grade</th>
+								<th>Remark</th>
+
+							</tr>
+
+							{{#if english}}
+							<tr>
+								<td></td>
+								<td>English Language</td>
+								<td>{{english.ca}}</td>
+								<td>{{english.exam}}</td>
+								<td>{{english.total}}</td>
+								<td>{{english.grade}}</td>
+								<td>{{english.remark}}</td>
+							</tr>
+							{{/if}}
+
+
+							{{#if mathematics}}
+							<tr>
+								<td></td>
+								<td>Mathematics</td>
+								<td>{{mathematics.ca}}</td>
+								<td>{{mathematics.exam}}</td>
+								<td>{{mathematics.total}}</td>
+								<td>{{mathematics.grade}}</td>
+								<td>{{mathematics.remark}}</td>
+							</tr>
+							{{/if}}
+
+							{{#if physics}}
+							<tr>
+								<td></td>
+								<td>Physics</td>
+								<td>{{physics.ca}}</td>
+								<td>{{physics.exam}}</td>
+								<td>{{physics.total}}</td>
+								<td>{{physics.grade}}</td>
+								<td>{{physics.remark}}</td>
+							</tr>
+
+
+							{{/if}}
+
+
+							{{#if chemistry}}
+							<tr>
+								<td></td>
+								<td>Chemistry</td>
+								<td>{{chemistry.ca}}</td>
+								<td>{{chemistry.exam}}</td>
+								<td>{{chemistry.total}}</td>
+								<td>{{chemistry.grade}}</td>
+								<td>{{chemistry.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+							{{#if biology}}
+							<tr>
+								<td></td>
+								<td>Biolog</td>
+								<td>{{biology.ca}}</td>
+								<td>{{biology.exam}}</td>
+								<td>{{biology.total}}</td>
+								<td>{{biology.grade}}</td>
+								<td>{{biology.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+
+							{{#if account}}
+							<tr>
+								<td></td>
+								<td>Accounting</td>
+								<td>{{account.ca}}</td>
+								<td>{{account.exam}}</td>
+								<td>{{account.total}}</td>
+								<td>{{account.grade}}</td>
+								<td>{{account.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+
+							{{#if commerce}}
+							<tr>
+								<td></td>
+								<td>Commerce</td>
+								<td>{{commerce.ca}}</td>
+								<td>{{commerce.exam}}</td>
+								<td>{{commerce.total}}</td>
+								<td>{{commerce.grade}}</td>
+								<td>{{commerce.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+							{{#if economics}}
+							<tr>
+								<td></td>
+								<td>Economics</td>
+								<td>{{economics.ca}}</td>
+								<td>{{economics.exam}}</td>
+								<td>{{economics.total}}</td>
+								<td>{{economics.grade}}</td>
+								<td>{{economics.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+							{{#if literature}}
+							<tr>
+								<td></td>
+								<td>Literature</td>
+								<td>{{literature.ca}}</td>
+								<td>{{literature.exam}}</td>
+								<td>{{literature.total}}</td>
+								<td>{{literature.grade}}</td>
+								<td>{{literature.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+							{{#if government}}
+							<tr>
+								<td></td>
+								<td>Government</td>
+								<td>{{government.ca}}</td>
+								<td>{{government.exam}}</td>
+								<td>{{government.total}}</td>
+								<td>{{government.grade}}</td>
+								<td>{{government.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+
+							{{#if geography}}
+							<tr>
+								<td></td>
+								<td>Geography</td>
+								<td>{{geography.ca}}</td>
+								<td>{{geography.exam}}</td>
+								<td>{{geography.total}}</td>
+								<td>{{geography.grade}}</td>
+								<td>{{geography.remark}}</td>
+							</tr>
+
+							
+							{{/if}}
+							
+							{{#with studentInfo}}
+
+							<tfoot><a href="/result/edit/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></tfoot>
+							
+							{{/with}}
+
+						</table>
+
+
+							
+					{{/with}}
+
+				{{else}}
+					<p style="font-size: 2em; text-align: center;">No result found for the current class and term!</p>
+				{{/if}}
+			
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+
+
+</template>
+
+
+<template name="updateResult">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+
+			{{#if resultFor}}
+				{{#with resultFor}}
+					<h3>Adding Result for:</h3>
+					<table style="margin: 5px auto;">
+						<tr>
+							<td><strong>Name:</strong></td> <td><strong>{{name}}</strong></td>
+							<td><strong>Student ID:</strong></td> <td><strong>{{studentId}}</strong></td>
+							<td rowspan="2"><img src="http://localhost:3000/student10.png" alt="{{studentId}} passport"></td>
+						</tr>
+						<tr>
+							<td><strong>Class:</strong></td> <td><strong>{{currentClass}}</strong></td>
+							<td><strong>Term:</strong></td> <td><strong>{{term}}</strong></td>
+						</tr>
+					</table>
+
+				{{/with}}
+
+			{{else}}
+				<p>No student is selected for this result. How did you get here?</p>
+
+			{{/if}}
+
+		{{> quickForm schema="g.Schemas.ResultArray" id="updateResult" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+</template>
+
+<template name="editResult">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			{{#if resultToEdit}}
+
+			<h3>Student details</h3>
+				{{#with studentInfo}}
+					<table style="margin: 5px auto;">
+						<tr>
+							<td><strong>Name:</strong></td> <td><strong>{{lastName}}, {{firstName}} {{otherName}}</strong></td>
+							<td><strong>Student ID:</strong></td> <td><strong>{{studentId}}</strong></td>
+							<td rowspan="2"><img src="http://localhost:3000/student10.png" alt="{{studentId}} passport"></td>
+						</tr>
+						<tr>
+							<td><strong>Class:</strong></td> <td><strong>{{currentClass}}</strong></td>
+							<td><strong>Term:</strong></td>
+							<td><strong>{{currentTerm}}</strong></td>
+						</tr>
+					</table>
+
+				{{/with}}
+				{{#with resultToEdit}}
+					<h3>Update result for</h3>
+					<table>
+						<tr>
+						<td><strong>Class</strong></td>
+						<td>{{class}}</td>
+						<td><strong>Term</strong></td>
+						<td>{{term}}</td>
+
+						</tr>
+					</table>
+
+				{{/with}}
+
+
+			{{> quickForm type="normal" id="editResult" schema="g.Schemas.ResultArray" collection="g.Results" doc=resultToEdit template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+			
+			{{else}}
+				<h3>No result to edit</h3>
+			{{/if}}
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+</template>
+
+<!-- Result Ended -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- Payments templates begin -->
+
+
+<template name="paymentList">
+	{{#if isInRole 'admin, editor, staff'}}
+	{{#if Template.subscriptionsReady}}
+		<form class="filter">
+			<input type="text" name="name" placeholder="name">	
+			<input type="text" name="studentId" placeholder="student Id">
+			<select name='class'>
+				<option selected disabled>select class</option>
+				<option>JSS1</option>
+				<option>JSS2</option>
+				<option>JSS3</option>
+				<option>SSS1</option>
+				<option>SSS2</option>
+				<option>SSS3</option>
+			</select>
+			<input type="submit" name="submit" value="Search for payment" class="btn btn-primary">
+		</form>
+		<table class="serial table table-striped">
+			<tr>
+				<th>S/N</th>
+				<th>Name</th>
+				<th>Student ID</th>
+				<th>Class</th>
+				<th>Last Payment made</th>
+				<th>Action</th>
+			</tr>
+		{{#each payments}}
+
+			<tr>
+				<td></td>
+				<td>{{firstName}}, {{lastName}} {{otherName}}</td>
+				<td>{{studentId}}</td>
+				<td>{{currentClass}}</td>
+
+				{{#if payment}}
+					{{#each payment}}
+					<td>
+						
+							{{class}} | {{term}} | {{session}}
+						
+					</td>
+					{{/each}}
+				{{else}}
+					<td>Not avail</td>
+					
+
+				{{/if}}
+
+				<td style="text-align: center;">
+				<a href="/payment/view/{{studentId}}" class="btn btn-info"><span class="fa fa-info"></span> View Payments</a> || <a href="{{pathFor '/payment/new'}}" class="addPayment btn btn-primary"><span class="fa fa-plus"></span> Add payment</a>
+				</td>
+			</tr>
+
+		{{/each}}
+		</table>
+
+	{{else}}
+		{{> spinner}}
+
+	{{/if}}
+	{{/if}}
+	
+	
+</template>
+
+
+<template name="singlePayment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+				{{#with studentInfo}}
+
+					<h2>{{firstName}}, {{lastName}} {{otherName}} payments</h2>
+					<hr style="border-bottom: 3px dashed #abcdef;"/>
+					
+					<form class='searchPayment'>
+						
+						<select name="class">
+						{{#if availableClass}}
+							{{#each availableClass}}	
+									<option value="{{this}}">{{this}}</option>
+							{{/each}}
+
+						{{/if}}
+						</select>
+
+						<select name="term">
+							<option value="1">1st term</option>
+							<option value="2">2nd term</option>
+							<option value="3">3rd term</option>
+							
+						</select>
+						
+						<input type="submit" class="btn btn-primary" name="submit" value="Show payment">
+
+					</form>
+					<table class="table table-striped">
+						<tr>
+							<td><strong>First Name</strong></td>
+							<td>{{lastName}}</td>
+							<td><strong>Other Name(s)</strong></td>
+							<td>{{firstName}} {{otherName}}</td>
+							<td rowspan="3" style="border: 1px solid black">
+								<img src="http://localhost:3000/student10.png" alt="{{studentId}} passport">
+
+							</td>
+						</tr>
+						<tr>
+							<td><strong>Student ID</strong></td>
+							<td>{{studentId}}</td>
+							<td><strong>Email</strong></td>
+							<td>{{email}}</td>
+						</tr>
+						<tr>
+							<td><strong>Current Class</strong></td>
+							<td>{{currentClass}}</td>
+							<td><strong>Current Term</strong></td>
+							<td>{{currentTerm}}</td>
+						</tr>
+						
+					</table>
+					{{#if singlePay}}
+					{{#with singlePay}}
+						<h2>Result details</h2>
+						<table class="table table-striped">
+							<tr>
+								<td><strong>Class</strong></td> <td>{{class}}</td>
+								<td><strong>Term</strong></td> <td>{{term}}</td>
+								<td><strong>Session</strong></td><td>{{session}}</td>
+							</tr>
+
+						</table>
+
+						<table class="table table-striped serial">
+							<tr>
+								<th>S/N</th>
+								<th>Subjects</th>
+								<th>CA</th>
+								<th>Exam</th>
+								<th>Total</th>
+								<th>Grade</th>
+								<th>Remark</th>
+
+							</tr>
+							<tfoot><a href="/payment/edit/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> Edit</a></tfoot>
+							
+
+						</table>
+
+
+							
+					{{/with}}
+
+				{{else}}
+					<p style="font-size: 2em; text-align: center;">No payment found for the current class and term!</p>
+				{{/if}}
+			{{/with}}
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+	
+</template>
+
+<template name="updatePayment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+
+			{{#if paymentFor}}
+				{{#with paymentFor}}
+					<h3>Making payment for:</h3>
+					<table style="margin: 5px auto;">
+						<tr>
+							<td><strong>Name:</strong></td> <td><strong>{{name}}</strong></td>
+							<td><strong>Student ID:</strong></td> <td><strong>{{studentId}}</strong></td>
+							<td rowspan="2"><img src="http://localhost:3000/student10.png" alt="{{studentId}} passport"></td>
+						</tr>
+						<tr>
+							<td><strong>Class:</strong></td> <td><strong>{{currentClass}}</strong></td>
+							<td><strong>Term:</strong></td> <td><strong>{{term}}</strong></td>
+						</tr>
+					</table>
+
+				{{/with}}
+			{{else}}
+				<p>No student is selected for this payment. How did you get here?</p>
+			{{/if}}
+			<form>
+				<select name="paymentCat">
+					{{#each paymentCategory}}
+						<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+				<button type="submit">Create receipt</button>
+			</form>
+
+			{{#if defaultPayment}}
+				{{#with defaultPayment}}
+					{{term}}
+					{{paymentCategory}}
+				{{/with}}
+			{{else}}
+				<p>Select a payment category above and create a receipt</p>
+			{{/if}}
+		
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+	
+</template>
+
+<template name="editPayment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<!-- Payments templates end -->
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+
+<template name="assignmentList">
+	{{#if isInRole 'admin, editor, staff'}}
+		<h2>Assignment list</h2>
+		<p> <a href="{{pathFor '/assignment/new'}}" class="btn btn-primary"><span class="fa fa-plus"></span> Create new</a> </p>
+		{{#if Template.subscriptionsReady}}
+			<form class="form-inline">
+				<div class="form-group">
+					<select name='class' class="form-control">
+						<option>JSS1</option>
+						<option>JSS2</option>
+						<option>JSS3</option>
+						<option>SSS1</option>
+						<option>SSS2</option>
+						<option>SSS3</option>
+					</select>
+					<select name="subject" class="form-control">
+						<option value="English">Englis Language</option>
+						<option value="Mathematics">Mathematics</option>
+						<option value="Physics">Physics</option>
+						<option value="Chemistry">Chemistry</option>
+						<option value="Biology">Biology</option>
+						<option value="Geography">Geography</option>
+						<option value="Economics">Economics</option>
+						<option value="Computer">Computer Science</option>
+						<option value="Agric">Agric Science</option>
+						<option value="Civic">Civic Education</option>
+						<option value="Commerce">Commerce</option>
+						<option value="Accounting">Accounting</option>
+						<option value="Government">Government</option>
+					</select>
+					<button class="btn btn-primary">Filter Assignment</button>
+				</div>
+			</form> <br/>
+			{{#if assignments}}
+				{{#each assignments}}
+					<div class="row assignmentList">
+								<div class="col-md-2 col-sm-2 col-xs-12 badge">
+									<h4>{{class}}</h4>
+									<p>{{subject}}</p>
+								</div>
+								<div class="col-md-10 col-sm-10 col-xs-12">
+									<h4><a href="assignment/view/{{_id}}">{{title}}</a> [{{answerCount}} Answer(s)]
+									{{#if validity}}
+										<i class="label label-danger">Expired</i>
+									{{/if}}
+								</h4>
+									<span><strong>Start: </strong>{{startDate}}</span>
+									<span><strong>Due date: </strong>{{endDate}}</span>
+									<span><strong>Max score: </strong>{{totalScore}}</span>
+								</div>
+					</div><hr/>
+				{{/each}}
+
+			{{else}}
+				<p>No assignment found</p>
+			{{/if}}
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}
+	
+	
+</template>
+
+<template name="singleAssignment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			<div class="assignment">
+				{{#with assignment}}
+					<h3><span>{{title}}</span></h3><hr/>
+					<article>
+						<h3>Question</h3>
+						<p>{{content}}</p>
+
+						<span><strong>Class:</strong> {{class}}</span>
+						<span><strong>Subject:</strong> {{subject}}</span>
+						<span><strong>Mark:</strong> {{totalScore}}</span>
+						<span><strong>Start date:</strong> {{startDate}}</span>
+						<span><strong>End date:</strong> {{endDate}}</span><br/>
+						<p>
+							Posted by: 
+							{{#if isInRole 'admin, editor'}}
+								<strong>
+								<a href="/staff/view/{{staffId}}">{{author}}</a>
+								</strong>
+							{{else}}
+								<strong>{{author}}</strong>
+							{{/if}}
+						</p>
+						{{#if canEdit}}
+						<p style="float: right;">
+							<span title="click to modify this assignment">
+								<a href="/assignment/edit/{{_id}}">Edit</a>
+							</span>
+						</p><br/>
+						{{else}}
+						<p style="float: right;">
+							<span title="You cannot edit this assignment" class="fa fa-ban fa-1x">
+								 Edit
+							</span>
+						</p>
+						{{/if}}
+						<p>
+							{{#if answerCount}} 
+								<strong>{{answerCount}} answer(s) submitted </strong>
+							{{else}} 
+								No answer
+								{{/if}}
+						</p>
+
+						{{#if answerList}}
+							<h3>Answers</h3><hr/>
+							{{#each answerList}}
+								<div class="answer">
+									<p>
+										<strong>{{fullName}}</strong>
+										<p>{{text}}</p>
+										{{#if score}}
+											<span><strong>Score: </strong>{{score}} / {{assignment.totalScore}}</span> <i class="fa fa-check fa-2x" style="color: green;"></i>&nbsp;&nbsp;<span><strong>Comment: </strong></span><content class="text-danger">{{comment}}</content>
+										{{else}}
+											{{#if assignment.canEdit}}
+											<form class="form-group">
+
+												<label>Award score: </label>
+												<input type="number" max="{{assignment.totalScore}}" min="0" name="score" placeholder="score this answer" required=""> 
+												<input type="text" name="comment" placeholder="comment">
+
+												
+												<button type="submit" class="btn btn-default">Add score &amp; comment</button>
+												<div style="display: none;">
+													<div style="display: none;">
+														<p style="display: none;">
+															<input type="hidden" name="id" value="{{assignment._id}}" style="display: none;">
+														</p>
+													</div>
+												</div>
+											</form>
+
+											{{else}}
+												<p class="text-info"><small>Not yet marked by the teacher</small></p>
+											{{/if}}
+										{{/if}}
+										<span><strong>Submitted on: </strong>{{date}}</span>
+										</p>
+								</div><hr/>
+							{{/each}}
+						{{/if}}
+					</article>
+
+				{{/with}}
+			</div>
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<template name="createAssignment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			<h2>New assignment</h2> <br/>
+			
+			{{#autoForm schema="g.Schemas.Assignment" id="createAssignment" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+				{{> afQuickField name="title"}}
+				{{> afQuickField name="content"}}
+				{{> afQuickField name="class" options="allowed" firstOption="Class"}}
+				{{> afQuickField name="subject" options="allowed" firstOption="Subject"}}
+				{{> afQuickField name="totalScore"}}
+				{{> afQuickField name="startDate"}}
+				{{> afQuickField name="endDate" buttonClasses="glyphicon glyphicon-calendar"}}
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Create</button>
+				</div>
+
+			{{/autoForm}}
+		
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<template name="editAssignment">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			<h2>Edit assignment</h2> <br/>
+			
+			{{#autoForm schema="g.Schemas.Assignment" id="editAssignment" type="normal" afFieldInput-placeholder="schemaLabel" doc=assignmentToEdit validation='blur'}}
+				{{> afQuickField name="title"}}
+				{{> afQuickField name="content"}}
+				{{> afQuickField name="subject" options="allowed" firstOption="Subject"}}
+				{{> afQuickField name="class"}}
+				{{> afQuickField name="totalScore"}}
+				{{> afQuickField name="startDate"}}
+				{{> afQuickField name="endDate" buttonClasses="glyphicon glyphicon-calendar"}}
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Update</button>
+				</div>
+
+			{{/autoForm}}
+		
+
+		
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<template name='messages'>
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+		<div class="messages">
+			<h2>Messages</h2><hr/><br/>
+		<!-- Nav tabs -->
+			  <ul class="nav nav-tabs" role="tablist">
+			    <li role="presentation" class="active">
+			    	<a href="#inbox" aria-controls="inbox" role="tab" data-toggle="tab">Inbox Messages</a>
+			    </li>
+			    <li role="presentation">
+			    	<a href="#sent" aria-controls="sent" role="tab" data-toggle="tab">Sent Messages</a>
+			    </li>
+			    <li role="presentation">
+			    	<a href="#draft" aria-controls="draft" role="tab" data-toggle="tab">Draft Message</a>
+			    </li>
+			    <li role="presentation">
+			    	<a href="#newMessage" aria-controls="newMessage" role="tab" data-toggle="tab">Compose New</a>
+			    </li>
+			  </ul>
+
+
+
+			 <div class="tab-content">
+			    <div role="tabpanel" class="tab-pane fade in active" id="inbox">
+			  	
+			    	{{> messageList}}
+
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="sent">
+			    	
+			    	{{> createMessage}}
+
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="draft">
+			    	
+			    	{{> editMessage}}
+
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="newMessage">
+			    	
+			    	{{> createMessage}}
+
+			    </div>
+			 </div>
+		 </div>
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+
+</template>
+
+<template name="messageList">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			<h3>Inbox messages</h3>
+			
+
+		{{else}}
+			{{> spinner}}
+
+		{{/if}}
+
+	{{/if}}
+</template>
+
+
+<template name="singleMessage">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+
+			<h1>Single Message</h1>
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<template name="createMessage">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			
+			<h3>Compose new message</h3>
+			<div class="alert alert-info alert-dismissible" role='alert'>
+			
+			<button type="button" class="close" data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+				Please Note: 
+					<ul>
+						<li>
+						Select staff(s) to send a message, 
+						<strong>hold ctrl key to select multiple staff.</strong>
+						</li>
+						<li>
+							Select class(es) of students to send a message, 
+							<strong>select multiple boxes to send message to different classes.</strong>
+						</li>
+						<li>
+							If message is to be sent a single student, <a href="{{pathFor 'studentList'}}" class="alert-link">open student</a> details and click on <strong>send message</strong>.
+						</li>
+					</ul>
+			</div>
+			<form>
+				<div class="form-group">
+					<label for="staff">Staff (<small>if message is for staff</small>)</label><br/>
+					<select name="staff" class="form-control msgStaff" multiple="true">
+						{{#each staff}}
+							<option value="{{meteorIdInStaff}}">{{lastName}}, {{firstName}} {{otherName}}</option>
+						{{/each}}
+					</select>
+				</div>
+				
+
+				<div id="msgClass">
+					<label>Class of students (<small>if message is for one or more classes</small>)</label> <br/>
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="JSS1">JSS1
+					</label>
+
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="JSS2">JSS2
+					</label>
+
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="JSS3">JSS3
+					</label>
+
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="SSS1">SSS1
+					</label>
+
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="SSS2">SSS2
+					</label>
+
+					<label class="checkbox-inline">
+						<input type="checkbox" name="class" value="SSS3">SSS3
+					</label>
+
+				</div><br/>
+				<div class="form-group">
+					<label for="title">Title</label><br/>
+					<input type="text" name="title" class="form-control" required placeholder="Title of the message">
+				</div>
+				<div class="form-group">
+					<label for="content">Message body</label><br/>
+					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body"></textarea>
+				</div>
+
+				<button type="submit" class="btn btn-primary">Send message</button>
+				<button type="button" class="btn btn-danger">Save to draft</button>
+			</form><br/>
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+<template name="editMessage">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+
+			<h1>Edit Message</h1>
+
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+
+
+<template name="feedbackList">
+	{{#if isInRole 'admin'}}
+		{{#if Template.subscriptionsReady}}
+
+
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+
+<template name="singleFeedback">
+	{{#if isInRole 'admin'}}
+		{{#if Template.subscriptionsReady}}
+
+
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+
+
+<template name="createFeedback">
+	{{#if isInRole 'admin'}}
+		{{#if Template.subscriptionsReady}}
+
+		
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+
+	{{/if}}
+	
+	
+</template>
+
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+<!-- *************Break Break Break************* -->
+
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+<!-- ******************************************* -->
+
+
+
+
+
+

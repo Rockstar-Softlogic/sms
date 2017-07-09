@@ -1,0 +1,209 @@
+
+<!--Template for all Authenticated Users -->
+
+<template name="privateNav">
+	
+		<aside id="privateNav">
+
+						<div>
+							<a href="{{pathFor '/dashboard'}}">
+							<i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+
+						</div>
+
+						{{#if isInRole 'admin'}}
+						<div> 
+						<a href="http://localhost:3000/admin">
+							<i class="fa fa-user-secret"></i><span>Admin</span></a>
+
+						</div>
+						
+						<div> 
+						<a href="{{pathFor '/editor'}}">
+							 <i class="fa fa-user-plus"></i><span>Editor</span></a>
+						</div>
+
+						{{/if}}
+						{{#if isInRole 'admin, editor'}}
+						<div> 
+						<a href="{{pathFor '/staff'}}">
+							<i class="fa fa-group"></i><span>Staff</span></a>
+						</div>
+						
+						<div> 
+						<a href="{{pathFor '/student'}}">
+							<i class="fa fa-users"></i><span>Students</span></a>
+						</div>
+						<div> 
+						<a href="{{pathFor '/student'}}">
+							<i class="fa fa-users"></i><span>Bulk SMS</span></a>
+						</div>
+						{{/if}}
+						{{#if isInRole 'admin, editor, staff'}}
+						<div> 
+							<a href="{{pathFor '/result'}}"><i class="fa fa-check-square"></i><span>Results</span></a> 
+						</div>
+						<div> 
+							<a href="{{pathFor '/payment'}}"><i class="fa fa-cc-mastercard"></i><span>Payments</span></a> 
+						</div>
+						
+						<div> 
+							<a href="{{pathFor '/assignment'}}"><i class="fa fa-book"></i><span>Assignments</span></a>
+						</div>
+						
+						<div> 
+							<a href="{{pathFor '/message'}}"><i class="fa fa-envelope"></i><span>Messages</span></a>
+						</div>
+						<div> 
+							<a href="{{pathFor '/feedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a>
+						</div>
+
+					
+						{{/if}}
+		</aside>
+
+
+
+</template>		
+
+<template name="stNav">
+	
+		<aside id="stNav">
+
+						<div>
+							<a href="{{pathFor 'stDashboard'}}">
+							<i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+
+						</div>
+							{{#if isInRole 'student'}}
+						<div> 
+							<a href="{{pathFor 'stResult'}}"><i class="fa fa-check-square"></i><span>Results</span></a> 
+						</div>
+						<div> 
+							<a href="{{pathFor 'stPayment'}}"><i class="fa fa-cc-mastercard"></i><span>Payments</span></a> 
+						</div>
+						
+						<div> 
+							<a href="{{pathFor 'stAssignment'}}"><i class="fa fa-book"></i><span>Assignments</span></a>
+						</div>
+						
+						<div> 
+							<a href="{{pathFor 'stMessage'}}"><i class="fa fa-envelope"></i><span>Messages</span></a>
+						</div>
+						<div> 
+							<a href="{{pathFor 'stFeedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a>
+						</div>
+
+					
+						{{/if}}
+		</aside>
+
+
+
+</template>		
+
+<!-- Private Area rendering layout -->
+
+<template name="dashboard">
+	<div class="container-fluid" id="dashboard">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 col-sm-12">
+ 				{{> header}}
+			</div>
+		</div>
+			{{#if currentUser}}
+				{{#if isInRole 'admin, editor, staff'}}
+					<div id="privateContent" class="row">
+					
+						<div class="col-md-2 col-sm-2 col-xs-4">
+							{{> privateNav}}
+						</div>
+
+						<section class="col-md-10 col-sm-10 col-xs-8 mainContent">
+							<div class="insertNotice"></div>
+							{{> Template.dynamic template=content}}
+						</section>
+		
+					</div>		 
+				{{/if}}
+			{{else}}
+				<p> Please <a href="login">sign in here</a> </p>
+			{{/if}}
+			
+		<div class="row">
+			<div class="col-md-12 col-xs-12 col-sm-12">
+				{{> footer}}
+			</div>
+		</div>
+		
+		
+	</div>
+</template>
+
+<!-- Logged in student area -->
+<template name="stDashboard">
+	<div class="container-fluid" id="stDashboard">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 col-sm-12">
+				{{> header}}
+			</div>
+		</div>
+			{{#if currentUser}}
+				{{#if Template.subscriptionsReady}}
+				{{#if isInRole 'student'}}	
+					<div id="stPrivateContent" class="row">
+					
+						<div class="col-md-2 col-sm-2 col-xs-5">
+							{{> stNav}}
+						</div>
+
+						<section class="col-md-10 col-sm-10 col-xs-7 mainContent">
+							<div class="insertNotice"></div>
+							
+					{{#with studentInfo}}
+						<h4>Welcome {{lastName}} {{firstName}}</h4>
+					{{/with}}
+						<hr/>
+							<div class="row">
+								<div class="col-md-8 col-sm-8 col-xs-12">
+									{{> Template.dynamic template=content}}
+								</div>
+					{{#with studentInfo}}
+							
+								<div class="col-md-4 col-sm-4 col-xs-12" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
+									<div class="passport" style="text-align: center;">
+										<img src="http://localhost:3000/student10.png" alt="{{lastName}} {{firstName}} passport">
+										<p><strong>{{studentId}}</strong></p>
+									</div><hr/>
+									<div>
+										<p><a href="#">Assignments</a></p><hr/>
+										<p><a href="#">Subjects</a></p><hr/>
+										<p><a href="#">Messages</a></p><hr/>
+										<p><a href="#">Send feedback</a></p><hr/>
+									</div>
+								</div>
+					{{/with}}
+							</div>
+					
+						</section>
+		
+					</div>		 
+				{{/if}}
+				{{else}}
+					<p>Loading...</p>
+				{{/if}}
+			{{else}}
+				<p> Please <a href="login">sign in here</a> </p>
+			{{/if}}
+			
+		<div class="row">
+			<div class="col-md-12 col-xs-12 col-sm-12">
+				{{> footer}}
+			</div>
+		</div>
+		
+		
+	</div>
+
+
+</template>

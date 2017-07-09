@@ -1,0 +1,50 @@
+
+//navigation for Logged in users
+
+//left and right rules for private area /authenticated users
+$auth-nav: #4e4442;
+$auth-nav-icon: #283c59;
+
+body{
+	background-color: white !important;
+}
+
+#privateContent{
+	background-color: white;
+}
+
+section.mainContent{
+	margin-top: 70px;
+	z-index: 1;
+	min-height: 100vh;
+}
+	//navigation rules
+	aside#privateNav, aside#stNav{
+		position: fixed;
+		height: 100vh;
+		margin-top: 50px;
+		background-color: $auth-nav;
+		z-index: 99;
+				div{
+					
+					padding: 5px;
+					a{
+						display: block;
+						color: #ffffff;
+						margin: 5px 0;
+						i{
+							font-size: 14px;
+							color: white;
+
+							margin: 5px;
+						}
+						span{
+							margin: 5px;
+							font-size: 16px;
+						}
+
+					}
+				}
+			
+
+		}//navigation rule ended
