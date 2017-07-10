@@ -13,14 +13,14 @@
 
 						{{#if isInRole 'admin'}}
 						<div> 
-						<a href="http://localhost:3000/admin">
-							<i class="fa fa-user-secret"></i><span>Admin</span></a>
+						<a href="{{pathFor '/admin'}}">
+							<i class="fa fa-user-secret"></i><span>Settings</span></a>
 
 						</div>
 						
 						<div> 
 						<a href="{{pathFor '/editor'}}">
-							 <i class="fa fa-user-plus"></i><span>Editor</span></a>
+							 <i class="fa fa-user-plus"></i><span>Admin</span></a>
 						</div>
 
 						{{/if}}
