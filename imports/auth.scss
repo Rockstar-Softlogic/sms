@@ -32,6 +32,7 @@ section.mainContent{
 						display: block;
 						color: #ffffff;
 						margin: 5px 0;
+						text-decoration: none;
 						i{
 							font-size: 14px;
 							color: white;
@@ -44,6 +45,10 @@ section.mainContent{
 						}
 
 					}
+				}
+				div:hover{
+					background-color: #df421e;
+					background-color: rgba(223, 66, 30, 0.9); //#df421e
 				}
 			
 

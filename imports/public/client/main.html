@@ -3,25 +3,43 @@
 		
 				<header id="header">
 					<div class="row">
-						<div class="col-sm-3 col-md-3">
-							<div class="logo">
-								<img src="http://localhost:3000/logo.jpg" alt="school logo" style="max-width: 50px">
-							</div>
+						<div class="col-md-8">
+						
+								<div class="logo col-md-3">
+									<img src="/logo.jpg" alt="school logo" style="max-width: 50px">
+								</div>
+
+								<div class="col-md-9">
+									<h4>School Management Systems</h4>
+								</div>	
 						</div>
-						<div class="col-sm-7 col-md-7">
-							<p>Navigation</p>
-						</div>
-						<div class="col-sm-2 col-md-2">
-							
-							<p>{{> loginButtons}}</p>
+						<div class="col-md-4">
+						{{#if currentUser}}
+							 {{#with user}}
+								<button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="text-default">{{emails.[0].address}}</span>
+									<span class="caret"></span>
+									<span class="sr-only">Toggle Dropdown</span>
+								 </button>
+								  <ul class="dropdown-menu">
+								    <li><a href="#">{{username}}</a></li>
+								    <li><a href="/profile">My profile</a></li>
+								    <li role="separator" class="divider"></li>
+								    <li id="header-logout" title="Sign out"><a href="#">Logout</a></li>
+
+								  </ul>
+
+								
+							 {{/with}}
+						{{else}}
+							<a href="/login" class="btn btn-default btn-xs">Sign In</a>
+						{{/if}}
 						</div>
 					</div>
 				</header>
 			
 		
 </template>
-
-
 
 <template name="publicNav">
 	
@@ -45,12 +63,32 @@
 </template>
 
 
-<template name="home">
-	<section style="margin-top: 70px; ">
-
-		<h1>Welcome to the School Management Systems</h1>
-
-		<p>This is the home page</p>
+<template name="contact">
+	<section style="margin-top: 70px;" class="col-md-6 center-block" id="contact-form">
+	    <div class="form-area">  
+	        <form role="form">
+	        <br style="clear:both">
+	                    <h3 style="margin-bottom: 25px; text-align: center;">Contact Form</h3>
+	    				<div class="form-group">
+							<input type="text" class="form-control" id="name" name="name" placeholder="Name" minlength="5" maxlength="30" required>
+						</div>
+						<div class="form-group">
+							<input type="email" class="form-control" id="email" name="email" placeholder="Email" minlength="8" required>
+						</div>
+						<div class="form-group">
+							<input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile Number" maxlength="15" minlength="8" required>
+						</div>
+						<div class="form-group">
+							<input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" minlength="5" maxlength="100" required>
+						</div>
+	                    <div class="form-group">
+	                    	<textarea class="form-control" type="textarea" id="message" placeholder="Message" minlength="50" maxlength="1500" rows="7"></textarea>                    
+	                    </div>
+	            
+	        			<button type="button" id="cancel" class="btn btn-danger pull-left">Cancel</button>
+	       				<button type="submit" id="submit" name="submit" class="btn btn-primary pull-right">Submit Form</button>
+	        </form>
+	    </div>
 	</section>
 
 
@@ -58,15 +96,141 @@
 	
 
 
-<template name="footer">
+<!-- begin template for login page -->
 
-	<footer style = "padding: 1em;">
-		<div class="row">
-			<div class="col-xs-12 col-sm-7 col-md-7">
-				<p>terms and conditions</p>
+<template name="login">
+		<section style="padding-top: 5em;">
+			<h2 class="text-center text-primary">School Management Systems Demo</h2>
+			<div class="row">
+				<div class="col-md-7">
+					<h3 class="text-center">Usage Instruction</h3>
+					<div style="width:100%; margin-left: 30px; padding: 2em;">
+						
+						<p><strong>Admin</strong><br/>
+						
+							Email Address: admin@gmail.com <br/>
+							Password: @012345#
+						</p>
+						
+
+						<p><strong>Staffs</strong><br/>
+							Email Address: staff1@gmail.com, staff2@gmail.com, staff3@gmail.com <br/>
+							Password: @012345# (combine with any staff email)
+						</p>
+						
+						<p><strong>Students</strong><br/>
+							Email Address: student1@gmail.com, student2@gmail.com, student3@gmail.com <br/>
+							Password: @012345# (combine with any student email address)
+
+						</p>
+					</div>
+					
+				</div>
+				<div class="col-md-5">
+					{{#if currentUser}}
+						<h3>You're logged in.</h3>
+						{{#if isInRole 'admin, editor, staff'}}
+							<p>
+								<a href="/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+								<a href="/profile" class="btn btn-primary btn-lg">My Profile</a>	
+
+							</p>
+							
+						{{else}}
+							{{#if isInRole 'student'}}
+								<p>
+									<a href="/st/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+									<a href="/st/profile" class="btn btn-primary btn-lg">My Profile</a>
+								</p>
+							{{else}}
+								{{> notFound}}
+							{{/if}}
+						{{/if}}
+			          	<p>
+			          		<button class="btn btn-danger btn-lg" id="logout">Logout</button>
+			          		<a href="/contact" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-envelope"></span> Support</a> 
+			          	</p>
+			        {{else}}
+			        	 <form class="login-form">
+			                <div class="panel panel-default">
+			                    <div class="panel-heading">
+			                        <h3>User Login</h3>
+			                    </div>
+			                    <div class="panel-body">
+			                    	
+			                   		<h4 id="login-error" class="text-danger text-center" style="display: none;"></h4>
+			          				<p style="display: none;" id="loggingIn">
+			          					{{> smsLoading}}
+			          				</p>
+			                        <div class="form-group">
+			                            <label>Email</label>
+			                            <input type="email"  class="form-control" id="email" value="" placeholder="Email address" required>
+			                        </div>
+			                        <div class="form-group">
+			                            <label>Password</label>
+			                            <input type="password" name="" class="form-control" id="password" value="" placeholder="Password" required>
+			                        </div>
+			                    </div>
+			                    <div class="panel-footer">
+			                        <button type="submit" id="btn-login" class="btn btn-danger btn-lg">Login</button>
+			                    </div>
+			                </div>
+			            </form>
+			        {{/if}}
+
+				</div>
 			</div>
-			<div class="col-xs-12 col-sm-5 col-md-5">
-				<p>copyright</p>
+		</section>
+</template>
+
+<!-- End template for login page -->
+
+<template name="smsLoading">
+		 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+		     width="40px" height="50px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+		    <rect x="0" y="13" width="4" height="5" fill="#333">
+		      <animate attributeName="height" attributeType="XML"
+		        values="5;21;5" 
+		        begin="0s" dur="0.6s" repeatCount="indefinite" />
+		      <animate attributeName="y" attributeType="XML"
+		        values="13; 5; 13"
+		        begin="0s" dur="0.6s" repeatCount="indefinite" />
+		    </rect>
+		    <rect x="10" y="13" width="4" height="5" fill="#333">
+		      <animate attributeName="height" attributeType="XML"
+		        values="5;21;5" 
+		        begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+		      <animate attributeName="y" attributeType="XML"
+		        values="13; 5; 13"
+		        begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+		    </rect>
+		    <rect x="20" y="13" width="4" height="5" fill="#333">
+		      <animate attributeName="height" attributeType="XML"
+		        values="5;21;5" 
+		        begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+		      <animate attributeName="y" attributeType="XML"
+		        values="13; 5; 13"
+		        begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+		    </rect>
+		  </svg>
+
+
+</template>
+
+
+
+<template name="footer">
+	<footer style = "padding: 1em; color: #fff;">
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				<span>Terms and Conditions</span>
+				<span>Privacy Policy</span>
+				<span>Official page</span>
+				</p>
+			</div>
+			<div class="col-md-6">
+				<p>Copyright &copy; Lovelamp Systems &amp; Consulting Firm</p>
 			</div>
 		</div>
 
@@ -75,14 +239,29 @@
 </template>
 
 <template name="notFound">
-	<content style="height: 100px; background-color: skyblue;">
-		<h2>The resource you requested was not found</h2>
-		<p>click <a href="login">here</a> to login <br/>
-			go <a href="/">home</a> here.
-		</p>
-
-
-	</content>
 	
+	<div class="container" id="notFound">
+	    <div class="row">
+	        <div class="col-md-12">
+	            <div class="error-template">
+	                <h1>Oops!</h1>
+	                <h2>
+	                    404 Not Found</h2>
+	                <div class="error-details">
+	                    The resource you requested was not found.
+	                </div>
+	                <div class="error-actions">
+	                    <a href="/" class="btn btn-primary btn-lg">
+	                    	<span class="glyphicon glyphicon-home"></span>
+	                        Take Me Home
+	                     </a>
+	                     <a href="/contact" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-envelope"></span> Contact Support
+	                     </a> 
+	                     <a href="/login" class="btn btn-danger btn-lg">Login Page</a>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
 
 </template>

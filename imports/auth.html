@@ -13,7 +13,7 @@
 
 						{{#if isInRole 'admin'}}
 						<div> 
-						<a href="{{pathFor '/admin'}}">
+						<a href="{{pathFor '/ctrlpanel'}}">
 							<i class="fa fa-user-secret"></i><span>Settings</span></a>
 
 						</div>
@@ -32,14 +32,15 @@
 						
 						<div> 
 						<a href="{{pathFor '/student'}}">
-							<i class="fa fa-users"></i><span>Students</span></a>
-						</div>
-						<div> 
-						<a href="{{pathFor '/student'}}">
 							<i class="fa fa-users"></i><span>Bulk SMS</span></a>
 						</div>
 						{{/if}}
 						{{#if isInRole 'admin, editor, staff'}}
+						
+						<div> 
+						<a href="{{pathFor '/student'}}">
+							<i class="fa fa-users"></i><span>Students</span></a>
+						</div>
 						<div> 
 							<a href="{{pathFor '/result'}}"><i class="fa fa-check-square"></i><span>Results</span></a> 
 						</div>
@@ -53,6 +54,9 @@
 						
 						<div> 
 							<a href="{{pathFor '/message'}}"><i class="fa fa-envelope"></i><span>Messages</span></a>
+						</div>
+						<div> 
+							<a href="{{pathFor '/profile'}}"><i class="fa fa-user"></i><span>My Profile</span></a>
 						</div>
 						<div> 
 							<a href="{{pathFor '/feedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a>
@@ -91,6 +95,9 @@
 							<a href="{{pathFor 'stMessage'}}"><i class="fa fa-envelope"></i><span>Messages</span></a>
 						</div>
 						<div> 
+							<a href="{{pathFor 'stProfile'}}"><i class="fa fa-user"></i><span>My Profile</span></a>
+						</div>
+						<div> 
 							<a href="{{pathFor 'stFeedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a>
 						</div>
 
@@ -107,7 +114,7 @@
 <template name="dashboard">
 	<div class="container-fluid" id="dashboard">
 		<div class="row">
-			<div class="col-md-12 col-xs-12 col-sm-12">
+			<div class="col-md-12">
  				{{> header}}
 			</div>
 		</div>
@@ -115,13 +122,17 @@
 				{{#if isInRole 'admin, editor, staff'}}
 					<div id="privateContent" class="row">
 					
-						<div class="col-md-2 col-sm-2 col-xs-4">
+						<div class="col-md-2">
 							{{> privateNav}}
 						</div>
 
-						<section class="col-md-10 col-sm-10 col-xs-8 mainContent">
+						<section class="col-md-10 mainContent">
 							<div class="insertNotice"></div>
 							{{> Template.dynamic template=content}}
+							
+							<div class="col-md-12">
+								{{> footer}}
+							</div>
 						</section>
 		
 					</div>		 
@@ -129,22 +140,15 @@
 			{{else}}
 				<p> Please <a href="login">sign in here</a> </p>
 			{{/if}}
-			
-		<div class="row">
-			<div class="col-md-12 col-xs-12 col-sm-12">
-				{{> footer}}
-			</div>
-		</div>
-		
 		
 	</div>
 </template>
 
 <!-- Logged in student area -->
 <template name="stDashboard">
-	<div class="container-fluid" id="stDashboard">
+	<div class="container-fluid" id="stDashboard" style="min-height: 100%">
 		<div class="row">
-			<div class="col-md-12 col-xs-12 col-sm-12">
+			<div class="col-md-12">
 				{{> header}}
 			</div>
 		</div>
@@ -153,11 +157,11 @@
 				{{#if isInRole 'student'}}	
 					<div id="stPrivateContent" class="row">
 					
-						<div class="col-md-2 col-sm-2 col-xs-5">
+						<div class="col-md-2">
 							{{> stNav}}
 						</div>
 
-						<section class="col-md-10 col-sm-10 col-xs-7 mainContent">
+						<section class="col-md-10 mainContent">
 							<div class="insertNotice"></div>
 							
 					{{#with studentInfo}}
@@ -165,12 +169,12 @@
 					{{/with}}
 						<hr/>
 							<div class="row">
-								<div class="col-md-8 col-sm-8 col-xs-12">
+								<div class="col-md-8">
 									{{> Template.dynamic template=content}}
 								</div>
 					{{#with studentInfo}}
 							
-								<div class="col-md-4 col-sm-4 col-xs-12" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
+								<div class="col-md-4" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
 									<div class="passport" style="text-align: center;">
 										<img src="http://localhost:3000/student10.png" alt="{{lastName}} {{firstName}} passport">
 										<p><strong>{{studentId}}</strong></p>
@@ -185,23 +189,19 @@
 					{{/with}}
 							</div>
 					
+							<div class="col-md-12">
+								{{> footer}}
+							</div>
 						</section>
 		
 					</div>		 
 				{{/if}}
 				{{else}}
-					<p>Loading...</p>
+					{{> spinner}}
 				{{/if}}
 			{{else}}
 				<p> Please <a href="login">sign in here</a> </p>
 			{{/if}}
-			
-		<div class="row">
-			<div class="col-md-12 col-xs-12 col-sm-12">
-				{{> footer}}
-			</div>
-		</div>
-		
 		
 	</div>
 

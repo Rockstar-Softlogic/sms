@@ -14,20 +14,19 @@ function checkRole(ctx, redirect){
 FlowRouter.route('/', {
 	name: 'index',
 	action(){
-		BlazeLayout.render('publicLayout', {public: 'home'});
+		BlazeLayout.render('publicLayout', {public: 'login'});
 	}
 });
-FlowRouter.route('/home', {
+FlowRouter.route('/contact', {
 	name: 'home',
 	action(){
-		BlazeLayout.render('publicLayout', {public: 'home'});
+		BlazeLayout.render('publicLayout', {public: 'contact'});
 	}
 });
 
 
 FlowRouter.route('/login', {
 	name: 'login',
-	triggersEnter:[checkRole],
 	action(){
 		BlazeLayout.render('publicLayout', {public: 'login'});
 	}

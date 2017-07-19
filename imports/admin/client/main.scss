@@ -173,3 +173,24 @@ table.serial {
 		}
 	}
 }
+
+.inbox table.inboxMsg, .sent table.sentMsg{
+	border-collapse: collapse;
+	th{
+		border: none;
+	}
+	tr, td{
+		border: none;
+		border-bottom: 1px solid #ddd;
+		text-align: left;
+	}
+	tr{
+		background-color: #fff;
+	}
+	tr:hover{
+		background-color: #eee;
+	}
+	td{
+		padding-right: 10px;
+	}
+}

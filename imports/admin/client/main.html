@@ -1,5 +1,22 @@
+<template name="staffDashboard">
+	{{#if isInRole 'admin, staff'}}
+		{{#if Template.subscriptionsReady}}
+
+		{{else}}
+			{{> spinner}}
+		{{/if}}
+	{{/if}}	
+</template>
+
+
+<template name="profile">
+	{{#if isInRole 'admin, staff'}}
+			{{>staffProfile}}
+	{{/if}}
+</template>
+
 							
-<template name="admin">
+<template name="ctrlpanel">
 	<h4>Admin actions only!</h4>
 	{{#if isInRole 'admin'}}
 		{{#if Template.subscriptionsReady}}
@@ -237,7 +254,7 @@
 			{{#with staffInfo}}
 
 
-				<h3>Welcome {{lastName}} {{firstName}}</h3> <hr/>
+				<h3>{{lastName}} {{firstName}} {{otherName}}</h3> <hr/>
 					<div class="row">
 						<div class="col-md-8 col-sm-8 col-xs-12">
 							
@@ -246,8 +263,16 @@
 									<th colspan="2" class="customHead">Employment Data</th>
 								</tr>
 								<tr>
-									<td><strong>Name: </strong></td>
-									<td> {{lastName}}, {{firstName}} {{otherName}}</td>
+									<td><strong>Last Name: </strong></td>
+									<td> {{lastName}}</td>
+								</tr>
+								<tr>
+									<td><strong>First Name: </strong></td>
+									<td>{{firstName}}</td>
+								</tr>
+								<tr>
+									<td><strong>Other Name: </strong></td>
+									<td>{{otherName}}</td>
 								</tr>
 								<tr>
 									<td><strong>staff Id</strong></td>
@@ -427,7 +452,13 @@
 							<caption>Employment Data</caption>
 
 							<tr>
-								<td>Name</td><td>{{lastName}}, {{firstName}} {{otherName}}</td>
+								<td>Last Name</td><td>{{lastName}}</td>
+							</tr>
+							<tr>
+								<td>First Name</td><td>{{firstName}}</td>
+							</tr>
+							<tr>
+								<td>Other Name</td><td>{{otherName}}</td>
 							</tr>
 							<tr>	
 								<td>Gender</td> <td>{{gender}}</td>
@@ -810,7 +841,7 @@
 
 <template name="insertStudent">
 	
-	{{#if isInRole 'admin, editor'}}
+	{{#if isInRole 'admin, editor, staff'}}
 		{{#if Template.subscriptionsReady}}
 
 			<progress value="70" max="100"></progress>
@@ -1845,17 +1876,17 @@
 			 <div class="tab-content">
 			    <div role="tabpanel" class="tab-pane fade in active" id="inbox">
 			  	
-			    	{{> messageList}}
+			    	{{> inboxMessage}}
 
 			    </div>
 			    <div role="tabpanel" class="tab-pane fade" id="sent">
 			    	
-			    	{{> createMessage}}
+			    	{{> sentMessage}}
 
 			    </div>
 			    <div role="tabpanel" class="tab-pane fade" id="draft">
 			    	
-			    	{{> editMessage}}
+			    	{{> draftMessage}}
 
 			    </div>
 			    <div role="tabpanel" class="tab-pane fade" id="newMessage">
@@ -1873,26 +1904,132 @@
 
 </template>
 
-<template name="messageList">
+<template name="inboxMessage">
 	{{#if isInRole 'admin, editor, staff'}}
 		{{#if Template.subscriptionsReady}}
 			<h3>Inbox messages</h3>
-			
+			{{#with inboxCount}}
+				<button class="btn btn-primary">Inbox: <span class="badge">{{count}}</span></button>
+				<button class="btn btn-primary">Unread: <span class="badge">{{unread}}</span></button>
+				<button class="btn btn-primary">Read: <span class="badge">{{read}}</span></button>
+			{{/with}}
+			<section class="inbox">
+				{{#if inboxMessage}}
+					<table class="inboxMsg">
+						<tr>
+							<th></th>
+							<th>Sender</th>
+							<th>Subject</th>
+							<th>Date received</th>
+							<th>Action</th>
+						</tr>
+						{{#each inboxMessage}}
+								<tr>
+									<td>
+										<input type="checkbox" name="id" value="{{_id}}">
+									</td>
+									<td>
+										{{senderName}}
+									</td>
+									<td>
+										{{subject}}
+									</td>
+									<td>
+										{{createdAt}}
+									</td>
+									<td>
+										<a href="/message/{{_id}}">
+											<button class="btn btn-info btn-xs">Open</button>	
+										</a>
+										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
+	
+									</td>
+								</tr>
+						{{/each}}
+					</table>
+				{{else}}
+					<p>No inbox messages</p>
+				{{/if}}
+			</section>
 
 		{{else}}
 			{{> spinner}}
+		{{/if}}
 
+	{{/if}}
+</template>
+
+<template name="sentMessage">
+	{{#if isInRole 'admin, editor, staff'}}
+		{{#if Template.subscriptionsReady}}
+			<h3>Sent messages</h3>
+				<button class="btn btn-primary">Sent: <span class="badge">{{sentCount}}</span></button>
+			<section class="sent">
+				{{#if sentMessage}}
+					<table class="sentMsg">
+						<tr>
+							<th></th>
+							<th>Recipients</th>
+							<th>Subject</th>
+							<th>Date sent</th>
+							<th>Action</th>
+						</tr>
+						{{#each sentMessage}}
+							
+								<tr>
+									<td>
+										<input type="checkbox" name="id" value="{{_id}}">
+									</td>
+									<td>
+										{{staffName}} {{studentName}}
+									</td>
+									<td>
+										{{subject}}
+									</td>
+									<td>
+										{{createdAt}}
+									</td>
+									<td>
+										<a href="/message/{{_id}}">
+											<button class="btn btn-info btn-xs">Open</button>	
+										</a>
+										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
+										
+									</td>
+								</tr>
+						{{/each}}
+					</table>
+
+				{{else}}
+					<p>No sent messages</p>
+				{{/if}}
+			</section>
+
+		{{else}}
+			{{> spinner}}
 		{{/if}}
 
 	{{/if}}
 </template>
 
 
+
+
 <template name="singleMessage">
 	{{#if isInRole 'admin, editor, staff'}}
 		{{#if Template.subscriptionsReady}}
-
-			<h1>Single Message</h1>
+			{{#with message}}
+				<h3>{{subject}}</h3><hr/>
+				<p><strong>From: {{senderName}}</strong></p>
+				<p><strong>To: {{staffName}} {{studentName}}</strong></p>
+				<p><strong>Date: {{createdAt}}</strong></p>
+				<hr/>
+				<article>
+					<p>
+						{{content}}
+					</p>
+				</article>
+			{{/with}}
 
 		{{else}}
 			{{> spinner}}
@@ -1927,11 +2064,17 @@
 					</ul>
 			</div>
 			<form>
+				
+				<label for="staff">Staff (<small>if message is for staff</small>)</label><br/>
+
+				<div class="form-group" id="all_staff">
+					<input type="checkbox" value="all_staff">All Staffs
+				</div>
+
 				<div class="form-group">
-					<label for="staff">Staff (<small>if message is for staff</small>)</label><br/>
 					<select name="staff" class="form-control msgStaff" multiple="true">
 						{{#each staff}}
-							<option value="{{meteorIdInStaff}}">{{lastName}}, {{firstName}} {{otherName}}</option>
+							<option value="{{meteorIdInStaff}}" name='{{lastName}} {{firstName}} {{otherName}}'>{{lastName}}, {{firstName}} {{otherName}}</option>
 						{{/each}}
 					</select>
 				</div>
@@ -1965,12 +2108,12 @@
 
 				</div><br/>
 				<div class="form-group">
-					<label for="title">Title</label><br/>
-					<input type="text" name="title" class="form-control" required placeholder="Title of the message">
+					<label for="title">Subject</label><br/>
+					<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="15">
 				</div>
 				<div class="form-group">
 					<label for="content">Message body</label><br/>
-					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body"></textarea>
+					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="50"></textarea>
 				</div>
 
 				<button type="submit" class="btn btn-primary">Send message</button>
@@ -1986,11 +2129,11 @@
 	
 </template>
 
-<template name="editMessage">
+<template name="draftMessage">
 	{{#if isInRole 'admin, editor, staff'}}
 		{{#if Template.subscriptionsReady}}
 
-			<h1>Edit Message</h1>
+			<h3>Draft Message</h3>
 
 
 		{{else}}

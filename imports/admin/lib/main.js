@@ -152,7 +152,7 @@ Meteor.methods({
 //insert staff and Editor by admin and editor only
 	createStaff: function(data){
 
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['superAdmin', 'admin', 'editor'])){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
 			let duplicateLookUp;
@@ -355,6 +355,8 @@ Meteor.methods({
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
+		let username = g.Staffs.findOne({meteorIdInStaff: this.userId});
+		message.senderName = (username.lastName || ' ') + ' ' + (username.firstName || ' ') + ' ' + (username.otherName || ' ');
 		let msgInsert = g.Messages.insert(message);
 		return msgInsert;
 	}

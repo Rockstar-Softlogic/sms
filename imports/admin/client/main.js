@@ -4,14 +4,14 @@ let monthArr = ["January", "February", "March", "April", "May", "June", "July", 
 
 
 
-Template.admin.onCreated(function(){
+Template.ctrlpanel.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('setting');
 	});
 });
 
-Template.admin.helpers({
+Template.ctrlpanel.helpers({
 	termSchoolFees: function(){
 		let session = g.Settings.findOne({_id: "default"}).session;
 		let term = g.Settings.findOne({_id: "default"}).term;
@@ -45,7 +45,7 @@ Template.admin.helpers({
 	
 });
 
-Template.admin.events({
+Template.ctrlpanel.events({
 	'click .promoteAll button': function(){
 		let verify = confirm('You\'re about to promote all students in the school. Are you sure?');
 			if(verify){
@@ -1056,7 +1056,7 @@ Template.createMessage.onCreated(function(){
 
 Template.createMessage.helpers({
 	staff: function(){
-		return g.Staffs.find({});
+		return g.Staffs.find({meteorIdInStaff: {$ne: Meteor.userId()}});
 	},
 
 });
@@ -1065,41 +1065,131 @@ Template.createMessage.events({
 	'submit form': function(e){
 		e.preventDefault();
 		let msgStaff = $('select.msgStaff option:selected').map(function(){ return this.value;}).get(),
+			staffName = [],
+			allStaff = [],
 			msgClass = [],
 			msgTitle = e.target.title.value,
 			msgBody = e.target.body.value;
 			
+			$('select.msgStaff option:selected').map(function(){
+				staffName.push($(this).attr('name'));
+			});
+
 			$('#msgClass input:checked').map(function(){
 				msgClass.push($(this).attr('value'));
 			});
+			$('#all_staff input:checked').map(function(){
+				allStaff.push($(this).attr('value'));
+			});
+			msgStaff = msgStaff.concat(allStaff);
+
 		if(msgStaff.length && msgClass.length){
 			insertNotice('Cannot send the same message to staff and student at the same time.', 5000);
 			return false;
 		}
-		let msgObj = {to: msgStaff.concat(msgClass), subject: msgTitle, content: msgBody};
+		let msgObj = {to: msgStaff.concat(msgClass), subject: msgTitle, content: msgBody, staffName: staffName, studentName: msgClass};
 		console.log(msgObj);
-		Meteor.call('createMessage', msgObj, function(error){
+		Meteor.call('createMessage', msgObj, function(error, result){
 			if(error){
 				insertNotice(error, 5000);
+				return false;
 			}else{
 				insertNotice('Your message was sent successfully', 4000);
-					FlowRouter.go('/message');
+					let pathToGo = FlowRouter.path('/message/'+result);
+					FlowRouter.go(pathToGo);
 			}
 		});
 	},
 });
 
-Template.messageList.onCreated(function(){
+Template.inboxMessage.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('message.list');
-			self.subscribe('staff.name');
-			self.subscribe('student.list');
 		});
 });
 
-Template.messageList.helpers({
-	
+Template.inboxMessage.helpers({
+	inboxMessage: function(){
+		let userId = Meteor.userId(),
+			inbox = g.Messages.find({$or: [{to: userId}, {to: 'all_staff'}]}).fetch().reverse();
+			inbox.forEach(function(data){
+				data.senderName?data.senderName = data.senderName.substr(0, 20) + '...':data.senderName = 'Unknown sender';
+				data.subject = data.subject.substr(0, 75) + '...' || 'No subject';
+				data.createdAt = data.createdAt.toString().substr(4, 17);
+				return data;
+			});
+			return inbox;
+	},
+	inboxCount: function(){
+		let userId = Meteor.userId();
+		let count = g.Messages.find({$or: [{to: userId}, {to: 'all_staff'}]}).count();
+		let unread = g.Messages.find({$and: [{$or: [{to:userId}, {to:'all_staff'}]}, {readStatus: false}]}).count();
+		let read = g.Messages.find({$and: [{$or: [{to:userId}, {to:'all_staff'}]}, {readStatus: true}]}).count();
+		return {count: count, unread: unread, read: read};
+
+
+	}
+});
+
+Template.sentMessage.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('message.list');
+		});
+});
+
+Template.sentMessage.helpers({
+	sentMessage: function(){
+		let userId = Meteor.userId(),
+			sent = g.Messages.find({from: userId}).fetch().reverse();
+			sent.forEach(function(data){
+				if(data.to[0] == 'all_staff'){
+					data.staffName = 'All Staffs';
+				}else if(data.staffName){
+					data.staffName = data.staffName.join(", ").substr(0, 20);
+				}else{
+					data.staffName = 'Unknown Recipient';
+				}
+				data.subject = data.subject.substr(0, 75) + '...' || 'No Subject';
+				data.createdAt = data.createdAt.toString().substr(4, 17);
+
+				if(data.studentName){
+					data.studentName = data.studentName.join(", ").substr(0, 20);
+				}
+				return data;
+			});
+			return sent;
+	},
+	sentCount: function(){
+		let userId = Meteor.userId();
+		let count = g.Messages.find({from: userId}).count();
+		return count;
+	}
+
+});
+
+Template.singleMessage.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('message.list');
+		});
+});
+
+Template.singleMessage.helpers({
+	message: function(){
+		let id = FlowRouter.getParam('id');
+		let msg = g.Messages.findOne({_id: id});
+			if(msg.to[0] == 'all_staff'){
+					msg.staffName = 'All Staffs';
+				}else if(msg.staffName){
+					msg.staffName = msg.staffName;
+				}else{
+					msg.staffName = 'Unknown Recipient';
+				}
+			msg.createdAt = msg.createdAt.toString().substr(4, 17);
+		return msg;
+	},
 });
 
 //Autoform hooks and addHooks
