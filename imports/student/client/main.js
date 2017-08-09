@@ -32,14 +32,14 @@ Template.studentProfile.helpers({
 	}
 });
 
-Template.editProfile.onCreated(function(){
+Template.editStProfile.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('student.info');
 		});
 });
 
-Template.editProfile.helpers({
+Template.editStProfile.helpers({
 	editable: function(){
 		let profile = g.Students.findOne();
 		return profile;
@@ -300,6 +300,7 @@ Template.stSingleAssignment.events({
 				insertNotice(error, 8000);
 				return false;
 			}else{
+				e.target.answer.value = "";
 				insertNotice("You answer was submitted", 4000);
 			}
 		});
@@ -310,7 +311,7 @@ Template.stSingleAssignment.events({
 
 ////////////////////////autoform hooks///////////////////////////////////
 AutoForm.hooks({
-	editProfile:{
+	editStProfile:{
 		onSubmit: function(data){
 			this.event.preventDefault();
 			Meteor.call('updateStudentProfile', data, function(error){

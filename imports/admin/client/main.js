@@ -122,21 +122,33 @@ Template.setTermAndSchoolFees.events({
 
 //Each staff Profile page
 
-Template.staffProfile.onCreated(function(){
+Template.profile.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('staff.info');
-
 	});
 });
 
-Template.staffProfile.helpers({
+Template.profile.helpers({
 	staffInfo: function(){
 		let data = g.Staffs.findOne();
 		return data;
 	}
 });
 
+Template.editProfile.onCreated(function(){
+	let self = this;
+	self.autorun(function(){
+		self.subscribe('staff.info');
+	});
+});
+
+Template.editProfile.helpers({
+	editable: function(){
+		let data = g.Staffs.findOne();
+		return data;
+	}
+});
 
 //End Each staff Profile page
 // **********************///
@@ -144,7 +156,20 @@ Template.staffProfile.helpers({
 // ******BREAK Brea******///
 // **********************///
 // **********************///
+//list of admin among staffs
+Template.editorList.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('staff.list');
+			self.subscribe('editor.list');
+		});
+});
 
+Template.editorList.helpers({
+	editors: function(){
+
+	}
+})
 //List of Staff in School
 Template.staffList.onCreated(function(){
 	let self = this;
@@ -190,7 +215,46 @@ Template.singleStaff.helpers({
 	staff: function(){
 		let id = FlowRouter.getParam('id');
 		let data = g.Staffs.findOne({staffId: id});
+		let role = Meteor.call('isEditor', data.meteorIdInStaff);
+		console.log(role);
 		return data;
+	},
+});
+
+Template.singleStaff.events({
+	'click #makeAdmin':function(e){
+		e.preventDefault();
+		let staff = this.staffId, staffId = this.meteorIdInStaff, action = "add";
+		bootbox.confirm("Are you sure to make "+this.lastName+" "+this.firstName+" ("+staff+") admin?", function(result){
+			if(result){
+				Meteor.call('toggleAdmin', staffId, staff, action, function(error){
+					if(error){
+						insertNotice(error, 6000);
+						return;
+					}else{
+						insertNotice(staff+" is now an admin.", 4000);
+						return;
+					}
+				});
+			}
+		});
+	},
+	'click #removeAdmin':function(e){
+		e.preventDefault();
+		let staff = this.staffId, staffId = this.meteorIdInStaff, action = "remove";
+		bootbox.confirm("Are you sure to remove "+this.lastName+" "+this.firstName+" ("+staff+") as admin?", function(result){
+			if(result){
+				Meteor.call('toggleAdmin', staffId, staff, action, function(error){
+					if(error){
+						insertNotice(error, 6000);
+						return;
+					}else{
+						insertNotice(staff+" is no more an admin.", 4000);
+						return;
+					}
+				});
+			}
+		});
 	},
 });
 
@@ -284,7 +348,7 @@ Template.passportUpload.events({
 
 						image.onerror = function(){
 							$('#file').hide('fast');
-							$('#passportPreview').html("You selected a file renamed to an image extension. <br/>Do you know what you're doing? <br/> Don't go against the rule.");
+							$('#passportPreview').html("You selected a file renamed to an image extension. <br/>Do you know what you're doing?");
 							return false;
 						}		
 						image.src = e.target.result;
@@ -546,7 +610,8 @@ Template.singleResult.helpers({
 						return r;
 					}
 			});
-			return filtered[0];
+
+			if(filtered) return filtered[0];
 		}return;
 	},
 
@@ -756,22 +821,22 @@ Template.singlePayment.helpers({
 			requestedPayment = Session.get('requestedPayment');
 		let gTerm = g.Settings.findOne({_id: "default"}).term;
 
-
-			let filtered = query.payment.filter(function(p){
-
-				if(requestedPayment && (requestedPayment.class && requestedPayment.term) && requestedPayment.id == id){
-					if(p.class == requestedPayment.class && p.term == requestedPayment.term){
+			let filtered;
+			if(query.payment){
+				filtered = query.payment.filter(function(p){
+					if(requestedPayment && (requestedPayment.class && requestedPayment.term) && requestedPayment.id == id){
+						if(p.class == requestedPayment.class && p.term == requestedPayment.term){
+							return p;
+						}	
+					}
+					else if(p.class == currentClass.currentClass && p.term == gTerm){
 						return p;
-					}	
-				}
+					}
+					return false;
+				});
+			}
 
-				else if(p.class == currentClass.currentClass && p.term == gTerm){
-					return p;
-				}
-				return false;
-			});
-
-			if(filtered[0]){return filtered[0];} return false;
+			if(filtered){return filtered[0];} return false;
 
 	},
 
@@ -790,10 +855,11 @@ Template.singlePayment.helpers({
 		let id = FlowRouter.getParam('id');
 		let classes = [];
 		let data = g.Payments.findOne({studentId: id},{payment: 1});
-			data.payment.forEach(function(pay){
-				classes.push(pay.class);
-			});
-
+			if(data.payment){
+				data.payment.forEach(function(pay){
+					classes.push(pay.class);
+				});
+			}
 			if(classes.length){
 				classes = classes.filter(function(item, pos){
 					return classes.indexOf(item) == pos;
@@ -973,17 +1039,14 @@ Template.singleAssignment.helpers({
 			thisAssignment = g.Assignments.findOne({_id: id}),
 			sDate = thisAssignment.startDate,
 			eDate = thisAssignment.endDate;
-
 			thisAssignment.startDate = sDate.getDate() + "-" + monthArr[sDate.getMonth()] + "-" + sDate.getFullYear();
 			thisAssignment.endDate = eDate.getDate() + "-" + monthArr[eDate.getMonth()] + "-" + eDate.getFullYear();
-		
 		let staff = g.Staffs.findOne({meteorIdInStaff: thisAssignment.addedBy});
 			if(staff){
 				thisAssignment.author = (staff.firstName || '') + ', ' + (staff.lastName || '') + ' ' + (staff.otherName || '');
 				thisAssignment.staffId = staff.staffId;
 			}
 			thisAssignment.canEdit = thisAssignment.addedBy == Meteor.userId();
-
 		return thisAssignment;
 	},
 	answerCount: function(){
@@ -1088,7 +1151,6 @@ Template.createMessage.events({
 			return false;
 		}
 		let msgObj = {to: msgStaff.concat(msgClass), subject: msgTitle, content: msgBody, staffName: staffName, studentName: msgClass};
-		console.log(msgObj);
 		Meteor.call('createMessage', msgObj, function(error, result){
 			if(error){
 				insertNotice(error, 5000);
@@ -1113,13 +1175,18 @@ Template.inboxMessage.helpers({
 	inboxMessage: function(){
 		let userId = Meteor.userId(),
 			inbox = g.Messages.find({$or: [{to: userId}, {to: 'all_staff'}]}).fetch().reverse();
-			inbox.forEach(function(data){
-				data.senderName?data.senderName = data.senderName.substr(0, 20) + '...':data.senderName = 'Unknown sender';
-				data.subject = data.subject.substr(0, 75) + '...' || 'No subject';
-				data.createdAt = data.createdAt.toString().substr(4, 17);
-				return data;
-			});
-			return inbox;
+			if(inbox){
+				inbox.forEach(function(data){
+					data.senderName?data.senderName = data.senderName.substr(0, 20) + '...':data.senderName = 'Unknown sender';
+					data.subject = data.subject.substr(0, 75) + '...' || 'No subject';
+					data.createdAt = data.createdAt.toString().substr(4, 17);
+					if(data.replies){
+						data.count = data.replies.length;
+					}
+					return data;
+				});
+				return inbox;
+			}
 	},
 	inboxCount: function(){
 		let userId = Meteor.userId();
@@ -1143,23 +1210,29 @@ Template.sentMessage.helpers({
 	sentMessage: function(){
 		let userId = Meteor.userId(),
 			sent = g.Messages.find({from: userId}).fetch().reverse();
-			sent.forEach(function(data){
-				if(data.to[0] == 'all_staff'){
-					data.staffName = 'All Staffs';
-				}else if(data.staffName){
-					data.staffName = data.staffName.join(", ").substr(0, 20);
-				}else{
-					data.staffName = 'Unknown Recipient';
+			
+				if(sent){
+					sent.forEach(function(data){
+						if(data.to[0] == 'all_staff'){
+							data.staffName = 'All Staffs';
+						}else if(data.staffName){
+							data.staffName = data.staffName.join(", ").substr(0, 20);
+						}else{
+							data.staffName = 'Unknown Recipient';
+						}
+						data.subject = data.subject.substr(0, 75) + '...' || 'No Subject';
+						data.createdAt = data.createdAt.toString().substr(4, 17);
+	
+						if(data.studentName){
+							data.studentName = data.studentName.join(", ").substr(0, 20);
+						}
+						if(data.replies){
+							data.count = data.replies.length;
+						}
+						return data;
+					});
+					return sent;
 				}
-				data.subject = data.subject.substr(0, 75) + '...' || 'No Subject';
-				data.createdAt = data.createdAt.toString().substr(4, 17);
-
-				if(data.studentName){
-					data.studentName = data.studentName.join(", ").substr(0, 20);
-				}
-				return data;
-			});
-			return sent;
 	},
 	sentCount: function(){
 		let userId = Meteor.userId();
@@ -1179,7 +1252,7 @@ Template.singleMessage.onCreated(function(){
 Template.singleMessage.helpers({
 	message: function(){
 		let id = FlowRouter.getParam('id');
-		let msg = g.Messages.findOne({_id: id});
+		let msg = g.Messages.findOne({_id:id});
 			if(msg.to[0] == 'all_staff'){
 					msg.staffName = 'All Staffs';
 				}else if(msg.staffName){
@@ -1190,10 +1263,116 @@ Template.singleMessage.helpers({
 			msg.createdAt = msg.createdAt.toString().substr(4, 17);
 		return msg;
 	},
+	msgReply: function(){
+		let id = FlowRouter.getParam("id");
+		let replies = g.Messages.findOne({_id:id}).replies;
+			if(replies){
+				replies.forEach(function(doc){
+				doc.replyDate = doc.replyDate.toString().substr(0, 21);
+				return doc;
+				});
+				return replies.reverse();	
+			}
+		return false;
+	},
+	count: function(){
+		let id = FlowRouter.getParam("id");
+		let replies = g.Messages.findOne({_id:id}).replies;
+		if(replies){
+			return replies.length;	
+		}else{
+			return 0;
+		}
+	},
 });
 
+Template.singleMessage.events({
+	'submit form': function(e){
+		e.preventDefault();
+		let id = FlowRouter.getParam("id");
+		let reply = e.target.reply.value;
+		Meteor.call("replyAssignment", id, reply, function(error){
+			if(error){
+				insertNotice(error, 6000);
+			}else{
+				e.target.reply.value = "";
+				insertNotice("Your reply was submitted.", 4000);
+			}
+		});
+	},
+
+});
+Template.createFeedback.events({
+	"submit form":function(e){
+		e.preventDefault();
+		let subject = e.target.subject.value;
+		let message = e.target.message.value;
+
+		Meteor.call("createFeedback", subject, message, function(error){
+			if(error){
+				insertNotice(error, 6000);
+				return false;
+			}else{
+				insertNotice("Feedback sent", 4000);
+				FlowRouter.go("/dashboard");
+				return;
+			}
+		});
+	}
+
+});
+
+Template.feedbackList.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('feedback.list');
+		});
+});
+
+Template.feedbackList.helpers({
+	feedbacks: function(){
+		let list = g.Feedbacks.find().fetch().reverse();
+			if(list){
+				list.forEach(function(feed){
+					feed.sentDate?feed.sentDate = feed.sentDate.toString().substr(0, 21): feed.sentDate="Not specified";
+					feed.subject.length>20?feed.subject=feed.subject.substr(0, 20) + "...":feed.subject=feed.subject; 
+					return feed;
+				});
+				return list;
+			}
+	},
+	singleFeedback: function(){
+		let feedId = Session.get("feedbackId");
+		if(feedId){
+			let feedback = g.Feedbacks.findOne({_id:feedId});
+			feedback.sentDate?feedback.sentDate=feedback.sentDate.toString().substr(0, 21):feedback.sentDate="Not specified";
+			return feedback;
+		}
+	},
+});
+Template.feedbackList.events({
+	"click #showFeedback":function(e){
+		e.preventDefault();
+		Session.set("feedbackId", this._id);
+	}
+})
 //Autoform hooks and addHooks
 AutoForm.hooks({
+	//Staff profile self update
+	editProfile:{
+		onSubmit: function(data){
+			this.event.preventDefault();
+			Meteor.call('updateStaffProfile', data, function(error){
+				if(error){
+					insertNotice(error, 4000);
+				}else{
+					insertNotice("Profile updated successfully", 4000);
+					let pathToGo = FlowRouter.path('/profile');
+						FlowRouter.go(pathToGo);
+				}
+			});
+		}
+	},
 	// Insert Student
 	insertStudent:{
 		onSubmit: function(data){

@@ -4,9 +4,19 @@ Meteor.publish({
 	'setting': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff', 'student'])){
-			let appSetting = g.Settings.find({});	
+			let appSetting = g.Settings.find();	
 				if(appSetting){
 					return appSetting;
+				}
+		}
+		return this.ready();
+	},
+	'editor.list':function(){
+		let userId = this.userId;
+		if(Roles.userIsInRole(userId, ["admin"])){
+			let editor = Meteor.users.find({roles: "editor"});
+				if(editor){
+					return editor;
 				}
 		}
 		return this.ready();
@@ -37,7 +47,7 @@ Meteor.publish({
 	'staff.name': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let staffList = g.Staffs.find({}, {fields:{firstName:1, lastName:1, otherName: 1, meteorIdInStaff:1}});	
+			let staffList = g.Staffs.find({}, {fields:{firstName:1, lastName:1, otherName: 1, meteorIdInStaff:1, staffId:1}});	
 				if(staffList){
 					return staffList;
 				}
@@ -113,9 +123,14 @@ Meteor.publish({
 		return this.ready();
 	},
 	'assignment.list': function(){
-			let userId = this.userId;
-			if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-				let assignment = g.Assignments.find({});	
+			let userId = this.userId, assignment;
+			if(Roles.userIsInRole(userId, ['admin', 'editor'])){
+					assignment = g.Assignments.find({});	
+					if(assignment){
+						return assignment;
+					}
+			}else if(Roles.userIsInRole(userId, ['staff'])){
+					assignment = g.Assignments.find({addedBy:userId});
 					if(assignment){
 						return assignment;
 					}
@@ -131,13 +146,24 @@ Meteor.publish({
 						}
 				}
 				return this.ready();
+	},
+	'feedback.list': function(){
+			let userId = this.userId;
+				if(Roles.userIsInRole(userId, ['admin'])){
+					let feedback = g.Feedbacks.find();	
+						if(feedback){
+							return feedback;
+						}
+				}
+				return this.ready();
 	}
 
 });
 
 
+
 Meteor.methods({
-	'uploadPassport': function(name, argument){
+	'uploadPassport':function(name, argument){
 		serverRoot = process.env.PWD;
 		let filePath = path.join(serverRoot, name);
 		console.log(filePath);
@@ -147,5 +173,24 @@ Meteor.methods({
 			}
 		});
 	},
-
+	toggleAdmin:function(staffId, staffUsername, action){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
+				throw new Meteor.Error('500', 'Unauthorized Operation');
+			}
+			if(!staffId || !staffUsername || !action){
+				throw new Meteor.Error('500', 'Incomplete information to perform opeartion');
+			}
+			if(Roles.userIsInRole(staffId, ['editor']) && action == "remove"){
+				let removeAdmin = Roles.setUserRoles(staffId, ['staff']);
+				console.log(removeAdmin);
+				return removeAdmin;
+			}else if(Roles.userIsInRole(staffId, ['staff']) && action == "add"){
+				let addAdmin = Roles.addUsersToRoles(staffId, ['editor', 'staff']);
+				console.log(addAdmin);
+				return addAdmin;
+			}else{
+				throw new Meteor.Error(500, "Request not understood!");
+			}
+	},
 });
+

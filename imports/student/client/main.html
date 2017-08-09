@@ -100,10 +100,10 @@
 	
 </template>
 
-<template name="editProfile">
+<template name="editStProfile">
 		{{#if Template.subscriptionsReady}}
 			{{#if isInRole 'student'}}
-				{{#autoForm schema="g.Schemas.UpdateStudent" type="normal" id="editProfile" doc=editable}}
+				{{#autoForm schema="g.Schemas.UpdateStudent" type="normal" id="editStProfile" doc=editable}}
 				{{> afQuickField name="presentAddress"}}
 				{{> afQuickField name="homeAddress"}}
 				{{> afQuickField name="phone"}}

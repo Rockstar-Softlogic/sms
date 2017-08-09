@@ -14,26 +14,7 @@
 								</div>	
 						</div>
 						<div class="col-md-4">
-						{{#if currentUser}}
-							 {{#with user}}
-								<button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<span class="text-default">{{emails.[0].address}}</span>
-									<span class="caret"></span>
-									<span class="sr-only">Toggle Dropdown</span>
-								 </button>
-								  <ul class="dropdown-menu">
-								    <li><a href="#">{{username}}</a></li>
-								    <li><a href="/profile">My profile</a></li>
-								    <li role="separator" class="divider"></li>
-								    <li id="header-logout" title="Sign out"><a href="#">Logout</a></li>
-
-								  </ul>
-
-								
-							 {{/with}}
-						{{else}}
 							<a href="/login" class="btn btn-default btn-xs">Sign In</a>
-						{{/if}}
 						</div>
 					</div>
 				</header>

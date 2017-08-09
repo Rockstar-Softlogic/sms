@@ -1,6 +1,14 @@
 
-
 Meteor.methods({
+	//staffProfile edit
+	updateStaffProfile: function(data){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin','editor','staff'])){
+				throw new Meteor.Error('500', 'Unauthorized Operation');
+			}
+		let userId = this.userId,
+			staffUpdate = g.Staffs.update({meteorIdInStaff: userId}, {$set: data});
+			return staffUpdate;
+		},
 	//insert student by admin and editor only
 	newSession: function(doc){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
@@ -149,9 +157,9 @@ Meteor.methods({
 
 	},
 
+
 //insert staff and Editor by admin and editor only
 	createStaff: function(data){
-
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
@@ -259,7 +267,6 @@ Meteor.methods({
 							obj = query[i];
 							for(var prop in obj){
 								if(obj['class'] == data['class'] && obj['term'] == data['term'] && obj['session'] == data['session']){
-									console.log('match found!, terminating');
 									throw new Meteor.Error(302, "Result already available", "View the result to edit.");
 									
 								}
@@ -353,13 +360,47 @@ Meteor.methods({
 	},
 	createMessage: function(message){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
-				throw new Meteor.Error(500, 'Unauthorized Operation');
+			throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
+		if(typeof message !== "object"){
+			throw new Meteor.Error(500, 'Invalid message received');
+		}
 		let username = g.Staffs.findOne({meteorIdInStaff: this.userId});
 		message.senderName = (username.lastName || ' ') + ' ' + (username.firstName || ' ') + ' ' + (username.otherName || ' ');
 		let msgInsert = g.Messages.insert(message);
 		return msgInsert;
-	}
+	},
+	replyAssignment: function(id,reply){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(reply.length < 5){
+				throw new Meteor.Error(500, 'Reply too short. At least 6 characters.');
+		}
+		let userId = this.userId, staff, staffName;
+		if(Meteor.isServer){
+			staff = g.Staffs.findOne({meteorIdInStaff:userId});
+			staffName = (staff.lastName || "") + " " + (staff.firstName || "") + " " + (staff.otherName || "");
+		}
+		let replyObj = {reply:reply,userId:userId,name:staffName, replyDate:new Date()};
+		let msgUpdate = g.Messages.update({_id: id},{$push:{replies: replyObj}});
+		return msgUpdate;
+	},
+	createFeedback: function(subject, message){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(subject.length < 5 || subject.length > 100){
+				throw new Meteor.Error(400, 'Subject too short or too long');
+		}
+		if(message.length < 50 || message.length > 1500){
+				throw new Meteor.Error(400, 'Message too short or too long');
+		}
+		let user = Meteor.user();
+		let feedbackObj = {subject:subject,message:message,senderId:this.userId,senderUsername:user.username,senderEmail:user.emails[0].address, sentDate:new Date()};
+		let sendFeedback = g.Feedbacks.insert(feedbackObj);
+		return sendFeedback;
+	},
 
 });
 

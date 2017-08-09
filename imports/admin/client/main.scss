@@ -2,31 +2,16 @@ body{
 
 }
 
-.insertNotice{
-	position: fixed;
-	color: white;
-	background-color: #000;
-	padding: 10px;
-	z-index: 999;
-	border-radius-left: 4px; 
-	font-size: 18px;
-	display: none;
-	bottom: 10px;
-	right: 0;
-	opacity: 0.8;
+#staffDashboard{
+	div{
+		min-height: 200px;
+		margin-top: 1em;
+		box-shadow: 2px 2px 5px grey, -2px -2px 5px grey;
+	}
+	.sms-offset-1{
+		margin-left:4.16667%;
+	}	
 }
-
-/* .overlay{
-	display: block;
-	background-color: black;
-	min-width: 50%;
-	min-height: 100%;
-	top: 0;
-	z-index: 99;
-	position: fixed;
-	overflow: scroll;
-	margin: auto;
-} */
 
 button#uploadBtn{
 	display: none;

@@ -1,7 +1,26 @@
 <template name="staffDashboard">
 	{{#if isInRole 'admin, staff'}}
 		{{#if Template.subscriptionsReady}}
-
+			<div class="row" id="staffDashboard">
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+				<div class="col-md-5 sms-offset-1">
+					
+				</div>
+			</div>
 		{{else}}
 			{{> spinner}}
 		{{/if}}
@@ -10,13 +29,171 @@
 
 
 <template name="profile">
-	{{#if isInRole 'admin, staff'}}
-			{{>staffProfile}}
+	<div class="col-md-10">
+	{{#if Template.subscriptionsReady}}
+		{{#if isInRole 'admin,  editor, staff'}}
+			{{#with staffInfo}}
+				<h3>{{lastName}} {{firstName}} {{otherName}}</h3> <hr/>
+					<div class="row">
+						<div class="col-md-8">
+							
+							<table>
+								<tr>
+									<th colspan="2" class="customHead">Employment Data</th>
+								</tr>
+								<tr>
+									<td><strong>Last Name: </strong></td>
+									<td> {{lastName}}</td>
+								</tr>
+								<tr>
+									<td><strong>First Name: </strong></td>
+									<td>{{firstName}}</td>
+								</tr>
+								<tr>
+									<td><strong>Other Name: </strong></td>
+									<td>{{otherName}}</td>
+								</tr>
+								<tr>
+									<td><strong>staff Id</strong></td>
+									<td>{{staffId}}</td>
+								</tr>
+								<tr>
+									<td><strong>Email</strong></td>
+									<td>{{email}}</td>
+								</tr>
+								<tr>
+									<td><strong>Gender</strong></td>
+									<td>{{gender}}</td>
+								</tr>
+								<tr>
+									<td><strong>Date of birth</strong></td>
+									<td>{{dob}}</td>
+								</tr>
+								<tr>
+									<td><strong>State of origin</strong></td>
+									<td>{{state}}</td>
+								</tr>
+								<tr>
+									<td><strong>Town</strong></td>
+									<td>{{town}}</td>
+								</tr>
+								<tr>
+									<td><strong>Club and Soceity</strong></td>
+									<td>{{club}}</td>
+								</tr>
+								<tr>
+									<td><strong>Subject taught</strong></td>
+									<td>{{subjectTaught}}</td>
+								</tr>										
+							</table>
+								<br/>
+
+							<table>
+								<tr>
+									<th colspan="2" class="customHead">Staff Profile</th>
+								</tr>
+								<tr>
+									<td><strong>Contact phone</strong></td>
+									<td>{{phone}}</td>
+								</tr>
+								<tr>
+									<td><strong>Home Address</strong></td>
+									<td>{{homeAddress}}</td>
+								</tr>
+								<tr>
+									<td><strong>Present Address</strong></td>
+									<td>{{presentAddress}}</td>
+								</tr>
+								<tr>
+									<td><strong>Hobby</strong></td>
+									<td>{{hobby}}</td>
+								</tr>
+								<tr>
+									<th colspan="2" class="customHead">Next of Kin details</th>
+									
+								</tr>
+								<tr>
+									<td><strong>Name</strong></td>
+									<td>{{nok.name}}</td>
+								</tr>
+								<tr>
+									<td><strong>Address</strong></td>
+									<td>{{nok.address}}</td>
+								</tr>
+								<tr>
+									<td><strong>Phone contact</strong></td>
+									<td>{{#each nok.phone}} {{this}} {{/each}}</td>
+								</tr>	
+								<tr>
+									<td><strong>Relationship</strong></td>
+									<td>{{nok.relationship}}</td>
+								</tr>
+								<tfoot>
+									<a href="/profile/edit" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a>
+								</tfoot>										
+							</table>
+
+						</div>
+						<div class="col-md-4" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
+							<div class="passport" style="text-align: center;">
+								<img src="http://localhost:3000/staff5.png" alt="{{lastName}} {{firstName}} passport">
+								<p><strong>{{studentId}}</strong></p>
+							</div>
+							<div>
+								<p><a href="#">Assignments</a></p><hr/>
+								<p><a href="#">Subjects</a></p><hr/>
+								<p><a href="#">Messages</a></p><hr/>
+								<p><a href="#">Send feedback</a></p><hr/>
+							</div>
+								
+								
+						</div>
+
+
+					</div>
+			{{/with}}
+		{{/if}}
+	{{else}}
+		{{> spinner}}
 	{{/if}}
+	</div>
 </template>
 
+<template name="editProfile">
+		{{#if isInRole 'admin, editor, staff'}}
+		<div class="col-md-8 col-md-offset-2">
+			{{#if Template.subscriptionsReady}}
+				{{#with editable}}
+				<table style="margin: 5px auto;">
+					<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/staff5.png" alt="{{firstName}} passport"></td></tr>
+
+					<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
+					
+					<tr><td><strong>Staff Id</strong></td><td>{{staffId}}</td></tr>
+				</table>
+				{{/with}}
+				{{#autoForm schema="g.Schemas.UpdateStaff" id="editProfile" type="normal" doc=editable validation='blur'}} 
+					{{> afQuickField name = "presentAddress"}}
+					{{> afQuickField name = "homeAddress"}}
+					{{> afQuickField name = "phone"}}
+					{{> afQuickField name = "hobby"}}
+					{{> afQuickField name = "club" options="allowed" firstOption="Club and Society"}}
+					{{> afQuickField name = "nok"}}
+
+
+					<div class="form-group">
+							<button type="submit" class="btn btn-primary">Update Profile</button>
+					</div>
+				{{/autoForm}}
+			{{else}}
+				{{> spinner}}
+			{{/if}}
+		</div>
+		{{/if}}
+</template>
 							
 <template name="ctrlpanel">
+	<div class="col-md-10 col-md-offset-1">
 	<h4>Admin actions only!</h4>
 	{{#if isInRole 'admin'}}
 		{{#if Template.subscriptionsReady}}
@@ -147,7 +324,7 @@
 			{{> spinner}}
 		{{/if}}
 	{{/if}} 
-
+	</div>
 </template>
 
 <template name="newSessionModal">
@@ -241,144 +418,17 @@
 
 <template name="editorList">
 	{{#if isInRole 'admin'}}
+		{{#if Template.subscriptionsReady}}
 
-
-	{{/if}}
-
-</template>
-
-
-<template name="staffProfile">
-	{{#if Template.subscriptionsReady}}
-		{{#if isInRole 'admin,  editor, staff'}}
-			{{#with staffInfo}}
-
-
-				<h3>{{lastName}} {{firstName}} {{otherName}}</h3> <hr/>
-					<div class="row">
-						<div class="col-md-8 col-sm-8 col-xs-12">
-							
-							<table>
-								<tr>
-									<th colspan="2" class="customHead">Employment Data</th>
-								</tr>
-								<tr>
-									<td><strong>Last Name: </strong></td>
-									<td> {{lastName}}</td>
-								</tr>
-								<tr>
-									<td><strong>First Name: </strong></td>
-									<td>{{firstName}}</td>
-								</tr>
-								<tr>
-									<td><strong>Other Name: </strong></td>
-									<td>{{otherName}}</td>
-								</tr>
-								<tr>
-									<td><strong>staff Id</strong></td>
-									<td>{{staffId}}</td>
-								</tr>
-								<tr>
-									<td><strong>Email</strong></td>
-									<td>{{email}}</td>
-								</tr>
-								<tr>
-									<td><strong>Gender</strong></td>
-									<td>{{gender}}</td>
-								</tr>
-								<tr>
-									<td><strong>Date of birth</strong></td>
-									<td>{{dob}}</td>
-								</tr>
-								<tr>
-									<td><strong>State of origin</strong></td>
-									<td>{{state}}</td>
-								</tr>
-								<tr>
-									<td><strong>Town</strong></td>
-									<td>{{town}}</td>
-								</tr>
-								<tr>
-									<td><strong>Club and Soceity</strong></td>
-									<td>{{club}}</td>
-								</tr>
-								<tr>
-									<td><strong>Subject taught</strong></td>
-									<td>{{subjectTaught}}</td>
-								</tr>										
-							</table>
-								<br/>
-
-							<table>
-								<tr>
-									<th colspan="2" class="customHead">Staff Profile</th>
-								</tr>
-								<tr>
-									<td><strong>Contact phone</strong></td>
-									<td>{{phone}}</td>
-								</tr>
-								<tr>
-									<td><strong>Home Address</strong></td>
-									<td>{{homeAddress}}</td>
-								</tr>
-								<tr>
-									<td><strong>Present Address</strong></td>
-									<td>{{presentAddress}}</td>
-								</tr>
-								<tr>
-									<td><strong>Hobby</strong></td>
-									<td>{{hobby}}</td>
-								</tr>
-								<tr>
-									<th colspan="2" class="customHead">Next of Kin details</th>
-									
-								</tr>
-								<tr>
-									<td><strong>Name</strong></td>
-									<td>{{nok.name}}</td>
-								</tr>
-								<tr>
-									<td><strong>Address</strong></td>
-									<td>{{nok.address}}</td>
-								</tr>
-								<tr>
-									<td><strong>Phone contact</strong></td>
-									<td>{{#each nok.phone}} {{this}} {{/each}}</td>
-								</tr>	
-								<tr>
-									<td><strong>Relationship</strong></td>
-									<td>{{nok.relationship}}</td>
-								</tr>
-								<tfoot>
-									<a href="/profile/edit" class="btn btn-primary"><span class="fa fa-edit"></span> edit profile</a>
-								</tfoot>										
-							</table>
-
-						</div>
-						<div class="col-md-4 col-sm-4 col-xs-12" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
-							<div class="passport" style="text-align: center;">
-								<img src="http://localhost:3000/staff5.png" alt="{{lastName}} {{firstName}} passport">
-								<p><strong>{{studentId}}</strong></p>
-							</div><hr/>
-							<div>
-								<p><a href="#">Assignments</a></p><hr/>
-								<p><a href="#">Subjects</a></p><hr/>
-								<p><a href="#">Messages</a></p><hr/>
-								<p><a href="#">Send feedback</a></p><hr/>
-							</div>
-								
-								
-						</div>
-
-
-					</div>
-			{{/with}}
+		{{else}}
+			{{> smsLoading}}
 		{{/if}}
-	{{else}}
-		{{> spinner}}
+
 	{{/if}}
-	
+
 </template>
+
+
 
 
 <!-- ******************************************* -->
@@ -442,11 +492,21 @@
 
 <template name="singleStaff">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 	{{#if Template.subscriptionsReady}}
 
 	{{#with staff}}	
 	<section id="singleStaff" class="row">
-			<h1>{{lastName}}, {{firstName}} {{otherName}} profile</h1><hr style="border-bottom: 3px dashed orangered; border-top: 3px dotted orangered;" />
+			<h1>{{lastName}}, {{firstName}} {{otherName}} profile 
+				{{#if isInRole 'admin'}}
+					{{#if staff.isAdmin}}
+						<span class="btn btn-danger btn-xs" id="removeAdmin">Remove Admin</span>
+					{{else}}
+						<span class="btn btn-danger btn-xs" id="makeAdmin">Make Admin</span>
+					{{/if}}
+				{{/if}}
+			</h1>
+			<hr style="border-bottom: 3px dashed orangered; border-top: 3px dotted orangered;" />
 					<div class="col-md-8 col-sm-8">	
 						<table class="table">
 							<caption>Employment Data</caption>
@@ -538,6 +598,7 @@
 	{{else}}
 		{{> spinner}}
 	{{/if}}
+	</div>
 	{{/if}}
 
 </template>
@@ -546,17 +607,19 @@
 
 <template name="insertStaff">
 {{#if isInRole 'admin, editor'}}
+<div class="col-md-10 col-md-offset-1">
 	<progress value="70" max="100"></progress>
 
 	
 	{{> quickForm collection="g.Staffs" id="insertStaff" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
-
+</div>
 {{/if}}
 </template>
 
 
 <template name="editStaff">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 		{{#with editStaffInfo}}
 			<table style="margin: 5px auto;">
@@ -587,6 +650,7 @@
 		{{else}}
 				{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 
 </template>
@@ -595,6 +659,7 @@
 
 <template name="updateStaff">
 		{{#if isInRole 'admin, editor'}}
+		<div class="col-md-10 col-md-offset-1">
 			{{#if Template.subscriptionsReady}}
 			{{#with updateStaffInfo}}
 			<table style="margin: 5px auto;">
@@ -618,11 +683,10 @@
 					<button type="submit" class="btn btn-primary">Update</button>
 			</div>
 		{{/autoForm}}
-
-
 			{{else}}
 				{{> spinner}}
 			{{/if}}
+		</div>
 		{{/if}}
 </template>
 
@@ -705,7 +769,7 @@
 				<option>SSS2</option>
 				<option>SSS3</option>
 			</select>
-			<input type="submit" name="submit" class="btn btn-primary" value="filter student">
+			<button type="submit" class="btn btn-primary">Filter students</button>
 		</form>
 		<table class="table table-bordered serial">
 			<tr>
@@ -715,7 +779,6 @@
 				<th>ID</th>
 				<th>Email</th>
 				<th>Gender</th>
-				<th>Club</th>
 				<th>View</th>
 			</tr>
 		{{#each students}}
@@ -726,10 +789,8 @@
 				<td>{{studentId}}</td>
 				<td>{{email}}</td>
 				<td>{{gender}}</td>
-				<td>{{club}}</td>
 				<td style="text-align: center;"><a href="/student/view/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info-circle"></span> More Details</a> <br/>
-				<a href="/result/view/{{studentId}}">Result</a> | 
-				<a href="/payment/view/{{studentId}}">Payments</a></td>
+				</td>
 			</tr>
 
 		{{/each}}
@@ -744,6 +805,7 @@
 </template>
 <template name="singleStudent">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 		<!-- Admission Information -->
 		{{#with student}}	
@@ -834,6 +896,7 @@
 		{{else}}
 		{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 	
 
@@ -842,6 +905,7 @@
 <template name="insertStudent">
 	
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 
 			<progress value="70" max="100"></progress>
@@ -851,12 +915,14 @@
 		{{else}}
 				{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 </template>
 
 
 <template name="editStudent">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 		{{#with editStudentInfo}}
 			<table style="margin: 5px auto;">
@@ -889,6 +955,7 @@
 		{{else}}
 				{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 
 </template>
@@ -901,6 +968,7 @@
 
 <template name="updateStudent">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 		{{#with updateStudentInfo}}
 			<table style="margin: 5px auto;">
@@ -925,6 +993,7 @@
 		{{else}}
 				{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 
 </template>
@@ -964,7 +1033,7 @@
 				<option>SSS2</option>
 				<option>SSS3</option>
 			</select>
-			<input type="submit" class="btn btn-primary" name="submit" value="filter result">
+			<button type="submit" class="btn btn-primary btn-xs">Filter result</button>
 		</form>
 
 		<table class="serial table table-striped">
@@ -998,9 +1067,9 @@
 				{{/if}}
 				<td style="text-align: center;">
 				
-				<a href="/result/view/{{studentId}}" class="btn btn-info"><span class="fa fa-info"></span> View Results</a> ||
+				<a href="/result/view/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View Results</a> ||
 
-				<a href="{{pathFor '/result/new'}}" class="addResult btn btn-info"><span class="fa fa-plus"></span> Add result</a>
+				<a href="{{pathFor '/result/new'}}" class="addResult btn btn-info btn-xs"><span class="fa fa-plus"></span> Add result</a>
 				</td>
 
 			</tr>
@@ -1019,6 +1088,7 @@
 
 <template name="singleResult">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 				
 				{{#with studentInfo}}
@@ -1044,7 +1114,7 @@
 							
 						</select>
 						
-						<input type="submit" class="btn btn-primary" name="submit" value="Show result">
+						<button type="submit" class="btn btn-primary btn-xs">Show result</button>
 
 					</form>
 
@@ -1156,7 +1226,7 @@
 							{{#if biology}}
 							<tr>
 								<td></td>
-								<td>Biolog</td>
+								<td>Biology</td>
 								<td>{{biology.ca}}</td>
 								<td>{{biology.exam}}</td>
 								<td>{{biology.total}}</td>
@@ -1273,6 +1343,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 
 
@@ -1393,7 +1464,7 @@
 				<option>SSS2</option>
 				<option>SSS3</option>
 			</select>
-			<input type="submit" name="submit" value="Search for payment" class="btn btn-primary">
+			<button type="submit" class="btn btn-primary btn-xs">Search Payment</button>
 		</form>
 		<table class="serial table table-striped">
 			<tr>
@@ -1427,7 +1498,7 @@
 				{{/if}}
 
 				<td style="text-align: center;">
-				<a href="/payment/view/{{studentId}}" class="btn btn-info"><span class="fa fa-info"></span> View Payments</a> || <a href="{{pathFor '/payment/new'}}" class="addPayment btn btn-primary"><span class="fa fa-plus"></span> Add payment</a>
+				<a href="/payment/view/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View Payments</a> || <a href="{{pathFor '/payment/new'}}" class="addPayment btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add payment</a>
 				</td>
 			</tr>
 
@@ -1446,6 +1517,7 @@
 
 <template name="singlePayment">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 				{{#with studentInfo}}
 
@@ -1470,7 +1542,7 @@
 							
 						</select>
 						
-						<input type="submit" class="btn btn-primary" name="submit" value="Show payment">
+						<button type="submit" class="btn btn-primary btn-xs">Show payment</button>
 
 					</form>
 					<table class="table table-striped">
@@ -1538,13 +1610,14 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
-	
 	
 </template>
 
 <template name="updatePayment">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 
 			{{#if paymentFor}}
@@ -1587,6 +1660,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 	
 	
@@ -1622,6 +1696,7 @@
 
 <template name="assignmentList">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		<h2>Assignment list</h2>
 		<p> <a href="{{pathFor '/assignment/new'}}" class="btn btn-primary"><span class="fa fa-plus"></span> Create new</a> </p>
 		{{#if Template.subscriptionsReady}}
@@ -1636,7 +1711,7 @@
 						<option>SSS3</option>
 					</select>
 					<select name="subject" class="form-control">
-						<option value="English">Englis Language</option>
+						<option value="English">English Language</option>
 						<option value="Mathematics">Mathematics</option>
 						<option value="Physics">Physics</option>
 						<option value="Chemistry">Chemistry</option>
@@ -1650,8 +1725,9 @@
 						<option value="Accounting">Accounting</option>
 						<option value="Government">Government</option>
 					</select>
-					<button class="btn btn-primary">Filter Assignment</button>
+					<button type="submit" class="btn btn-primary">Filter Assignment</button>
 				</div>
+
 			</form> <br/>
 			{{#if assignments}}
 				{{#each assignments}}
@@ -1680,6 +1756,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
+	</div>
 	{{/if}}
 	
 	
@@ -1687,6 +1764,7 @@
 
 <template name="singleAssignment">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 			<div class="assignment">
 				{{#with assignment}}
@@ -1776,7 +1854,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
-
+	</div>
 	{{/if}}
 	
 	
@@ -1784,6 +1862,7 @@
 
 <template name="createAssignment">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 			<h2>New assignment</h2> <br/>
 			
@@ -1804,7 +1883,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
-
+	</div>
 	{{/if}}
 	
 	
@@ -1812,6 +1891,7 @@
 
 <template name="editAssignment">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 			<h2>Edit assignment</h2> <br/>
 			
@@ -1834,7 +1914,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
-
+	</div>
 	{{/if}}
 	
 	
@@ -1852,9 +1932,10 @@
 
 <template name='messages'>
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 		<div class="messages">
-			<h2>Messages</h2><hr/><br/>
+			<h2>Messages</h2><hr/>
 		<!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist">
 			    <li role="presentation" class="active">
@@ -1899,7 +1980,7 @@
 		{{else}}
 			{{> spinner}}
 		{{/if}}
-
+	</div>
 	{{/if}}
 
 </template>
@@ -1932,13 +2013,13 @@
 										{{senderName}}
 									</td>
 									<td>
-										{{subject}}
+										{{subject}} <span class="label label-primary" title="Number of replies">{{count}}</span>
 									</td>
 									<td>
 										{{createdAt}}
 									</td>
 									<td>
-										<a href="/message/{{_id}}">
+										<a href="/message/{{_id}}" style="text-decoration: none;">
 											<button class="btn btn-info btn-xs">Open</button>	
 										</a>
 										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
@@ -1984,13 +2065,13 @@
 										{{staffName}} {{studentName}}
 									</td>
 									<td>
-										{{subject}}
+										{{subject}} <span class="label label-primary" title="Number of replies">{{count}}</span>
 									</td>
 									<td>
 										{{createdAt}}
 									</td>
 									<td>
-										<a href="/message/{{_id}}">
+										<a href="/message/{{_id}}" style="text-decoration: none;">
 											<button class="btn btn-info btn-xs">Open</button>	
 										</a>
 										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
@@ -2017,24 +2098,53 @@
 
 <template name="singleMessage">
 	{{#if isInRole 'admin, editor, staff'}}
+	<div class="col-md-10 col-md-offset-1">
 		{{#if Template.subscriptionsReady}}
 			{{#with message}}
 				<h3>{{subject}}</h3><hr/>
 				<p><strong>From: {{senderName}}</strong></p>
 				<p><strong>To: {{staffName}} {{studentName}}</strong></p>
 				<p><strong>Date: {{createdAt}}</strong></p>
+				<p><strong>Replies: {{count}}</strong></p>
 				<hr/>
 				<article>
-					<p>
+					<p style="padding: 1em;">
 						{{content}}
 					</p>
 				</article>
 			{{/with}}
+			
+			<form class="col-md-12">
+				<div class="form-group  col-md-6">
+					<textarea class="form-control" placeholder="Reply to this message" minlength="5" rows="5" name="reply" required></textarea>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary" type="submit">Submit reply</button>
+				</div>
+			</form>
+
+			{{#if msgReply}}
+				<h3>Replies <span class="label label-primary" title="{{count}} replies">{{count}}</span></h3><hr/>
+				{{#each msgReply}}
+				<div class="reply">
+					<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}}</strong></span>
+					<span title="Posted date"><strong>{{replyDate}}</strong></span>
+
+					</p>
+					<p style="padding-left:2em;">{{reply}}</p>
+
+				</div>
+				<hr/>		
+				{{/each}}
+			
+			{{else}}
+				<h3>No Replies</h3>
+			{{/if}}
 
 		{{else}}
-			{{> spinner}}
+			<p>{{> spinner}}</p>
 		{{/if}}
-
+	</div>
 	{{/if}}
 	
 	
@@ -2161,40 +2271,101 @@
 <template name="feedbackList">
 	{{#if isInRole 'admin'}}
 		{{#if Template.subscriptionsReady}}
+		<h3>List of feedbacks</h3><hr/>
+		<div class="row">
+			<div class="col-md-6" style="overflow: scroll;">
+				{{#if feedbacks}}
+					<table class="feedbackList">
+						<tr>
+							<th></th>
+							<th>Subject</th>
+							<th>Sender Email</th>
+							<th>Sent Date</th>
+							<th>Action</th>
+						</tr>
+						{{#each feedbacks}}
+							
+								<tr>
+									<td>
+										<input type="checkbox" name="id" value="{{_id}}">
+									</td>
+									<td>
+										{{subject}}
+									</td>
+									<td>
+										{{senderEmail}} 
+									</td>
+									<td>
+										{{sentDate}}
+									</td>
+									<td>
+										
+										<button class="btn btn-info btn-xs" id="showFeedback">show</button>	
+										
+										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
+										
+									</td>
+								</tr>
+						{{/each}}
+					</table>
 
+				{{else}}
+					<p>No feedback to show</p>
+				{{/if}}
+			</div>
+			<div class="col-md-6" id="singleFeedback" style="background-color:#eff; float: right;overflow:scroll;">
+				{{#if singleFeedback}}
+					{{#with singleFeedback}}
+					<h3>{{subject}}</h3><hr/>
+					<div>
+						<span><strong>Sender Email: </strong>{{senderEmail}}</span><br/>
+						<span><strong>Sender Username: </strong>{{senderUsername}}</span><br/>
+						<span><strong>Sent Date: </strong>{{sentDate}}</span><hr/>
+						<p>{{message}}</p>
+					</div>
 
+					{{/with}}
+				{{else}}
+					<p>Click a feedback to show content</p>
+				{{/if}}
 
-		{{else}}
-			{{> spinner}}
-		{{/if}}
+			</div>
+			<div style="clear:both;"></div>
+		</div>
+		
 
+			{{else}}
+				{{> spinner}}
+			{{/if}}
 	{{/if}}
 	
 	
 </template>
-
-
-<template name="singleFeedback">
-	{{#if isInRole 'admin'}}
-		{{#if Template.subscriptionsReady}}
-
-
-
-		{{else}}
-			{{> spinner}}
-		{{/if}}
-
-	{{/if}}
-	
-	
-</template>
-
 
 
 <template name="createFeedback">
-	{{#if isInRole 'admin'}}
+	{{#if isInRole 'admin, editor, staff'}}
 		{{#if Template.subscriptionsReady}}
+			{{#if isInRole 'admin'}}
+				<p><a href="{{pathFor 'feedbackList'}}" class="btn btn-primary">Feedback list</a></p>
+			{{/if}}
+			<div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+				<h3 style="margin-bottom: 25px; text-align: center;">Feedback Form</h3><hr/>
+				<form>
+	       			 <br style="clear:both">
+						<div class="form-group">
+							<input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" minlength="5" maxlength="100" required><br/>
+							<span class="text-danger">Minimum: 5 characters, maximum: 100 characters</span>
 
+						</div>
+	                    <div class="form-group">
+	                    	<textarea class="form-control" type="textarea" id="message" placeholder="Message" minlength="50" maxlength="1500" rows="7" name="message"></textarea><br/>
+							<span class="text-danger">Minimum: 50 characters, maximum: 1500 characters</span>
+
+	                    </div>
+	       				<button type="submit" id="submit" name="submit" class="btn btn-primary pull-right">Submit Form</button>
+	       		</form>
+			</div>
 		
 		{{else}}
 			{{> spinner}}

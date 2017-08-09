@@ -1,38 +1,12 @@
 
 import "./main.html";
 
-Template.header.helpers({
-	user: function(){
-		var currentUser = Meteor.user();
-		console.log(currentUser);
-		return currentUser;
-	},
-});
-
-Template.header.events({
-	 'click #header-logout': function(e){
-    	e.preventDefault();
-    	var confirmLogout = bootbox.confirm("You are about to logout, continue?", function(result){
-    		if(result){
-    			Meteor.logout(function(error){
-	    			if(error){
-	    				bootbox.alert(error);	
-	    			}else{
-	    				bootbox.alert("You're logged out. Thanks");	
-	    			}
-    			});
-    		}
-    	});
-    }
-});
-
 Template.login.events({
     'submit .login-form': function (event) {
         event.preventDefault();
         $("#btn-login").text("Please wait...");
         var email = event.target.email.value;
         var password = event.target.password.value;
-        
         Meteor.loginWithPassword(email,password,function(err, res){
             if(err){
                err.error == 403?$("#login-error").text("Invalid email or password"):$("#login-error").text("Login failed! Empty value.");

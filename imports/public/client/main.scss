@@ -19,16 +19,13 @@ body{
 	height: 100%;
 }
 
-
-
 //app logo
 #header{
 	width: inherit;
-	position: fixed;
 	background-color: #df421e;
 	background-color: rgba(223, 66, 30, 0.9); //#df421e
 	color: white;
-	z-index: 999;
+	z-index: 99;
 	.row{
 		.logo{
 			max-width: 70px;
@@ -59,6 +56,7 @@ footer{
 	position: relative;
 	background-color: #003366;
 	background-color: rgba(0, 51, 102, 0.9); //#003366
+	z-index: 99;
 
 }
 
