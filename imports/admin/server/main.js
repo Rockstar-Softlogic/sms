@@ -21,7 +21,6 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
-
 	'staff.info': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
@@ -32,7 +31,6 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
-
 	'staff.list': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor'])){
@@ -43,7 +41,6 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
-
 	'staff.name': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
@@ -65,6 +62,16 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
+	'graduate.list': function(){
+		let userId = this.userId;
+		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
+			let graduateList = g.Graduates.find({});	
+				if(graduateList){
+					return graduateList;
+				}
+		}
+		return this.ready();
+	},
 	'result.list': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
@@ -75,47 +82,10 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
-	'lastResult.check': function(){
-		let userId = this.userId;
-		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let resultList = g.Results.find({}, {fields: {
-													"result": {"$slice": -1},
-													"studentId": 1,
-													"meteorIdInStudent": 1,
-													"firstName": 1,
-													"lastName": 1,
-													"otherName": 1,
-													"currentClass": 1,}});	
-				if(resultList){
-					return resultList;
-				}
-		}
-		return this.ready();
-	},
-
-
 	'payment.list': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
 			let paymentList = g.Payments.find({});	
-				if(paymentList){
-					return paymentList;
-				}
-		}
-		return this.ready();
-	},
-
-	'lastPayment.check': function(){
-		let userId = this.userId;
-		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let paymentList = g.Payments.find({}, {fields: {
-													"payment": {"$slice": -1},
-													"studentId": 1,
-													"meteorIdInStudent": 1,
-													"firstName": 1,
-													"lastName": 1,
-													"otherName": 1,
-													"currentClass": 1,}});	
 				if(paymentList){
 					return paymentList;
 				}
@@ -147,20 +117,22 @@ Meteor.publish({
 				}
 				return this.ready();
 	},
-	'feedback.list': function(){
-			let userId = this.userId;
-				if(Roles.userIsInRole(userId, ['admin'])){
-					let feedback = g.Feedbacks.find();	
-						if(feedback){
-							return feedback;
-						}
-				}
-				return this.ready();
+	'log.list':function(){
+		let userId = this.userId,logs;
+		if(Roles.userIsInRole(userId, ['admin', 'editor'])){
+			logs = g.Logs.find({},{sort:{time:-1}});
+			if(logs){
+				return logs;
+			}
+		}else if(Roles.userIsInRole(userId, ['staff'])){
+			logs = g.Logs.find({"by":this.userId},{sort:{time:-1}});
+			if(logs){
+				return logs;
+			}
+		}
+		return this.ready();
 	}
-
 });
-
-
 
 Meteor.methods({
 	'uploadPassport':function(name, argument){
@@ -173,12 +145,16 @@ Meteor.methods({
 			}
 		});
 	},
-	toggleAdmin:function(staffId, staffUsername, action){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
+	toggleAdmin:function(doc){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin','editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
+			let staffId = doc.staffId,
+				staffUsername = doc.staff,
+				action = doc.action;
+			delete doc;
 			if(!staffId || !staffUsername || !action){
-				throw new Meteor.Error('500', 'Incomplete information to perform opeartion');
+				throw new Meteor.Error('500', 'Incomplete information to perform operation');
 			}
 			if(Roles.userIsInRole(staffId, ['editor']) && action == "remove"){
 				let removeAdmin = Roles.setUserRoles(staffId, ['staff']);

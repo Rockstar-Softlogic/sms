@@ -5,14 +5,33 @@ import '../imports/student/server/main.js';
 Meteor.startup(() => {
   // code to run on server at startup
 });
+function initAdmin(){
+	let lookUp = Meteor.users.findOne({username:"wisdomabioye", "emails.0.address":"hakym2009@gmail.com", roles:'admin'});
+	if(!lookUp){
+		let admin= Accounts.createUser({username:"wisdomabioye", email:"hakym2009@gmail.com", password: "wetindey"});
+		if(admin){
+			Roles.addUsersToRoles(admin, ['staff', 'admin','superAdmin']);
+			console.log("Admin created and addded to roles");
+		}
+	}else{
+		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);
+	}
+}
+initAdmin();
 
-
-// Roles.addUsersToRoles('kWkdkSDGKDdkk', ['student']);
-// Roles.removeUsersFromRoles('mGQhNrg65z7rNvqbM', ['editor', 'staff','student']);
-
-//Accounts.createUser({username:"wisdomabioye", email:"hakym2009@gmail.com", password: "wetindey"});
-//Roles.addUsersToRoles('LBugkfmZskZw4wWmC', ['admin', 'staff']);
-
+function fakeAdmin(){
+	let lookUp = Meteor.users.findOne({username:"admin", "emails.0.address":"admin@rssl.com", roles:'admin'});
+	if(!lookUp){
+		let admin = Accounts.createUser({username:"admin", email:"admin@rssl.com", password: "admin123"});
+		if(admin){
+			Roles.addUsersToRoles(admin, ['staff', 'admin']);
+			console.log("Fake admin created and addded to roles");
+		}
+	}else{
+		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);
+	}
+}
+fakeAdmin();
 
 
 

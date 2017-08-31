@@ -1,5 +1,10 @@
 
 Meteor.methods({
+	log:function(action){
+		let by = this.userId;
+		let insertLog = g.Logs.insert({"action":action,"by":by,"time":(new Date())});
+		return insertLog;
+	},
 	//staffProfile edit
 	updateStaffProfile: function(data){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin','editor','staff'])){
@@ -7,6 +12,7 @@ Meteor.methods({
 			}
 		let userId = this.userId,
 			staffUpdate = g.Staffs.update({meteorIdInStaff: userId}, {$set: data});
+			Meteor.call("log","Updated profile");
 			return staffUpdate;
 		},
 	//insert student by admin and editor only
@@ -28,25 +34,26 @@ Meteor.methods({
 
 					doc['currentTerm'] = 1;
 					Meteor.call("setTermAndSchoolFees", doc, id, session);
+					Meteor.call("log","Created new session");
 
-				}else{
-					throw new Meteor.Error('Session Error', 'Error occurred while creating new session.');
-
-				}
-			
+			}else{
+				throw new Meteor.Error('Session Error', 'Error occurred while creating new session.');
+			}
 	},
-
 	setTermAndSchoolFees: function(doc, id, sessionYear){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
-			let term = g.Settings.findOne({_id: "default"}).term;
+			let setting = g.Settings.findOne({_id: "default"});
+			//check if not session or term and throw error
+			if(!setting || !setting.term || !setting.session){
+				throw new Meteor.Error(501, "Create new session instead!");
+			}
+			let term = setting.term;
 
 				if(doc['currentTerm'] == 1 && sessionYear && id){
 					 g.Settings.update({"_id": id, session: sessionYear},{$addToSet:{term:doc}});
 				}else if(term == 1 || term == 2){
-					
-					let id = g.Settings.findOne({_id: "default"}).settingId;
 							switch(term){
 								case 1:
 									term = 2;
@@ -61,13 +68,15 @@ Meteor.methods({
 									throw new Meteor.Error("Error", "Error occurred!");
 							}
 						
+						let id = setting.settingId;
 						doc.schoolFees.currentTerm = term;
 						doc.currentTerm = term;
+						sessionYear = setting.session;
 
-						sessionYear = g.Settings.findOne({_id: "default"}).session;
-					let insertSchoolFees = g.Settings.update({"_id": id, session: sessionYear}, {$addToSet: {term: doc}});	
+					let insertSchoolFees = g.Settings.update({"_id": id, "session": sessionYear}, {$addToSet: {"term": doc}});	
 						if(insertSchoolFees){
-							g.Settings.update({"_id": "default", session: sessionYear}, {$set: {term: term}});
+							g.Settings.update({"_id": "default", "session": sessionYear}, {$set: {"term": term}});
+							Meteor.call("log","Created new term");
 						}
 				}else{
 					throw new Meteor.Error("Error occurred", "You can't create new term after third term, create new session instead");
@@ -77,18 +86,19 @@ Meteor.methods({
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
-			let term = g.Settings.findOne({_id: "default"}).term;
-			let id = g.Settings.findOne({_id: "default"}).settingId;
-			let	sessionYear = g.Settings.findOne({_id: "default"}).session;
-
+			let setting = g.Settings.findOne({_id: "default"});
+			let term = setting.term,
+				id = setting.settingId,
+				sessionYear = setting.session;
 			data['currentTerm'] = data.schoolFees.currentTerm = term;
-			let schoolFeesUpdate = g.Settings.update({_id: id,
-													session: sessionYear,
-													'term.currentTerm': term},
-													{$set: {'term.$': data}});
-	},
+			let schoolFeesUpdate = g.Settings.update({"_id": id,
+													"session": sessionYear,
+													"term.currentTerm": term},
+													{$set: {"term.$": data}});
+			Meteor.call("log","Updated term school fees");
 
-	createStudent: function(data){
+	},
+	newStudent: function(data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
@@ -108,12 +118,12 @@ Meteor.methods({
 				if(insertToUser){
 					Roles.addUsersToRoles(insertToUser, ['student']);
 					data.meteorIdInStudent = insertToUser;
-					data['firstName'] = sentenceCase(data.firstName);
-					data['lastName'] = sentenceCase(data.lastName);
-					data['otherName'] = sentenceCase(data.otherName);
+					data['firstName'] = g.sentenceCase(data.firstName);
+					data['lastName'] = g.sentenceCase(data.lastName);
+					data['otherName'] = g.sentenceCase(data.otherName);
 
 					if(data.nok){
-						data.nok['name'] = sentenceCase(data.nok.name);
+						data.nok['name'] = g.sentenceCase(data.nok.name);
 					}
 					g.Students.insert(data);
 
@@ -129,37 +139,36 @@ Meteor.methods({
 							};
 					g.Results.insert(resultAndPaymentRecord);
 					g.Payments.insert(resultAndPaymentRecord);
+					Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
+
 				}
 		}, //end insertStudent method
-	editStudent: function(target, data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
-				throw new Meteor.Error(500, 'Unauthorized Operation');
-			}
-
-			if(target._id && target.studentId && data){
-				let stEdit = g.Students.update({_id: target._id, studentId: target.studentId}, {$set: data});
-							 g.Results.update({_id: target._id, studentId: target.studentId}, {$set: {currentClass: data.currentClass}});
-							 g.Payments.update({_id: target._id, studentId: target.studentId}, {$set: {currentClass: data.currentClass}});
-			}else{
-				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
-			}
-
-	},
 	updateStudent: function(target, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			if(target._id && target.studentId && data){
-				let stUpdate = g.Students.update({_id: target._id, studentId: target.studentId},{$set: data});
+			if(target._id && target.studentId && target.meteorIdInStudent && data){
+				console.log(data);return;
+				let stEdit = g.Students.update({"_id": target._id,
+						"meteorIdInStudent": target.meteorIdInStudent,
+						"studentId": target.studentId},
+						{$set: data});
+							 if(data.currentClass){
+								g.Results.update({"meteorIdInStudent": target.meteorIdInStudent, "studentId": target.studentId}, {$set: {"currentClass": data.currentClass}});
+							 	g.Payments.update({"meteorIdInStudent": target.meteorIdInStudent, "studentId": target.studentId}, {$set: {"currentClass": data.currentClass}});		 	
+							 	Meteor.call("log","Edited student profile "+target.studentId);
+							 	return;
+							 }
+							 
+			//log
+			Meteor.call("log","Updated student profile "+target.studentId);
+			
 			}else{
 				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
 			}
-
 	},
-
-
 //insert staff and Editor by admin and editor only
-	createStaff: function(data){
+	newStaff: function(data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
@@ -180,15 +189,16 @@ Meteor.methods({
 					Roles.addUsersToRoles(insertToUser, ['staff']);
 					//add userId to the staff Collection
 					data.meteorIdInStaff = insertToUser;
-					data.firstName = sentenceCase(data.firstName);
-					data.lastName = sentenceCase(data.lastName);
-					data.otherName = sentenceCase(data.otherName);
+					data.firstName = g.sentenceCase(data.firstName);
+					data.lastName = g.sentenceCase(data.lastName);
+					data.otherName = g.sentenceCase(data.otherName);
 					
 					if(data.nok){
-						data.nok.name = sentenceCase(data.nok.name);
+						data.nok.name = g.sentenceCase(data.nok.name);
 					}
-
 					g.Staffs.insert(data);
+					Meteor.call("log",("Added new staff with id "+data.staffId));
+
 				}
 
 		
@@ -197,118 +207,159 @@ Meteor.methods({
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-
 			if(target._id && target.staffId && data){
 				let staffEdit = g.Staffs.update({_id: target._id, staffId: target.staffId}, {$set: data});
+				Meteor.call("log",("Edited staff employment data, id is "+target.staffId));
 			}else{
 				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
 			}
-
 	},
-	updateStaff: function(target, data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+	removeUser:function(doc){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor','staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			if(target._id && target.staffId && data){
-				let staffUpdate = g.Staffs.update({_id: target._id, staffId: target.staffId},{$set: data});
+			if(doc.type=="staff" && Roles.userIsInRole(this.userId,['admin','editor'])){
+				let del = Meteor.users.remove({"_id":doc.meteorIdInStaff});
+				if(del){
+					g.Staffs.remove({"meteorIdInStaff":doc.meteorIdInStaff});
+					Meteor.call("log",("deleted a staff "+doc.firstName+" "+doc.lastName+" "+doc.staffId));
+					return;
+				} 
+			}else if(doc.type=="student"){
+				let del = Meteor.users.remove({"_id":doc.meteorIdInStudent});
+				if(del){
+					g.Students.remove({"meteorIdInStudent":doc.meteorIdInStudent});
+					g.Results.remove({"meteorIdInStudent":doc.meteorIdInStudent});
+					g.Payments.remove({"meteorIdInStudent":doc.meteorIdInStudent});
+					Meteor.call("log",("deleted a student in "+doc.currentClass+" "+doc.firstName+" "+doc.lastName+" "+doc.studentId));
+					return;
+				}
 			}else{
-				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
+				throw new Meteor.Error(400,'Request not understood!');
 			}
-
 	},
-
 	updateResult: function(get, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			
-			let meteorId, studentId;
-			if(!isEmptyObject(data) && get){
-				let term = g.Settings.findOne({_id: 'default'}).term;
-					meteorId = get.target;
-					studentId = get.studentId;
-					data['class'] = get.currentClass;
-					data['session'] = new Date().getFullYear();
-					data['term'] = term;
-					data['addedBy'] = this.userId;
+			let meteorId, studentId,student;
+			if(!g.isEmptyObject(data) && get){
+				let setting = g.Settings.findOne({"_id":'default'});
+				if(!setting || !setting.term || !setting.session){
+					throw new Meteor.Error("Start a new session first!");
+				}
+					//server only
+					if(Meteor.isServer){
 
-					for(var i in data){
-						if(typeof data[i] == 'object'){
-							data[i]["total"] = data[i].ca + data[i].exam;
-							data[i]["grade"] = calculateGrade(data[i].total);
-							data[i]['remark'] = remark(data[i].grade);
-						}
-					}	
-
+						student = g.Students.findOne({
+								"meteorIdInStudent":get.target,
+								"studentId":get.studentId});
+						meteorId = student.meteorIdInStudent;
+						studentId = student.studentId;
+						data['class'] = student.currentClass;
+						data['session'] = setting.session;
+						data['term'] = setting.term;
+						data['addedBy'] = this.userId;
+						for(var i in data){
+							if(typeof data[i] === 'object'){
+								data[i]["total"] = data[i].ca + data[i].exam;
+								data[i]["grade"] = g.calculateGrade(data[i].total);
+								data[i]['remark'] = g.remark(data[i].grade);
+							}
+						}	
+					}//end if server only
 				}else{
 					throw new Meteor.Error(502, 'Error occurred, invalid data');
 				}
-
-
-			let classArray = ['JSS1', 'JSS2', 'JSS3', 'SSS1', 'SSS2', 'SSS3'];
-			let termArry = [1, 2, 3];
-			
-			if(classArray.indexOf(data['class']) < 0){
-				throw new Meteor.Error(301, 'Class specified do not exist', 'Invalid Class');
-			}
-			if(termArry.indexOf(data['term']) < 0){
-				throw new Meteor.Error(301, 'Term specified do not exist', 'Invalid term');
-			}	
-
+			// if(g.classArray.indexOf(data['class']) < 0){
+			// 	throw new Meteor.Error(301, 'Class specified does not exist', 'Invalid Class');
+			// }
+			// if(g.termArray.indexOf(data['term']) < 0){
+			// 	throw new Meteor.Error(301, 'Term specified does not exist', 'Invalid term');
+			// }	
 				let checkResultInDb = [];
-				let query = g.Results.find({studentId: studentId,
-													meteorIdInStudent: meteorId}).map(function(r){
-														return r.result;
-													});
-
+				let query = g.Results.find({
+						"studentId":studentId,
+						"meteorIdInStudent":meteorId}).map(function(r){
+									return r.result;
+						});
 				query = query[0];
 				if(query){
 						for(var i = 0; i < query.length; i++){
 							obj = query[i];
 							for(var prop in obj){
-								if(obj['class'] == data['class'] && obj['term'] == data['term'] && obj['session'] == data['session']){
+								if(obj['class'] == data['class'] && obj['term'] == data['term'] /*&& obj['session'] == data['session']*/){
 									throw new Meteor.Error(302, "Result already available", "View the result to edit.");
-									
 								}
 							}
-							
 						}
-
-						let resultUpdate = g.Results.update({meteorIdInStudent: meteorId, studentId: studentId},
-											{$push: {result: data}});
-						if(resultUpdate) console.log("No match in previous result, added");
-
+						let resultUpdate = g.Results.update({
+											"meteorIdInStudent":meteorId,
+											"studentId":studentId},
+											{$push: {"result": data}});
+						if(resultUpdate){
+							console.log("No match in previous result, added");	
+						} 
 				}else{
-					let resultUpdate = g.Results.update({meteorIdInStudent: meteorId, studentId: studentId},
-							{$push: {result: data}});
+					let resultUpdate = g.Results.update({
+						"meteorIdInStudent":meteorId,
+						"studentId":studentId},
+						{$push:{"result":data}});
 					if(resultUpdate) console.log("First ever result, added");
 				}
-		
+			// log
+			Meteor.call("log",("created new result for "+studentId));
 	},//end updateResult
-
-	promoteStudent: function(){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
-				throw new Meteor.Error(500, 'Unauthorized Operation');
+	updatePaymentByCash:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+			throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		//get current setting
+		let setting = g.Settings.findOne({"_id":"default"});
+			if(!setting || !setting.session || !setting.term){
+				throw new Meteor.Error(501, "No Session or term found.");
 			}
-
-			g.Students.find().forEach(function(std){
-				g.Students.update({_id: std._id}, 
-					{$set: {currentClass: promoteStudent(std.currentClass)}});
-			});
+			//is server only
+			if(Meteor.isServer){
+				let student = g.Students.findOne({
+					"meteorIdInStudent":doc.target,
+					"studentId":doc.studentId});
+					console.log(doc.studentId,doc.target);
+					console.log(student);return;
+				let payment = {};//build payment object securely
+					payment.class = student.currentClass;
+					payment.term = setting.term;
+					payment.session = setting.session;
+					payment.category = doc.paymentCategory;
+					payment.transactionId = student.studentId+(new Date().toString().split(" ").join("").substring(0,20));
+					payment.amount = doc.amount;
+					payment.paymentStatus = "Paid";
+					payment.paymentType = doc.method;
+					payment.paid = true;
+					payment.date = new Date();
+					payment.addedBy = this.userId;
+					let paymentUpdate = g.Payments.update({
+										"meteorIdInStudent":student.meteorIdInStudent,
+										"studentId":student.studentId},
+										{$push:{"payment":payment}});
+			//log this action
+				Meteor.call("log",("add new payment for "+
+					student.lastName+" "+student.firstName+" ("+
+					student.studentId+") in "+student.currentClass));
+			}//end if server
+			
 	},
 	editResult: function(target, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff']) || !target.class || !target.term || !target.session){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			
 			for(var i in data){
 				if(typeof data[i] == 'object'){
 					data[i]["total"] = data[i].ca + data[i].exam;
-					data[i]["grade"] = calculateGrade(data[i].total);
-					data[i]['remark'] = remark(data[i].grade);
+					data[i]["grade"] = g.calculateGrade(data[i].total);
+					data[i]['remark'] = g.remark(data[i].grade);
 				}
 			}
-
 			data["class"] = target.class;
 			data["term"] = target.term;
 			data["session"] = target.session;
@@ -318,34 +369,48 @@ Meteor.methods({
 							"result.term": data.term,
 							"result.session": data.session}, 
 							{$set:{"result.$": data}});
-			
+			//log
+			Meteor.call("log",("edited result for "+target.studentId));
 			return target.studentId;
 	},
-	createAssignment: function(doc){
+	newAssignment: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			doc.addedBy = this.userId;
-		let tryInsert = g.Assignments.insert(doc);
+		if(Meteor.isServer){
+			let setting = g.Settings.findOne({"_id":"default"});
+			if(!setting || !setting.session || !setting.term){
+				throw new Meteor.Error(501, "No Session or term found. Create new session before adding assignment.");
+			}
+				doc.session = setting.session;
+				doc.term = setting.term;
+				doc.addedBy = this.userId;
+			let tryInsert = g.Assignments.insert(doc);
+			Meteor.call("log",("created "+doc.subject+" assignment for "+doc.class));
 			return tryInsert;
+		}
+			
 	},
-	editAssignment: function(id, doc){
+	editAssignment: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-
+		let id = doc.id;
+		delete doc.id;
 		let query = g.Assignments.findOne({'_id': id});
 			if(query.addedBy !== this.userId){
-				throw new Meteor.Error('Editing denied', 'You do not have the right to edit this assignments.');
+				throw new Meteor.Error('500, Editing denied.', 'You do not have the right to edit this assignment.');
 			}
-
 		let tryUpdate = g.Assignments.update({'_id': id}, {$set: doc});
+		Meteor.call("log",("edited "+doc.subject+" assignment for "+doc.class));
 		return tryUpdate;
 	},
-	scoreAssignment: function(id, doc){
+	scoreAssignment: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
+		let id = doc.id;
+		delete doc.id;
 		let query = g.Assignments.findOne({_id: id});
 			if(query.addedBy !== this.userId){
 				throw new Meteor.Error('Scoring denied', 'You do not have the right to mark this answer.');
@@ -358,7 +423,7 @@ Meteor.methods({
 				g.Assignments.update({_id: id, "answer.id": doc.id}, {$set: {"answer.$.score": doc.score, "answer.$.comment": doc.comment}})
 			}
 	},
-	createMessage: function(message){
+	newMessage: function(message){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 			throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
@@ -368,125 +433,108 @@ Meteor.methods({
 		let username = g.Staffs.findOne({meteorIdInStaff: this.userId});
 		message.senderName = (username.lastName || ' ') + ' ' + (username.firstName || ' ') + ' ' + (username.otherName || ' ');
 		let msgInsert = g.Messages.insert(message);
+			Meteor.call("log",("created new a message '"+message.subject+"'"));
 		return msgInsert;
 	},
-	replyAssignment: function(id,reply){
+	replyAssignment: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-		if(reply.length < 5){
-				throw new Meteor.Error(500, 'Reply too short. At least 6 characters.');
+		if(!doc.reply || doc.reply.length < 5){
+				throw new Meteor.Error(401, 'Reply too short. At least 6 characters.');
 		}
 		let userId = this.userId, staff, staffName;
 		if(Meteor.isServer){
 			staff = g.Staffs.findOne({meteorIdInStaff:userId});
 			staffName = (staff.lastName || "") + " " + (staff.firstName || "") + " " + (staff.otherName || "");
 		}
-		let replyObj = {reply:reply,userId:userId,name:staffName, replyDate:new Date()};
-		let msgUpdate = g.Messages.update({_id: id},{$push:{replies: replyObj}});
+		let replyObj = {reply:doc.reply,userId:userId,name:staffName, replyDate:new Date()};
+		let msgUpdate = g.Messages.update({_id: doc.id},{$push:{replies: replyObj}});
+			Meteor.call("log",("replied to a message"));
 		return msgUpdate;
 	},
-	createFeedback: function(subject, message){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+	promoteStudents: function(){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-		if(subject.length < 5 || subject.length > 100){
-				throw new Meteor.Error(400, 'Subject too short or too long');
-		}
-		if(message.length < 50 || message.length > 1500){
-				throw new Meteor.Error(400, 'Message too short or too long');
-		}
-		let user = Meteor.user();
-		let feedbackObj = {subject:subject,message:message,senderId:this.userId,senderUsername:user.username,senderEmail:user.emails[0].address, sentDate:new Date()};
-		let sendFeedback = g.Feedbacks.insert(feedbackObj);
-		return sendFeedback;
+			if(Meteor.isServer){
+				let students = g.Students.find();
+				if(students.count()<1){throw new Meteor.Error(300,"No student found!")};
+				//promote student
+				students.forEach(function(std){
+					let newClass = g.promoteStudents(std.currentClass);
+					//newClass = graduated? move student to graduate list:move to next class
+					if(newClass=="Graduated"){
+						// delete std._id;//not necessary,maximize random
+						//set currentClass to Graduated;
+						std.currentClass="Graduated";
+						//set graduate year
+						std.graduatedYear = new Date().getFullYear();
+						let newGrad = g.Graduates.insert(std);
+						//remove from students db
+						if(newGrad){
+							g.Results.update({"meteorIdInStudent":std.meteorIdInStudent,
+											"studentId":std.studentId},
+											{$set:{"graduated":true}});
+							g.Payments.update({"meteorIdInStudent":std.meteorIdInStudent,
+											"studentId":std.studentId},
+											{$set:{"graduated":true}});							
+							g.Students.remove({"_id":newGrad});
+						}
+					}else{
+						g.Students.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+						{$set:{"currentClass":newClass}});
+					//update currentClass in result and payment
+						g.Payments.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+							{$set:{"currentClass":newClass}});
+						g.Results.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+							{$set:{"currentClass":newClass}});
+					}//end if
+				});
+			}
+			//when done with promotion, log the action
+			Meteor.call("log",("promoted all Students"));
 	},
-
-});
-
-function promoteStudent(currentClass){
-	switch(currentClass){
-		case 'JSS1':
-			return 'JSS2';
-		case 'JSS2':
-			return 'JSS3';
-		case 'JSS3':
-			return 'SSS1';
-		case 'SSS1':
-			return 'SSS2';
-		case 'SSS2':
-			return 'SSS3';
-		case 'SSS3':
-			return 'Graduated';
-		case 'Graduated':
-			return "Graduated";
-
-		default:
-			return 'invalid';
-	}
-}
-
-//Grade Calculator
-function calculateGrade(num){
-	if(num >= 70) return "A";
-	else if(num >= 60) return "B";
-	else if(num >= 50) return "C";
-	else if(num >= 45) return "D";
-	else if(num >= 40) return "E";
-	else return "F";
-
-}
-
-//Remark calculator
-function remark(grade){
-	switch (grade) {
-		case 'A':
-		case 'A1':
-			return "Excellent";
-			break;
-		case 'B':
-		case 'B2':
-		case 'B3':
-		case 'C':
-		case 'C4':
-		case 'C5':
-		case 'C6':
-			return "Credit";
-			break;
-		case 'D':
-		case 'D7':
-		case 'E':
-		case 'E8':
-			return "Pass";
-			break;
-		case 'F':
-			return "Fail";
-			break;
-		default:
-			return "Not Offered";
-			break;
-	}
-}
-
-
-function isEmptyObject(obj){
-	for(var key in obj){
-		if(Object.prototype.hasOwnProperty.call(obj, key)){
-			return false;
+	demoteGraduate:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
 		}
+		let stToDemote = g.Graduates.findOne({"_id":doc._id,"studentId":doc.studentId});
+			//set class back to SSS3
+			stToDemote.currentClass = "SSS3";
+			//delete graduated year
+			delete stToDemote.graduatedYear;
+			//insert to student db
+		let insertToStudent = g.Students.insert(stToDemote);
+			if(insertToStudent){
+				g.Payments.update({"meteorIdInStudent":stToDemote.meteorIdInStudent,
+											"studentId":stToDemote.studentId},
+											{$set:{"graduated":false}});
+				g.Results.update({"meteorIdInStudent":stToDemote.meteorIdInStudent,
+											"studentId":stToDemote.studentId},
+											{$set:{"graduated":false}});
+				g.Graduates.remove({"_id":insertToStudent});
+			}
+		Meteor.call("log",("demoted student with id "+doc.studentId+" to SSS3"));
+	},
+	pushNotification:function(notification){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+			throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		let checkWord = notification.split(" ");
+		if(checkWord.length < 8){
+			throw new Meteor.Error("400","Notification too short!");
+		}
+		if(Meteor.isServer){
+			let checkSetting = g.Settings.findOne({"_id":"default"});
+			if(checkSetting && (checkSetting.session && checkSetting.term)){
+				Meteor.call("log",("pushed notification"));
+				return g.Settings.update({"_id":"default"},{$set:{"notification":notification}});
+			}else{
+				throw new Meteor.Error(501, "Cannot push notification! No Session or term found.");
+			}
+		}	
+
+		
 	}
-	return true;
-}
-
-
-function sentenceCase(name){
-	if(typeof(name) === "string"){
-		var cased = [];
-		name.split(" ").forEach(function(n){
-			cased.push(n[0].toUpperCase() + n.substring(1).toLowerCase()); 
-		});
-
-		return cased.join(" ");
-	}
-	return name;
-}
+});

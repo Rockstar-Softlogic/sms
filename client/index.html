@@ -3,27 +3,155 @@
 </head>
 <body>
 </body>
-<!-- Public Area rendering layout -->
-<template name="publicLayout">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-md-12">
-				{{> header}}
-			</div>
+
+<template name="login">
+	<section style="padding-top: 5em;">
+				<div class="col-md-offset-1 col-md-5" style="float:left;">
+					<h2 class="text-center text-primary">School Management System (Demo)</h2>
+					<div style="padding:3em;" title="Lovelamp Systems & Consulting Firm">
+						<img src="/logo.jpg" style="max-width:15em;opacity:0.3;margin:0 20%;">
+
+						<p>
+							<b><u>Login Credentials</u></b><br/>
+							<b>Admin Username: admin &amp; password:admin123 </b><br/>
+							<b>Staffs: staff1, staff2, staff3, staff4 &amp; password:12345 </b><br/>
+							<b>Students: student1, student2, student3, student4 &amp; password:12345 </b>
+
+						</p>
+					</div>
+					
+				</div>
+				<div class="col-md-offset-1 col-md-4" style="float:left;">
+					{{#if currentUser}}
+						<h3>You're logged in as {{loggedInUser.username}}</h3>
+						{{#if isInRole 'staff'}}
+							<p>
+								<a href="/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+							</p>
+							
+						{{else}}
+							{{#if isInRole 'student'}}
+								<p>
+									<a href="/st/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+								</p>
+							{{else}}
+								{{> notFound}}
+							{{/if}}
+						{{/if}}
+			          	<p>
+			          		<button class="btn btn-danger btn-lg" id="logout">Logout</button>
+			          		<a href="/contact" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-envelope"></span> Support</a> 
+			          	</p>
+			        {{else}}
+			        	 <form class="login-form">
+			                <div class="panel panel-default">
+			                    <div class="panel-heading">
+			                        <h3>SMS Login <span><a href="{{pathFor 'feedback'}}" class="btn btn-primary">Send feedback</a></span></h3>
+			                    </div>
+			                    <div class="panel-body">
+			                    	
+			                   		<h4 id="login-error" class="text-danger text-center" style="display: none;"></h4>
+			                        <div class="form-group">
+			                            <label>Username</label>
+			                            <input type="text"  class="form-control" id="username" value="" placeholder="username" required>
+			                        </div>
+			                        <div class="form-group">
+			                            <label>Password</label>
+			                            <input type="password" name="" class="form-control" id="password" value="" placeholder="Password" required>
+			                        </div>
+			                    </div>
+			                    <div class="panel-footer">
+			                        <button type="submit" id="btn-login" class="btn btn-danger btn-lg">Login</button>
+			                    </div>
+			                </div>
+			            </form>
+			        {{/if}}
+
+				</div>
+				<div style="clear:both;"></div>
+		</section>
+		<div style="padding:2em" class="col-md-offset-1 col-md-10">
+			{{>footer}}
 		</div>
-			
-		<div class="row" style="min-height: 100%;">
-			<div class="col-md-12">
-				{{> Template.dynamic template=public}}
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				{{> footer}}
-			</div>
-		</div>
+</template>
+
+<template name="smsLoading">
+	<div id="smsLoading" title="Processing">
+		<div class="text-center">
+			<h2><span class="fa fa-spin fa-spinner fa-2x"></span> Processing...</h2>
+		</div>		
 	</div>
 </template>
 
+<template name="feedback">
+	<div class="col-md-5 col-md-offset-4" style="padding:10px;">
+			<h3 style="margin-bottom:25px;text-align:center;">Feedback Form</h3><hr/>
+			<p class="alert alert-info">Thank you for taking your time to contact us. <br/>We'll get back to you in less than 24 hours if need be.</p>
+			<form method="POST">
+				 <br style="clear:both">
+					<label>Email</label>
+					{{#if currentUser}}
+						<p><strong>{{loggedInUser.username}}</strong></p>
+					{{else}}
+					<div class="form-group">
+						<input type="email" class="form-control" id="email" name="email" placeholder="Email" minlength="5" required><br/>
+						<span class="text-danger">A valid email address.</span>
 
-	
+					</div>
+       				{{/if}}
+       			 	<label>Subject</label>
+					<div class="form-group">
+						<input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" minlength="5" maxlength="100" required><br/>
+						<span class="text-danger">Minimum: 5 characters, maximum: 100 characters</span>
+
+					</div>
+					<label>Message</label>
+                    <div class="form-group">
+                    	<textarea class="form-control" type="textarea" id="message" placeholder="Message" minlength="50" maxlength="15000" rows="7" name="message"></textarea><br/>
+						<span class="text-danger">Minimum: 50 characters, maximum: 15000 characters</span>
+
+                    </div>
+       				<button type="submit" id="submit" name="submit" class="btn btn-primary pull-right">Submit Form</button>
+       		</form>
+		</div>
+		<div class="processRequest" style="display:none">{{>smsLoading}}</div>
+
+</template>
+
+<template name="notFound">
+	<div class="container" id="notFound">
+        <div class="col-md-offset-3 col-md-6">
+            <h1>Oops!</h1>
+            <h2>404 Not Found</h2>
+            <div class="error-details">
+                The resource you requested was not found.
+            </div>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg">
+                	<span class="glyphicon glyphicon-home"></span>
+                    Take Me Home
+                 </a>
+                 <a href="/login" class="btn btn-danger btn-lg">Login Page
+                 </a>
+            </div>
+        </div>
+	</div>
+
+</template>
+
+
+<template name="footer">
+	<footer style = "padding:1em;color:#fff;">
+		<div class="row">
+			<div class="col-md-6">
+				<p>Copyright &copy; Sample Schools, sample state, sample country.</p>
+			</div>
+			<div class="col-md-6">
+				<p>Designed by <a href="http://www.lovelampsys.com" target="_blank">Lovelamp Systems &amp; Consulting Firm</a></p>
+			</div>
+		</div>
+
+	</footer>
+
+</template>
+

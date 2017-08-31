@@ -1,16 +1,66 @@
 body{
-
 }
 
+// @media print{
+// 	button,a{
+// 		display:none;
+// 	}
+// 	.serial td:first-child{
+// 		width:20px;
+// 	}
+// }
+
 #staffDashboard{
-	div{
-		min-height: 200px;
-		margin-top: 1em;
-		box-shadow: 2px 2px 5px grey, -2px -2px 5px grey;
+	section{
+		margin: 0.8em 0 0 1.5em;
+		div{
+			min-height: 280px;
+			padding:5px 1em;
+			margin: 10px 0;
+			box-shadow: 2px 2px 5px grey, -2px -2px 5px grey;
+			h4{
+				border-bottom:1px solid #abc;
+				font-weight: bold;
+				font-family: georgia;
+				background-color:#eee;
+				padding:3px;
+				margin:4px 0;
+			}
+		}
 	}
 	.sms-offset-1{
 		margin-left:4.16667%;
+	}
+	.notification{
+		article{
+			font-size:1.2em;
+		}
+		textarea{
+			font-size:1.1em;
+		}
+	}
+	.summary,.result,.payment{
+		font-size:1.1em;
+		table{
+			font-size:14px;
+			td,th{
+				padding:3px;
+				text-align:center;
+			}
+			tr{
+				background-color:#fff !important;
+			}
+		}
 	}	
+}
+#ctrlpanel{
+	.schoolFees ul{
+		font-weight:bold;
+		font-size: 1.1em;
+	}
+	.changeSchoolFees{
+		padding:5px;
+	}
 }
 
 button#uploadBtn{
@@ -81,6 +131,9 @@ table.serial {
     tr:not(:first-child) {
     	counter-increment: rowNumber;
 		
+		td:first-child{
+			width:10px;
+		}
 		td:first-child::before {
     		content: counter(rowNumber);
 			}
@@ -91,7 +144,7 @@ table.serial {
 }
 
 
-.setting{
+/* .setting{
 	.setting-row{
 		margin: 1em 0;
 		border-radius: 3px;
@@ -103,12 +156,14 @@ table.serial {
 			padding: 5px;
 		}
 	}
-}
+} */
 
 .assignmentList{
+	margin:2px 0 10px 0;
+	padding:5px 0 10px 0;
 	.badge{
 		background-color: #ddd;
-		color: black;
+		color: #000;
 	}
 	div{
 		span{

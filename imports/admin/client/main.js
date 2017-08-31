@@ -1,161 +1,141 @@
 import './main.html';
-
-let monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-
-
-Template.ctrlpanel.onCreated(function(){
+//grab setting
+Template.staffDashboard.onCreated(function(){
 	let self = this;
-	self.autorun(function(){
-		self.subscribe('setting');
-	});
+		self.autorun(function(){
+			self.subscribe("student.list");
+			self.subscribe("result.list");
+			self.subscribe("payment.list");
+			self.subscribe("staff.list");
+			self.subscribe("log.list");
+		});
 });
-
-Template.ctrlpanel.helpers({
+Template.staffDashboard.helpers({
+	//Students count
+	studentCount:function(currentClass){
+		return g.Students.find({"currentClass":currentClass}).count();
+	},
+	allStudent:function(){
+		return g.Students.find().count();
+	},
+	graduates:function(){
+		return g.Graduates.find().count()
+	},
+	//results count
+	resultCount:function(currentClass){
+		let s = g.setting();if(!s)return;//review
+		return g.Results.find({"currentClass":currentClass,"result.session":s.session,"result.term":s.term}).count();
+	},
+	allResult:function(){
+		let s = g.setting();if(!s)return;//review
+		return g.Results.find({"result.session":s.session,"result.term":s.term}).count();
+	},
+	//payments count
+	paymentCount:function(currentClass){
+		let s = g.setting();if(!s)return;//review
+		return g.Payments.find({"currentClass":currentClass,"payment.session":s.session,"payment.term":s.term}).count();
+	},
+	allPayment:function(){
+		let s = g.setting();if(!s)return;//review
+		return g.Payments.find({"payment.session":s.session,"payment.term":s.term}).count();
+	},
 	termSchoolFees: function(){
-		let session = g.Settings.findOne({_id: "default"}).session;
-		let term = g.Settings.findOne({_id: "default"}).term;
-		let id = g.Settings.findOne({_id: "default"}).settingId;
-			
-		let query = g.Settings.findOne({_id: id, session: session});
+		let s = g.setting();if(!s)return;//review
+		let session = s.session,
+			term = s.term,
+			id = s.settingId;
+		let query = g.Settings.findOne({"_id":id,"session":session});
 		let filtered = query.term.filter(function(current){
 				if(current.currentTerm == term && current.schoolFees.currentTerm == term){
 					return current;
 				}
 		});
-			return filtered[0]
-		
+		return filtered[0]
 	},
-	currentSession: function(){
-		let gSession = g.Settings.findOne({_id: 'default'}).session;
-			return gSession;
-	},
-	currentTerm: function(){
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-
-		switch(gTerm){
-			case 1:
-				return '1st';
-			case 2:
-				return '2nd';
-			case 3:
-				return '3rd';
-		}
-	},
-	
+	log:function(){
+		let logs = g.Logs.find({},{limit:5}).fetch();
+			logs.forEach(function(log){
+				let name;
+				if(Meteor.userId() === log.by){
+					name = "You";
+				}else{
+					let query = g.Staffs.findOne({"meteorIdInStaff":log.by});
+					query?name = query.lastName+" "+query.firstName+" ("+query.staffId+")":name="superAdmin";	
+				}
+				log.name = name;
+				return log;
+			});
+		return logs;
+	}
 });
 
+Template.staffDashboard.events({
+	"submit form":function(e){
+		e.preventDefault();
+		let notification = e.target.notification.value;
+		g.meteorCall("pushNotification",{
+			doc:notification,
+			successMsg:"Notification was updated."
+			});
+		$("div.notification form").hide("fast");
+		$("div.notification article").show("fast");
+	},
+	"click button.pushNew":function(e){
+		e.preventDefault();
+		$("div.notification article").hide("fast");
+		$("div.notification form").show("fast");
+
+	},
+	"click button.cancelPush":function(e){
+		$("div.notification article").show("fast");
+		$("div.notification form").hide("fast");
+
+	}
+});
+Template.ctrlpanel.helpers({
+	termSchoolFees: function(){
+		let s = g.setting();if(!s)return;//needs review
+		let session = s.session,
+			term = s.term,
+			id = s.settingId;
+		let query = g.Settings.findOne({"_id":id,"session":session});
+		let filtered = query.term.filter(function(current){
+				if(current.currentTerm == term && current.schoolFees.currentTerm == term){
+					return current;
+				}
+		});
+		return filtered[0]
+	},
+});
 Template.ctrlpanel.events({
-	'click .promoteAll button': function(){
-		let verify = confirm('You\'re about to promote all students in the school. Are you sure?');
-			if(verify){
-				Meteor.call('promoteStudent', function(error){
-					if(error){
-						alert(error.error);
-					}
-					else alert("All students have been promoted");
-				});
-			}return;
+	'click #ctrlpanel button#promoteStudents': function(){
+		let warning = '<h4>You\'re about to promote all students in the school. This cannot be undone! <br/> Are you sure?</h4>';
+			bootbox.confirm(warning,function(verify){
+				if(verify){
+					g.meteorCall("promoteStudents",{
+						successMsg:"All students were promoted with success."
+					});
+				}
+			});
+			
 	},
 
-	'click #addSession': function(){
+	'click #newSessionBtn': function(){
 		Modal.show('newSessionModal', function(){return;}, {backdrop: 'static', keyboard: false});
 	},
 
-	'click #addTerm': function(){
+	'click #newTermBtn': function(){
 		Modal.show('setTermAndSchoolFees', function(){return;}, {backdrop: 'static', keyboard: false});
-	}
-
-});
-
-Template.newSessionModal.onCreated(function(){
-	let self = this;
-	self.autorun(function(){
-		self.subscribe('setting');
-	});
-});
-
-Template.newSessionModal.helpers({
-	sessionInfo: function(){
-		let obj = {};
-
-			obj['session'] = g.Settings.findOne({_id: "default"}).session;
-			obj['term'] = g.Settings.findOne({_id: "default"}).term;
-			obj['id'] = g.Settings.findOne({_id: "default"}).settingId;
-
-			return obj;
-
 	},
-
-});
-
-Template.newSessionModal.events({
-	
-});
-
-Template.setTermAndSchoolFees.onCreated(function(){
-	let self = this;
-	self.autorun(function(){
-		self.subscribe('setting');
-	});
-});
-
-Template.setTermAndSchoolFees.helpers({
-	sessionInfo: function(){
-		let obj = {};
-
-			obj['session'] = g.Settings.findOne({_id: "default"}).session;
-			obj['term'] = g.Settings.findOne({_id: "default"}).term;
-			obj['id'] = g.Settings.findOne({_id: "default"}).settingId;
-
-			return obj;
-
-	},
-
-});
-
-Template.setTermAndSchoolFees.events({
-	
-
-});
-
-
-//Each staff Profile page
-
-Template.profile.onCreated(function(){
-	let self = this;
-	self.autorun(function(){
-		self.subscribe('staff.info');
-	});
-});
-
-Template.profile.helpers({
-	staffInfo: function(){
-		let data = g.Staffs.findOne();
-		return data;
+	'click .schoolFees button':function(e){
+		e.preventDefault();
+		$('.schoolFees').hide("fast");
+		$('.changeSchoolFees').show("fast");
 	}
+
 });
 
-Template.editProfile.onCreated(function(){
-	let self = this;
-	self.autorun(function(){
-		self.subscribe('staff.info');
-	});
-});
 
-Template.editProfile.helpers({
-	editable: function(){
-		let data = g.Staffs.findOne();
-		return data;
-	}
-});
-
-//End Each staff Profile page
-// **********************///
-// **********************///
-// ******BREAK Brea******///
-// **********************///
-// **********************///
 //list of admin among staffs
 Template.editorList.onCreated(function(){
 	let self = this;
@@ -175,21 +155,26 @@ Template.staffList.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('staff.list');
-
 	});
 });
 
 Template.staffList.helpers({
 	staffs: function(){
-		let getFilter = Session.get('staffFilter');
-			if(getFilter && (getFilter.name || getFilter.staffId)){
-				return g.Staffs.find({$or: [{staffId: getFilter.staffId},
-												{fullName: /getFilter.name/i}]});
-				}
-		return g.Staffs.find({});
+		let filter = Session.get('staffFilter'),
+			staffs = g.Staffs.find({});
+			if(!filter || filter=="all_staff"){
+				return staffs;
+			}else if(filter.name || filter.staffId){
+					filter.name?filter.name=g.sentenceCase(filter.name):"";
+					staffs = g.Staffs.find({
+							$or: [{staffId: filter.staffId},
+								{firstName:filter.name},
+								{lastName:filter.name},
+								{otherName:filter.name}]}).fetch();
+				return staffs;
+			}
 	},
 });
-
 Template.staffList.events({
 	'submit form': function(e){
 			e.preventDefault();
@@ -199,63 +184,63 @@ Template.staffList.events({
 						staffId: staffId};
 			Session.set('staffFilter', filter);
 	},
-
+	'click button#all_staff':function(e){
+		e.preventDefault();
+		Session.set('staffFilter', "all_staff");
+	}
 });
-
-
 Template.singleStaff.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('staff.list');
-
 	});
 });
-
 Template.singleStaff.helpers({
 	staff: function(){
 		let id = FlowRouter.getParam('id');
 		let data = g.Staffs.findOne({staffId: id});
-		let role = Meteor.call('isEditor', data.meteorIdInStaff);
-		console.log(role);
 		return data;
 	},
 });
-
 Template.singleStaff.events({
 	'click #makeAdmin':function(e){
 		e.preventDefault();
-		let staff = this.staffId, staffId = this.meteorIdInStaff, action = "add";
+		let staff = this.staffId, staffId = this.meteorIdInStaff;
 		bootbox.confirm("Are you sure to make "+this.lastName+" "+this.firstName+" ("+staff+") admin?", function(result){
 			if(result){
-				Meteor.call('toggleAdmin', staffId, staff, action, function(error){
-					if(error){
-						insertNotice(error, 6000);
-						return;
-					}else{
-						insertNotice(staff+" is now an admin.", 4000);
-						return;
-					}
-				});
+				let obj = {staffId:staffId,staff:staff,action:'add'};
+				g.meteorCall("toggleAdmin",{doc:obj,
+					successMsg:staff+" is now an admin."});
 			}
 		});
 	},
 	'click #removeAdmin':function(e){
 		e.preventDefault();
-		let staff = this.staffId, staffId = this.meteorIdInStaff, action = "remove";
+		let staff = this.staffId, staffId = this.meteorIdInStaff;
 		bootbox.confirm("Are you sure to remove "+this.lastName+" "+this.firstName+" ("+staff+") as admin?", function(result){
 			if(result){
-				Meteor.call('toggleAdmin', staffId, staff, action, function(error){
-					if(error){
-						insertNotice(error, 6000);
-						return;
-					}else{
-						insertNotice(staff+" is no more an admin.", 4000);
-						return;
-					}
-				});
+				let obj = {staffId:staffId,staff:staff,action:'remove'};
+				g.meteorCall("toggleAdmin",{doc:obj,
+					successMsg:staff+" is no more an admin."});
 			}
 		});
 	},
+	"click #deleteStaff":function(e){
+		e.preventDefault();
+		let self = this;
+			self.type="staff";
+		let warning = "<h4>Deleting a staff will completely remove him/her from the database.<br/>";
+			warning += "This cannot be undone. Are you sure to continue?</h4>";
+		bootbox.confirm(warning,function(result){
+			if(result){
+				g.meteorCall("removeUser",{
+					doc:self,
+					successMsg:"The staff was removed!",
+					redirect:"staffList"
+				});
+			}
+		});
+	}
 });
 
 //editing and update staff
@@ -273,9 +258,6 @@ Template.editStaff.helpers({
 		return g.Staffs.findOne({staffId: id});
 	},
 });
-
-
-
 Template.updateStaff.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
@@ -290,16 +272,8 @@ Template.updateStaff.helpers({
 		return g.Staffs.findOne({staffId: id});
 	},
 });
-
 //End List of Staff in School
-
-// **********************///
-// **********************///
-// ******BREAK Break******///
-// **********************///
-// **********************///
 //passport upload events and helpers
-
 Template.passportUpload.helpers({
 	uploadInfo: function(){
 		let getInfo = Session.get('passportTarget');
@@ -308,36 +282,30 @@ Template.passportUpload.helpers({
 });
 
 Template.passportUpload.events({
-
 	'change input#file': function(event){
 		let file = event.target.files[0];
 			if(!file) return;
-
 			let allowedFormat = ["image/png", "image/jpg"],
 				maxSize = 51200,
 				minSize = 5120,
 				error = checkFile(file, allowedFormat, minSize, maxSize);
-
 				if(error){
-					insertNotice(error, 8000);
+					g.notice(error, 8000);
 					return false;
 				}
-
 			//read the file if valid
 			let maxHeight = 310, maxWidth = 250;
-
 			let reader = new FileReader();
 				reader.onload = function(e){
 					let image = document.createElement('img');
 						image.onload = function(){
-
 								if((image.width || image.naturalWidth) > maxWidth){
-									insertNotice('Image width cannot be greater than ' + maxWidth, 6000);
+									g.notice('Image width cannot be greater than ' + maxWidth, 6000);
 									$('#uploadBtn').hide('slow');
 									$('#passportPreview').html("<strong>Invalid passport <br/> width &gt; </strong>"+maxWidth);
 									return false;
 								}else if((image.height || image.naturalHeight) > maxHeight){
-									insertNotice('Image height cannot be greater than ' + maxHeight);
+									g.notice('Image height cannot be greater than ' + maxHeight);
 									$('#uploadBtn').hide('slow');
 									$('#passportPreview').html("<strong>Invalid passport <br/> height &lt; </strong> "+maxHeight);
 									return false;
@@ -345,7 +313,6 @@ Template.passportUpload.events({
 								$('#passportPreview').html(image);
 								$('#uploadBtn').fadeIn('slow');
 						}
-
 						image.onerror = function(){
 							$('#file').hide('fast');
 							$('#passportPreview').html("You selected a file renamed to an image extension. <br/>Do you know what you're doing?");
@@ -354,13 +321,11 @@ Template.passportUpload.events({
 						image.src = e.target.result;
 				}
 				reader.readAsDataURL(file);
-		
-
 	},
 	'click button#uploadBtn': function(){
 			let preview = $('#passportPreview img').attr('src');
 				if(preview.length < 100){
-					insertNotice("You've not selected any file to upload");
+					g.notice("You've not selected any file to upload");
 					return false;
 				}
 			let file = document.getElementById('file').files[0];
@@ -377,18 +342,18 @@ Template.passportUpload.events({
 
 					Meteor.call('uploadPassport', (target.id)+ext, content, function(err, result){
 						if(err){
-							insertNotice("error occurred", err);
-							return false;
+							g.notice("error occurred: "+err);
+							return;
 						}
 					else{
 						let pathToGo = target.diff;
 						if(pathToGo == 'student'){
-							insertNotice("Passport uploaded successfully", 4000);
-							next = FlowRouter.path('/student/view/'+target.id);
+							g.notice("Passport uploaded successfully", 4000);
+							next = FlowRouter.path('/dashboard/student/view/'+target.id);
 									FlowRouter.go(next);
 						}else if(pathToGo == 'staff'){
-							insertNotice("Passport uploaded successfully", 4000);
-							next = FlowRouter.path('/staff/view/'+target.id);
+							g.notice("Passport uploaded successfully", 4000);
+							next = FlowRouter.path('/dashboard/staff/view/'+target.id);
 									FlowRouter.go(next);}
 						}
 						
@@ -398,12 +363,9 @@ Template.passportUpload.events({
 	},
 });
 
-
-
 //function check file format and size
 function checkFile(file, format, minSize = 0, maxSize){
 	let error;
-
 	if(format.indexOf(file.type) < 0){
 		error = "Passport can only be in jpg or png format.";
 	}else if(file.size > maxSize){
@@ -414,12 +376,6 @@ function checkFile(file, format, minSize = 0, maxSize){
 	return error;
 
 }
-
-// **********************///
-// **********************///
-// ******BREAK Break******///
-// **********************///
-// **********************///
 //List of student in School
 Template.studentList.onCreated(function(){
 	let self = this;
@@ -428,19 +384,25 @@ Template.studentList.onCreated(function(){
 
 	});
 });
-
 Template.studentList.helpers({
 	students: function(){
-		let getFilter = Session.get('studentFilter');
-			if(getFilter && (getFilter.selectedClass || getFilter.studentId || getFilter.name)){
-				return g.Students.find({$or: [{currentClass: getFilter.selectedClass},
-												{studentId: getFilter.studentId},
-												{fullName: {$regex: /getFilter.name/i}}]}).fetch();
+		let filter = Session.get('studentFilter');
+			if(filter && (filter.selectedClass || filter.studentId || filter.name)){
+				filter.name?filter.name=g.sentenceCase(filter.name):"";
+				return g.Students.find({$or: [{currentClass: filter.selectedClass},
+												{studentId: filter.studentId},
+												{firstName:filter.name},
+												{lastName:filter.name},
+												{otherName:filter.name}	
+												]}).fetch();
 			}
-		return g.Students.find({currentClass: "JSS1"});
+		return g.Students.find({currentClass: "JSS1"}).fetch();
 	},
+	studentFilter:function(){
+		let filter = Session.get('studentFilter');
+		return filter;
+	}
 });
-
 Template.studentList.events({
 	'submit form': function(e){
 			e.preventDefault();
@@ -456,19 +418,14 @@ Template.studentList.events({
 		bootbox.alert('e.target.selectSt.value');
 	}
 });
-
 //End List of student in School
 //Single student view page
 Template.singleStudent.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('student.list');
-		self.subscribe('setting');
-
-
 	});
 });
-
 Template.singleStudent.helpers({
 	student: function(){
 		let id = FlowRouter.getParam('id');
@@ -476,9 +433,25 @@ Template.singleStudent.helpers({
 		return data;
 	},
 });
-
+Template.singleStudent.events({
+	"click #deleteStudent":function(e){
+		e.preventDefault();
+		let self = this;
+			self.type="student";
+		let warning = "<h4>Deleting a student will remove the results and payments.<br/>";
+			warning += "This cannot be undone. Are you sure to continue?</h4>";
+		bootbox.confirm(warning,function(result){
+			if(result){
+				g.meteorCall("removeUser",{
+					doc:self,
+					successMsg:"The student was removed!",
+					redirect:"studentList"
+				});
+			}
+		});
+	}
+});
 //End Single student view
-
 //edit student template
 Template.editStudent.onCreated(function(){
 	let self = this;
@@ -486,17 +459,12 @@ Template.editStudent.onCreated(function(){
 		self.subscribe('student.list');
 	});
 });
-
 Template.editStudent.helpers({
 	editStudentInfo: function(){
 		let id = FlowRouter.getParam('id');
-		return g.Students.findOne({studentId: id});
+		return g.Students.findOne({"studentId": id});
 	}
 });
-
-//edit student template
-
-
 //update student template
 Template.updateStudent.onCreated(function(){
 	let self = this;
@@ -504,57 +472,55 @@ Template.updateStudent.onCreated(function(){
 		self.subscribe('student.list');
 	});
 });
-
 Template.updateStudent.helpers({
 	updateStudentInfo: function(){
 		let id = FlowRouter.getParam('id');		
 		return g.Students.findOne({studentId: id});
 	}
 });
-
-
-
 //update student template
-
-// **********************///
-// **********************///
-// ******BREAK Break******///
-// **********************///
-// **********************///
-
 Template.resultList.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
-		self.subscribe('lastResult.check');
-		self.subscribe('setting');
-
+		self.subscribe('result.list');
 	});
 });
-
-
 Template.resultList.helpers({
 	results: function(){
-		let getFilter = Session.get('resultFilter');
-			if(getFilter && (getFilter.selectedClass || getFilter.studentId || getFilter.name)){
-				return g.Results.find({$or: [{currentClass: getFilter.selectedClass},
-												{studentId: getFilter.studentId},
-												{fullName: {$regex: /getFilter.name/i}}]}).fetch();
+		let s = g.setting();
+		if(!s)return;//review
+		let filter = Session.get('resultFilter'),result,filtered;
+			if(filter && (filter.selectedClass || filter.studentId)){
+				result = g.Results.find({
+					$or: [{"currentClass":filter.selectedClass},
+						{"studentId":filter.studentId}]}).fetch();
+			}else{
+				result = g.Results.find({currentClass:"JSS1"}).fetch();
 			}
-		return g.Results.find({currentClass: "JSS1"});
-		
-	},
-	resultAvailable: function(){
-		let bool = false;
-		let query = g.Results.find({}).map(function(each){
-				each.result;
-		});
-				if(query.length){
-					bool = true;
+		if(result){
+			filtered = result.map(function(res){
+			//alterntive:filter function for skipping empty result
+				if(res.result){
+					//get last result
+					lastResult = res.result[res.result.length-1];
+					//last result equals this term result?
+					if(lastResult.class==res.currentClass && lastResult.session == s.session && lastResult.term == s.term){
+						res.termResultAvailable=true;
+					}
+					res.lastResult = lastResult; 
+					//return res; //only available result would be returned
 				}
-		return bool;
-	},		
+				//return all result
+				return res;
+			});
+			return filtered;
+		}	
+	},
+	resultFilter:function(){
+		let filter = Session.get('resultFilter');
+		return filter;
+	}
 });
-
 Template.resultList.events({
 	"click .addResult": function(){
 			let query = {name: (this.lastName || " ") +", "+(this.firstName || " ") +" "+ (this.otherName || " "), 
@@ -563,100 +529,89 @@ Template.resultList.events({
 						target: this.meteorIdInStudent || undefined,
 					};
 			Session.set('st.info', query);
-
 	},
-
 	'submit form': function(e){
 			e.preventDefault();
-			let name = e.target.name.value;
 			let studentId = e.target.studentId.value;
 			let selectedClass = e.target.class.value;
-			let filter = {name: name,
-						studentId: studentId,
+			let filter = {studentId: studentId,
 						selectedClass: selectedClass};
 			Session.set('resultFilter', filter);
 	},
-
 });
-
-
-
-
 Template.singleResult.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('result.list');
 		self.subscribe('student.list');
-		self.subscribe('setting');
-
+		self.subscribe('graduate.list');
 	});
 });
 
 Template.singleResult.helpers({
 	singleRes: function(){
 		let id = FlowRouter.getParam('id'),
-			query = g.Results.findOne({studentId: id}),
-			currentClass = g.Students.findOne({studentId: id}),
-			requestedResult = Session.get('requestedResult'),
-			gTerm = g.Settings.findOne({_id: "default"}).term;
+			s = g.setting();if(!s)return;//review
+		let	query = g.Results.findOne({"studentId": id});
+		//get this student current class in student list 
+		//or graduated student list
+		let	currentClass = query.currentClass,		
+		//get searched result if available
+			requestedResult = Session.get('requestedResult');
 		if(query.result){
 			let filtered = query.result.filter(function(r){
 					if(requestedResult && (requestedResult.class && requestedResult.term) && requestedResult.id === id){
-						if(r.class === requestedResult.class && r.term == requestedResult.term){
+						if(r.class === requestedResult.class && r.term==requestedResult.term){
 							return r;
 						}	
-					}
-					else if(r.class === currentClass.currentClass && r.term == gTerm){
+					}//if no session, return result for current class
+					else if(currentClass && (r.class===currentClass && r.term===s.term)){
+						return r;
+					}//else if graduated student, return SSS3 result with current term
+					else if(r.class === "SSS3" && r.term == s.term){
 						return r;
 					}
 			});
-
-			if(filtered) return filtered[0];
+			if(filtered)return filtered[0];
 		}return;
 	},
-
 	studentInfo: function(){
 		let id = FlowRouter.getParam('id');
-		return g.Students.findOne({studentId: id}, {firstName: 1, 
-													lastName: 1,
-													otherName: 1,
-													email: 1,
-													studentId: 1,
-													currentClass: 1,
+		let info = g.Students.findOne({studentId: id}, {"firstName": 1, 
+													"lastName": 1,
+													"otherName": 1,
+													"email": 1,
+													"studentId": 1,
+													"currentClass": 1,
 													});
+		//is student still in school?
+		if(info){
+			return info;
+		}else{//otherwise check graduate list for student info
+			return g.Graduates.findOne({"studentId": id}, {"firstName": 1, 
+													"lastName": 1,
+													"otherName": 1,
+													"email": 1,
+													"studentId": 1,
+													"currentClass": 1,
+													});
+		}
 	},
 	availableClass: function(){
 		let id = FlowRouter.getParam('id');
 		let classes = [];
 		let data = g.Results.findOne({studentId: id},{result: 1});
-		
 		if(data.result){
 			data.result.forEach(function(res){
 					classes.push(res.class);
 				});
-
 			classes = classes.filter(function(item, pos){
 				return classes.indexOf(item) == pos;
 			});
 			return classes;
 		}return;
-	},
-
-	currentTerm: function(){
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-
-		switch(gTerm){
-			case 1:
-				return '1st';
-			case 2:
-				return '2nd';
-			case 3:
-				return '3rd';
-		}
-	},
-
+	}
 });
-
 Template.singleResult.events({
 	'submit form': function(e){
 		e.preventDefault();
@@ -665,49 +620,33 @@ Template.singleResult.events({
 		let request = {id: this.studentId, class: requestedClass, term: requestTerm};
 		Session.set('requestedResult', request);
 	},
-
 });
-
-
 // add result for student
-Template.updateResult.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe('setting');
-		});
-});
-
 Template.updateResult.helpers({
 	resultFor: function(){
-		let stInfo = Session.get('st.info');
-		let gTerm = g.Settings.findOne({_id:"default"}).term;
+		let stInfo = Session.get('st.info'),
+			s = g.setting();if(!s)return;//review
 		if(!$.isEmptyObject(stInfo)){
-			stInfo['term'] = gTerm;
+			stInfo['term'] = s.term;
 			return stInfo;
 		}
-	},
+	}
 });
-
 //edit result for student
 Template.editResult.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('result.list');
 			self.subscribe('student.list');
-			self.subscribe('setting');
-
 		});
-
 });
-
 Template.editResult.helpers({
 	resultToEdit: function(){
 		let id = FlowRouter.getParam('id'),
-			query = g.Results.findOne({studentId: id}),
+			s = g.setting();if(!s)return;//review
+		let	query = g.Results.findOne({studentId: id}),
 			currentClass = g.Students.findOne({studentId: id}),
-			requestedResult = Session.get('requestedResult'),
-			gTerm = g.Settings.findOne({_id: "default"}).term;
-
+			requestedResult = Session.get('requestedResult');
 		if(query.result){
 			let filtered = query.result.filter(function(r){
 					if(requestedResult && (requestedResult.class && requestedResult.term) && requestedResult.id === id){
@@ -715,7 +654,7 @@ Template.editResult.helpers({
 							r['studentId'] = id; 
 							return r;
 						}	
-					}else if(r.class === currentClass.currentClass && r.term == gTerm){
+					}else if(r.class === currentClass.currentClass && r.term == s.term){
 							r['studentId'] = id; 
 							return r;
 					}
@@ -731,96 +670,78 @@ Template.editResult.helpers({
 													studentId: 1,
 													currentClass: 1,
 													});
-	},
-	currentTerm: function(){
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-		switch(gTerm){
-			case 1:
-				return '1st';
-			case 2:
-				return '2nd';
-			case 3:
-				return '3rd';
-		}
-	},
-
+	}
 });
-// **********************///
-// **********************///
-// ******BREAK Break******///
-// **********************///
-// **********************///
-
 Template.paymentList.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
-		self.subscribe('lastPayment.check');
-		self.subscribe('setting');
-
-		
-
+		self.subscribe('payment.list');
 	});
 });
-
 Template.paymentList.helpers({
-	payments: function(){
-		let getFilter = Session.get('paymentFilter');
-			if(getFilter && (getFilter.selectedClass || getFilter.studentId || getFilter.name)){
-				return g.Payments.find({$or: [{currentClass: getFilter.selectedClass},
-												{studentId: getFilter.studentId},
-												{fullName: {$regex: /getFilter.name/i}}]}).fetch();
+	payments:function(){
+		let s = g.setting();if(!s)return;//review
+		let filter = Session.get('paymentFilter'),payment,filtered;
+			if(filter && (filter.selectedClass || filter.studentId)){
+				payment = g.Payments.find({
+					$or: [{currentClass: filter.selectedClass},
+						{studentId: filter.studentId}]}).fetch();
+			}else{
+				payment = g.Payments.find({currentClass:"JSS1"}).fetch();
 			}
-		return g.Payments.find({currentClass: "JSS1"});
+		if(payment){
+			filtered = payment.map(function(pay){
+				if(pay.payment){
+					lastPayment = pay.payment[pay.payment.length-1];
+					if(lastPayment.class==pay.currentClass && lastPayment.session == s.session && lastPayment.term == s.term){
+						pay.termPaymentAvailable=true;
+					}
+					pay.lastPayment = lastPayment; 
+				}
+				return pay;
+			});
+			return filtered;
+		}
 	},
+	paymentFilter:function(){
+		let filter = Session.get('paymentFilter');
+		return filter;	
+	}
 });
-
-
-
 Template.paymentList.events({
-	"click .addPayment": function(){
-
-			let query = {name: (this.lastName || " ") +", "+(this.firstName || " ") +" "+ (this.otherName || " "), 
-						studentId: this.studentId || undefined,
-						currentClass: this.currentClass || undefined,
-						target: this.meteorIdInStudent || undefined,
+	"click .addPayment":function(){
+			let query = {name:(this.lastName || " ") +", "+(this.firstName || " ") +" "+ (this.otherName || " "), 
+						studentId:this.studentId || undefined,
+						currentClass:this.currentClass || undefined,
+						target:this.meteorIdInStudent || undefined,
 					};
-			Session.set('st.info', query);
-
+			Session.set('st.info',query);
 	},
-
-	'submit form': function(e){
+	'submit form':function(e){
 			e.preventDefault();
-			let name = e.target.name.value;
 			let studentId = e.target.studentId.value;
 			let selectedClass = e.target.class.value;
-			let filter = {name: name,
-						studentId: studentId,
+			let filter = {studentId: studentId,
 						selectedClass: selectedClass};
 			Session.set('paymentFilter', filter);
-
-	},
-
+	}
 });
-
-
 Template.singlePayment.onCreated(function(){
 	let self = this;
 	self.autorun(function(){
 		self.subscribe('payment.list');
 		self.subscribe('student.list');
-		self.subscribe('setting');
-		
+		self.subscribe('staff.name');
+		self.subscribe('graduate.list');
 	});
 });
-
 Template.singlePayment.helpers({
 	singlePay: function(){
+		let s = g.setting();if(!s)return;//review
 		let id = FlowRouter.getParam('id'),
-			query = g.Payments.findOne({studentId: id}),
-			currentClass = g.Students.findOne({studentId: id}),
+			query = g.Payments.findOne({"studentId":id}),
+			currentClass = g.Students.findOne({"studentId":id}).currentClass,
 			requestedPayment = Session.get('requestedPayment');
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-
 			let filtered;
 			if(query.payment){
 				filtered = query.payment.filter(function(p){
@@ -829,32 +750,45 @@ Template.singlePayment.helpers({
 							return p;
 						}	
 					}
-					else if(p.class == currentClass.currentClass && p.term == gTerm){
+					else if(currentClass && (p.class == currentClass && p.term == s.term)){
+						return p;
+					}else if(p.class === "SSS3" && p.term == s.term){
 						return p;
 					}
-					return false;
+					return;
 				});
 			}
-
-			if(filtered){return filtered[0];} return false;
-
+			if(filtered){
+				let staff = g.Staffs.findOne({"meteorIdInStaff":filtered[0].addedBy});
+				staff?filtered[0].staffName=staff.lastName+" "+staff.firstName:filtered[0].staffName="Super Admin";
+				return filtered[0];
+			}return;
 	},
-
 	studentInfo: function(){
 		let id = FlowRouter.getParam('id');
-		return g.Students.findOne({studentId: id}, {firstName: 1, 
-													lastName: 1,
-													otherName: 1,
-													email: 1,
-													studentId: 1,
-													currentClass: 1,
+		let info = g.Students.findOne({"studentId": id}, {"firstName": 1, 
+													"lastName": 1,
+													"otherName": 1,
+													"email": 1,
+													"studentId": 1,
+													"currentClass": 1,
 													});
+		if(info){
+			return info;
+		}else{
+			return	g.Graduates.findOne({"studentId": id}, {"firstName": 1, 
+													"lastName": 1,
+													"otherName": 1,
+													"email": 1,
+													"studentId": 1,
+													"currentClass": 1,
+													});
+		}//end if
 	},
-
 	availableClass: function(){
 		let id = FlowRouter.getParam('id');
 		let classes = [];
-		let data = g.Payments.findOne({studentId: id},{payment: 1});
+		let data = g.Payments.findOne({"studentId": id});
 			if(data.payment){
 				data.payment.forEach(function(pay){
 					classes.push(pay.class);
@@ -864,169 +798,139 @@ Template.singlePayment.helpers({
 				classes = classes.filter(function(item, pos){
 					return classes.indexOf(item) == pos;
 				});
-
 				return classes;	
 			}
-			
-
-			return false;
+			return;
 	},
-
-	currentTerm: function(){
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-
-		switch(gTerm){
-			case 1:
-				return '1st';
-			case 2:
-				return '2nd';
-			case 3:
-				return '3rd';
-		}
-	},
-
 });
-
 Template.singlePayment.events({
 	'submit form': function(e){
 		e.preventDefault();
 		let requestedClass = e.target.class.value;
 		let requestTerm = e.target.term.value;
-		let request = {id: this.studentId, class: requestedClass, term: requestTerm};
-		Session.set('requestedPayment', request);
+		let request = {id:this.studentId,class:requestedClass,term:requestTerm};
+		Session.set('requestedPayment',request);
 	},
-
 });
-
-Template.updatePayment.onCreated(function(){
-	let self =  this;
-		self.autorun(function(){
-			self.subscribe('setting');
-		});
-});
-
 Template.updatePayment.helpers({
-	paymentFor: function(){
-		let stInfo = Session.get('st.info');
-		let gTerm = g.Settings.findOne({_id: "default"}).term;
-		if(!$.isEmptyObject(stInfo)){
-			stInfo['term'] = gTerm;
-			return stInfo;
-		}
-		return;
-	},
-
-	paymentInfo: function(){
-		let stInfo = Session.get('st.info');
-	},
-	paymentCategory: function(){
-		let category = [],
-			id = g.Settings.findOne({_id: 'default'}).settingId,
-			session = g.Settings.findOne({_id: 'default'}).session,
-			term = g.Settings.findOne({_id: 'default'}).term;
-		let query = g.Settings.findOne({_id: id, session: session}, {term: 1});
-			
-			query.term.forEach(function(obj){
+	paymentFor:function(){
+		let s = g.setting();if(!s)return;//review
+		let	id = s.settingId,session = s.session,term = s.term,
+			stInfo = Session.get('st.info');//get session.
+			stInfo.term = term //current term
+		//get this term payments
+		let query = g.Settings.findOne({"_id":id,"session":session}).term;
+		stInfo.fees = query[query.length-1]; //attach current term school fees to session
+		stInfo.transactionId = stInfo.studentId+(new Date().toString().split(" ").join("").substring(0,20));
+		// update the session
+		Session.set('st.info',stInfo);
+		//get all payments category
+		let	category = query.map(function(obj){
 				for(let key in obj){
 					if(typeof obj[key] == "object"){
-						category.push(key);
+						return key;
 					}
 				}
 			});
+			//if category, remove duplicate
 			if(category.length){
 				category = category.filter(function(item, pos){
 					return category.indexOf(item) == pos;
 				});
-				return category;
-			}	
+			}//end payment category.
+		return {"category":category,"stInfo":stInfo};	
 	},
-	defaultPayment: function(){
-		let stInfo = Session.get('st.info');
-			
-		let	paymentClass = stInfo['currentClass'],
-			paymentCategory = stInfo['paymentCategory'],
-
-			id = g.Settings.findOne({_id: 'default'}).settingId,
-			session = g.Settings.findOne({_id: 'default'}).session,
-			term = g.Settings.findOne({_id: 'default'}).term;
-
-		let query = g.Settings.find({_id: id, session: session});
-		let	amount = query.term.filter(function(doc){
-						if(doc['currentTerm'] == term && doc[paymentCategory]['currentTerm'] == term){
-							return doc;
-						}
-					});
-		let fees = amount[0][paymentCategory][paymentClass];
-		
-		return {term: term, paymentCategory: paymentCategory}; 
-			
-	},
-
+	paymentMethod:function(method){
+		let ret;
+		method=="Online"?ret=true:ret=false;
+		return ret;
+	}
 });
 
 Template.updatePayment.events({
-	"submit form": function(e){
+	"submit form":function(e){
 		e.preventDefault();
-		let paymentCat = e.target.paymentCat.value;
-		let stInfo = Session.get('st.info');
+		let paymentCat = e.target.paymentCat.value,
+			method = e.target.paymentMethod.value,
+			stInfo = Session.get('st.info');
 			stInfo['paymentCategory'] = paymentCat;
-			Session.set('st.info', stInfo);
-	}
+			stInfo['method'] = method;
+			stInfo['amount'] = stInfo.fees[paymentCat][stInfo.currentClass];
+			Session.set('st.info',stInfo);
+			$("button#proceedPayment").attr("disabled",false);
+	},
+	"click button#proceedPayment":function(e){
+		e.preventDefault();
+		let stInfo = Session.get('st.info'),warning;
+			if(stInfo.method==="Cash"){
+				warning = "<h4>Confirm that you've collected ";
+				warning += stInfo.amount+" for "+g.termSuffix(stInfo.term)+" term ";
+				warning += stInfo.paymentCategory+" from "+stInfo.name+" (";
+				warning += stInfo.studentId+") in "+stInfo.currentClass+"<br/><br/>";
+				warning += "This cannot be undone. Click okay to confirm</h4>";
+				bootbox.confirm(warning,function(result){
+					if(result){
+						g.meteorCall("updatePaymentByCash",{
+							doc:stInfo,
+							successMsg:"Payment was successfully"
+						});
+					}
+				});
+			}else if(stInfo.method==="Online"){
+				warning = "<h4>You'll be taken to Interswitch payment gateway.</h4>";
+				bootbox.confirm(warning,function(result){
 
+				});
+			}else{
+				bootbox.alert("<h4>Select payment method, category and create receipt before proceed.</h4>");
+				return;
+			}
+	}
 });
 
 //Assignment Template
 Template.assignmentList.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
-			self.subscribe('setting');
 			self.subscribe('assignment.list');
 		});
 });
-
 Template.assignmentList.helpers({
 	assignments: function(){
-		let filter = Session.get("assignmentFilter"),
-			assList;
-
+		let filter = Session.get("assignmentFilter"),assList,
+			s = g.setting();if(!s)return;//needs review
 			if(filter && (filter.class || filter.subject)){
-				assList = g.Assignments.find({$or: [{class: filter.class}, {subject: filter.subject}]}).fetch().reverse();
+				assList = g.Assignments.find({"session":filter.session,"term":filter.term,$or:[{"class":filter.class},{"subject":filter.subject}]}).fetch().reverse();
 			}else{			
-				assList = g.Assignments.find({"class": "JSS1"}).fetch().reverse();
+				assList = g.Assignments.find({"class":"JSS1","session":s.session,"term":s.term}).fetch().reverse();
 			}
-
 			assList.forEach(function(doc){
 				let	date = new Date();
 				doc.validity = doc.endDate < date;
-
-				let	sDate = doc.startDate,
-					eDate = doc.endDate;
-					doc.startDate = sDate.getDate() + "-" + monthArr[sDate.getMonth()] + "-" + sDate.getFullYear();
-					doc.endDate = eDate.getDate() + "-" + monthArr[eDate.getMonth()] + "-" + eDate.getFullYear();
-					doc.answerCount = doc.answer?doc.answer.length:"0";
-					return doc;
+				doc.answerCount = doc.answer?doc.answer.length:"0";
+				return doc;
 			});
 		return assList;
 	},	
-
+	assignmentFilter:function(){
+		return Session.get("assignmentFilter");
+	}
 });
 
 Template.assignmentList.events({
 	"submit form": function(e){
 		e.preventDefault();
 		let requestedClass = e.target.class.value,
-			requestedSubject = e.target.subject.value;
-		let obj = {class: requestedClass, subject: requestedSubject};
+			requestedSubject = e.target.subject.value,
+			session = e.target.session.value,
+			term = Number(e.target.term.value);
+		let obj = {class:requestedClass,subject:requestedSubject,session:session,term:term};
 			Session.set('assignmentFilter', obj);
 	}
-
 });
-
-
 Template.singleAssignment.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
-			self.subscribe('setting');
 			self.subscribe('assignment.list');
 			self.subscribe('staff.name');
 			self.subscribe('student.list');
@@ -1035,32 +939,22 @@ Template.singleAssignment.onCreated(function(){
 
 Template.singleAssignment.helpers({
 	assignment: function(){
-		let id = FlowRouter.getParam('id'),
-			thisAssignment = g.Assignments.findOne({_id: id}),
-			sDate = thisAssignment.startDate,
-			eDate = thisAssignment.endDate;
-			thisAssignment.startDate = sDate.getDate() + "-" + monthArr[sDate.getMonth()] + "-" + sDate.getFullYear();
-			thisAssignment.endDate = eDate.getDate() + "-" + monthArr[eDate.getMonth()] + "-" + eDate.getFullYear();
+		let id = FlowRouter.getParam('id');
+		let	thisAssignment = g.Assignments.findOne({_id: id});
 		let staff = g.Staffs.findOne({meteorIdInStaff: thisAssignment.addedBy});
 			if(staff){
 				thisAssignment.author = (staff.firstName || '') + ', ' + (staff.lastName || '') + ' ' + (staff.otherName || '');
 				thisAssignment.staffId = staff.staffId;
 			}
+			if(thisAssignment.answer){
+				thisAssignment.answerCount = thisAssignment.answer.length;
+			}
 			thisAssignment.canEdit = thisAssignment.addedBy == Meteor.userId();
 		return thisAssignment;
 	},
-	answerCount: function(){
-		let id = FlowRouter.getParam('id'),
-			query = g.Assignments.findOne({_id: id});
-			if(query.answer){
-				return query.answer.length;
-			}
-			return 0;
-	},
 	answerList: function(){
-		let id = FlowRouter.getParam('id'),
-			query = g.Assignments.findOne({_id: id});
-
+		let id = FlowRouter.getParam('id');
+		let	query = g.Assignments.findOne({_id: id});
 			if(query.answer){
 				let answers = query.answer.map(function(answer){
 					let q = g.Students.findOne({meteorIdInStudent: answer.id});
@@ -1069,9 +963,8 @@ Template.singleAssignment.helpers({
 						return answer;
 				});
 				return answers;
-				}
+			}
 	},
-
 });
 
 Template.singleAssignment.events({
@@ -1079,27 +972,18 @@ Template.singleAssignment.events({
 		e.preventDefault();
 		let score = e.target.score.value;
 		let comment = e.target.comment.value;
-		let id = e.target.id.value;
+		this.id = e.target.id.value;
 		this.score = score;
 		this.comment = comment;
-		Meteor.call("scoreAssignment", id, this, function(error){
-			if(error){
-				insertNotice(error, 5000);
-			}else{
-				insertNotice("Score was awarded okay.", 4000);
-			}
-		});
-		
+		g.meteorCall("scoreAssignment",{doc:this,
+				successMsg:"Score was awarded."});
 	}
-
 });
 
 Template.editAssignment.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
-			self.subscribe('setting');
 			self.subscribe('assignment.list');
-
 		});
 });
 
@@ -1110,21 +994,21 @@ Template.editAssignment.helpers({
 		return thisAssignment;
 	}
 });
-Template.createMessage.onCreated(function(){
+Template.newMessage.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('staff.name');
 		});
 });
 
-Template.createMessage.helpers({
+Template.newMessage.helpers({
 	staff: function(){
 		return g.Staffs.find({meteorIdInStaff: {$ne: Meteor.userId()}});
 	},
 
 });
 
-Template.createMessage.events({
+Template.newMessage.events({
 	'submit form': function(e){
 		e.preventDefault();
 		let msgStaff = $('select.msgStaff option:selected').map(function(){ return this.value;}).get(),
@@ -1147,20 +1031,13 @@ Template.createMessage.events({
 			msgStaff = msgStaff.concat(allStaff);
 
 		if(msgStaff.length && msgClass.length){
-			insertNotice('Cannot send the same message to staff and student at the same time.', 5000);
-			return false;
+			g.notice('Cannot send the same message to staff and student at the same time.', 8000);
+			return;
 		}
 		let msgObj = {to: msgStaff.concat(msgClass), subject: msgTitle, content: msgBody, staffName: staffName, studentName: msgClass};
-		Meteor.call('createMessage', msgObj, function(error, result){
-			if(error){
-				insertNotice(error, 5000);
-				return false;
-			}else{
-				insertNotice('Your message was sent successfully', 4000);
-					let pathToGo = FlowRouter.path('/message/'+result);
-					FlowRouter.go(pathToGo);
-			}
-		});
+		g.meteorCall("newMessage",{doc:msgObj,
+				successMsg:"Your message was sent successfully.",
+				redirect:"message"});
 	},
 });
 
@@ -1285,123 +1162,137 @@ Template.singleMessage.helpers({
 		}
 	},
 });
-
 Template.singleMessage.events({
 	'submit form': function(e){
 		e.preventDefault();
 		let id = FlowRouter.getParam("id");
 		let reply = e.target.reply.value;
-		Meteor.call("replyAssignment", id, reply, function(error){
-			if(error){
-				insertNotice(error, 6000);
-			}else{
-				e.target.reply.value = "";
-				insertNotice("Your reply was submitted.", 4000);
-			}
-		});
+		let doc = {id:id,reply:reply};
+		g.meteorCall("replyAssignment",{doc:doc,
+			successMsg:"Your reply was submitted."});
+		e.target.reply.value="";
 	},
 
 });
-Template.createFeedback.events({
-	"submit form":function(e){
-		e.preventDefault();
-		let subject = e.target.subject.value;
-		let message = e.target.message.value;
-
-		Meteor.call("createFeedback", subject, message, function(error){
-			if(error){
-				insertNotice(error, 6000);
-				return false;
-			}else{
-				insertNotice("Feedback sent", 4000);
-				FlowRouter.go("/dashboard");
-				return;
-			}
-		});
-	}
-
-});
-
-Template.feedbackList.onCreated(function(){
+///graduate list
+Template.graduatedStudents.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
-			self.subscribe('feedback.list');
+			self.subscribe("graduate.list");
 		});
 });
-
-Template.feedbackList.helpers({
-	feedbacks: function(){
-		let list = g.Feedbacks.find().fetch().reverse();
-			if(list){
-				list.forEach(function(feed){
-					feed.sentDate?feed.sentDate = feed.sentDate.toString().substr(0, 21): feed.sentDate="Not specified";
-					feed.subject.length>20?feed.subject=feed.subject.substr(0, 20) + "...":feed.subject=feed.subject; 
-					return feed;
-				});
-				return list;
-			}
-	},
-	singleFeedback: function(){
-		let feedId = Session.get("feedbackId");
-		if(feedId){
-			let feedback = g.Feedbacks.findOne({_id:feedId});
-			feedback.sentDate?feedback.sentDate=feedback.sentDate.toString().substr(0, 21):feedback.sentDate="Not specified";
-			return feedback;
-		}
-	},
-});
-Template.feedbackList.events({
-	"click #showFeedback":function(e){
-		e.preventDefault();
-		Session.set("feedbackId", this._id);
+Template.graduatedStudents.helpers({
+	graduates:function(){
+		let grads,
+			graduatesFilter = Session.get("graduatesFilter");
+		//if there is a session, use it
+		if(graduatesFilter){
+			grads = g.Graduates.find({$or:[{
+				"graduatedYear":graduatesFilter.year},
+				{"studentId":graduatesFilter.studentId}]}).fetch();
+			grads.count = grads.length;
+			return grads;
+		}//otherwise, return this year graduate.
+			grads = g.Graduates.find({"graduatedYear":(new Date().getFullYear())}).fetch();
+			grads.count = grads.length;
+		return grads;
 	}
-})
+});
+Template.graduatedStudents.events({
+	'submit form':function(e){
+		e.preventDefault();
+		let studentId = e.target.studentId.value,
+			year = Number(e.target.year.value);
+		Session.set("graduatesFilter",{"studentId":studentId,"year":year});
+	}
+});
+Template.singleGraduatedStudent.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("graduate.list");
+		});
+});
+Template.singleGraduatedStudent.helpers({
+	graduate:function(){
+		let id = FlowRouter.getParam("id");
+		let grad = g.Graduates.findOne({"studentId":id});
+		return grad;
+	}
+});
+Template.singleGraduatedStudent.events({
+	'click button#demoteGraduate':function(e){
+		e.preventDefault();
+		let self = this,
+			warning = "<h4>Confirm to demote this student to SSS3?";
+		bootbox.confirm(warning,function(result){
+			if(result){
+				g.meteorCall("demoteGraduate",{
+					doc:self,
+					successMsg:"The student was demoted to SSS3",
+					redirect:"graduatedStudents"
+				});
+			}
+		})
+	}
+});
+//logging user actions
+Template.logs.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("log.list");
+			self.subscribe("staff.list");
+		});
+});
+Template.logs.helpers({
+	log:function(){
+		let logs = g.Logs.find({},{limit:50}).fetch();
+			logs.forEach(function(log){
+				let name;
+				if(Meteor.userId() === log.by){
+					name = "You";
+				}else{
+					let query = g.Staffs.findOne({"meteorIdInStaff":log.by});
+					query?name = query.lastName+" "+query.firstName+" ("+query.staffId+")":name="Super Admin";	
+				}
+				log.name = name;
+				return log;
+			});
+
+		return logs;
+	}
+});
 //Autoform hooks and addHooks
 AutoForm.hooks({
 	//Staff profile self update
 	editProfile:{
 		onSubmit: function(data){
 			this.event.preventDefault();
-			Meteor.call('updateStaffProfile', data, function(error){
-				if(error){
-					insertNotice(error, 4000);
-				}else{
-					insertNotice("Profile updated successfully", 4000);
-					let pathToGo = FlowRouter.path('/profile');
-						FlowRouter.go(pathToGo);
-				}
-			});
+			g.meteorCall("updateStaffProfile",{doc:data,
+				submitBtnId:"#editProfile",
+				successMsg:"Profile updated successfully.",
+				redirect:"profile"});
 		}
 	},
 	// Insert Student
-	insertStudent:{
+	newStudent:{
 		onSubmit: function(data){
 			this.event.preventDefault();
 			Session.set('passportTarget',{id:data.studentId, name:data.lastName +' '+data.firstName, diff: 'student'});
-			Meteor.call('createStudent', data, function(error){
-				if(error){
-					insertNotice(error, 5000);
-				}else{
-					insertNotice('Student successfully created!', 4000);
-						FlowRouter.go('/passportUploader');
-				}
-			});
+			g.meteorCall("newStudent",{doc:data,
+				submitBtnId:"#newStudent",
+				successMsg:"Student successfully created!",
+				redirect:"passportUploader"});
 		}
 	},
 // Insert Staff form
-	insertStaff:{
+	newStaff:{
 		onSubmit: function(data){
 			this.event.preventDefault();
 			Session.set('passportTarget', {id:data.staffId, name:data.lastName +' '+data.firstName, diff: 'staff'});
-			Meteor.call('createStaff', data, function(error){
-				if(error){
-					insertNotice(error, 5000);
-				}else{
-					insertNotice('Staff successfully created!', 4000);
-						FlowRouter.go('/passportUploader');
-				}
-			});
-			
+			g.meteorCall("newStaff",{doc:data,
+				submitBtnId:"#newStaff",
+				successMsg:"Staff successfully created!",
+				redirect:"passportUploader"});
 		}
 	},
 
@@ -1411,20 +1302,20 @@ AutoForm.hooks({
 			this.event.preventDefault();
 				let get = Session.get('st.info');
 					if(!$.isEmptyObject(data) && get){
-							Meteor.call('updateResult',get, data, function(error){
+						Meteor.call('updateResult',get, data, function(error){
 							if(error && (error.error == 301 || error.error == 302 || error.error == 502 || error.error == 500)){
-								
-								insertNotice((error.reason + ", " + error.details), 5000);
+								g.notice((error.reason + ", " + error.details), 8000);
+								g.enableBtn("#updateResult");
+								return;
 							}
 							else{	
-									insertNotice('Result successfully added!', 3000);
-									let pathToGo = FlowRouter.path('/result/view/' + get.studentId);
-									FlowRouter.go(pathToGo);
+								g.notice('Result successfully added!', 4000);
+								let pathToGo = FlowRouter.path('/dashboard/result/view/' + get.studentId);
+								FlowRouter.go(pathToGo);
 							}
 						});
 					}else{
-						
-						insertNotice('error occurred!. Invalid data', 5000);
+						g.notice('error occurred! Invalid data.', 5000);
 						return false;
 					}
 		}
@@ -1435,10 +1326,12 @@ AutoForm.hooks({
 			let id = this.currentDoc.staffId;
 			Meteor.call("editStaff", this.currentDoc, doc, function(error){
 				if(error){
-					insertNotice("Error: "+ error, 4000);
+					g.notice("Error: "+ error, 6000);
+					g.enableBtn("#editStaff");
+					return;
 				}else{
-					insertNotice('Staff employment data updated successfully', 3000);
-					let pathToGo = FlowRouter.path('/staff/view/' + id);
+					g.notice('Staff employment data updated successfully');
+					let pathToGo = FlowRouter.path('/dashboard/staff/view/' + id);
 						FlowRouter.go(pathToGo);
 				}
 			});
@@ -1448,45 +1341,48 @@ AutoForm.hooks({
 		onSubmit: function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc.staffId;
-			Meteor.call("updateStaff", this.currentDoc, doc, function(error){
+			Meteor.call("editStaff", this.currentDoc, doc, function(error){
 				if(error){
-					insertNotice("Error: "+ error, 4000);
+					g.notice("Error: "+ error, 8000);
+					g.enableBtn("#updateStaff");
+					return;
 				}else{
-					insertNotice('Staff profile updated successfully', 3000);
-					let pathToGo = FlowRouter.path('/staff/view/' + id);
+					g.notice('Staff profile updated successfully');
+					let pathToGo = FlowRouter.path('/dashboard/staff/view/' + id);
 						FlowRouter.go(pathToGo);
 				}
 			});
 		},
 	},
-
 	editStudent:{
 		onSubmit: function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc.studentId;
-			Meteor.call("editStudent", this.currentDoc, doc, function(error){
+			Meteor.call("updateStudent", this.currentDoc, doc, function(error){
 				if(error){
-					insertNotice("Error: "+ error, 4000);
+					g.notice("Error: "+ error, 8000);
+					g.enableBtn("#editStudent");
+					return;
 				}else{
-					insertNotice('Student admission data updated successfully', 3000);
-					let pathToGo = FlowRouter.path('/student/view/' + id);
+					g.notice('Student admission data updated successfully');
+					let pathToGo = FlowRouter.path('/dashboard/student/view/' + id);
 						FlowRouter.go(pathToGo);
 				}
 			});
 		},
-	
 	},
-
 	updateStudent:{
 		onSubmit: function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc.studentId;
 			Meteor.call("updateStudent", this.currentDoc, doc, function(error){
 				if(error){
-					insertNotice("Error: "+ error, 4000);
+					g.notice("Error: "+ error, 8000);
+					g.enableBtn("#updateStudent");
+					return;
 				}else{
-					insertNotice('Student profile updated successfully', 3000);
-					let pathToGo = FlowRouter.path('/student/view/' + id);
+					g.notice('Student profile updated successfully');
+					let pathToGo = FlowRouter.path('/dashboard/student/view/' + id);
 						FlowRouter.go(pathToGo);
 				}
 			});
@@ -1499,17 +1395,20 @@ AutoForm.hooks({
 				if(!$.isEmptyObject(data) && this.currentDoc){
 					Meteor.call('editResult', this.currentDoc, data, function(error, resultId){
 						if(error){
-							insertNotice((error.reason + ", " + error.details), 5000);
+							g.notice((error.reason + ", " + error.details), 8000);
+							g.enableBtn("#editResult");
+							return;
 						}else{
-							insertNotice('Result successfully updated', 5000);
-							let pathToGo = FlowRouter.path('/result/view/' + resultId);
+							g.notice('Result successfully updated');
+							let pathToGo = FlowRouter.path('/dashboard/result/view/' + resultId);
 								FlowRouter.go(pathToGo);
 						}
 					});
 				}else{
-					insertNotice('error occurred!. Invalid data');				
-					window.location.reload();	
-					return false;
+					g.notice('error occurred! Invalid data.',8000);				
+					//window.location.reload();
+					g.enableBtn("#editResult");	
+					return;
 				}
 
 		},
@@ -1517,150 +1416,50 @@ AutoForm.hooks({
 	newSession: {
 		onSubmit: function(doc){
 			this.event.preventDefault();
-			Meteor.call("newSession", doc, function(error){
-				if(error){
-					insertNotice(error, 5000);
-				}else{
-					insertNotice('New term was created successfully');
-				}
-				Modal.hide('newSessionModal');
-			});
+			g.meteorCall("newSession",{doc:doc,
+				successMsg:"New session was created!"});
+			Modal.hide('newSessionModal');
 		},
 	},
 	setTermAndSchoolFees: {
 		onSubmit: function(fees){
 			this.event.preventDefault();
-			Meteor.call("setTermAndSchoolFees", fees, undefined, undefined, function(error){
-				if(error){
-					insertNotice(error, 5000);
-				}else{
-					insertNotice('New term was created successfully');
-				}
-
-				Modal.hide('setTermAndSchoolFees');
-			});
+			g.meteorCall("setTermAndSchoolFees",{doc:fees,
+				successMsg:"New term was created!"});
+			Modal.hide('setTermAndSchoolFees');
 		},
 	},
 	updateSchoolFees: {
 		onSubmit: function(fees){
 			this.event.preventDefault();
-			Meteor.call("updateSchoolFees", fees, function(error){
-				if(error){
-					insertNotice(error);
-				}else{
-					insertNotice("school fees updated successfully");
-				}
-			});
+			g.meteorCall("updateSchoolFees",{doc:fees,
+				submitBtnId:"#updateSchoolFees",
+				successMsg:"School fees updated successfully."});
+			$('.changeSchoolFees').hide("fast");
+			$('.schoolFees').show("fast");
 		}
 	},
 	//Assignment
-	createAssignment:{
+	newAssignment:{
 		onSubmit: function(doc){
 			this.event.preventDefault();
-			Meteor.call("createAssignment", doc, function(error, result){
-				if(error){
-					insertNotice("Error occurred", 5000);
-				}else{				
-					insertNotice("Assignment was created okay", 3000);
-					let pathToGo = FlowRouter.path("/assignment/view/" + result);
-						FlowRouter.go(pathToGo);}
-			});
+			g.meteorCall("newAssignment",{doc:doc,
+				submitBtnId:"#newAssignment",
+				successMsg:"Assignment was created okay.",
+				redirect:"assignmentList"});
 		}
 	},
 	editAssignment: {
 		onSubmit: function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc._id;
-			Meteor.call('editAssignment', this.currentDoc._id, doc, function(error){
-				if(error){
-					insertNotice("Error "+ error);
-				}else{
-					insertNotice("Assignment updated", 4000);
-					let pathToGo = FlowRouter.path("/assignment/view/" + id);
-						FlowRouter.go(pathToGo);}
-			});
+			doc.id = id;
+			g.meteorCall("editAssignment",{doc:doc,
+				submitBtnId:"#editAssignment",
+				successMsg:"Assignment updated.",
+				redirect:"/dashboard/assignment/view/"+id});
 		}
 	}
 });
 
 AutoForm.debug();
-// **********************///
-// **********************///
-// ******BREAK Break******//
-// **********************///
-// **********************///
-
-
-
-
-//Grade Calculator
-function calculateGrade(num){
-	if(num >= 70) return "A";
-	else if(num >= 60) return "B";
-	else if(num >= 50) return "C";
-	else if(num >= 45) return "D";
-	else if(num >= 40) return "E";
-	else return "F";
-
-}
-
-//Remark calculator
-function remark(grade){
-	switch (grade) {
-		case 'A':
-		case 'A1':
-			return "Excellent";
-			break;
-		case 'B':
-		case 'B2':
-		case 'B3':
-		case 'C':
-		case 'C4':
-		case 'C5':
-		case 'C6':
-			return "Credit";
-			break;
-		case 'D':
-		case 'D7':
-		case 'E':
-		case 'E8':
-			return "Pass";
-			break;
-		case 'F':
-			return "Fail";
-			break;
-		default:
-			return "Not Offered";
-			break;
-	}
-}
-
-function insertNotice(text, time = 4000){
-	$('.insertNotice').text(text);
-	$('.insertNotice').show('slow');
-	bootbox.alert(text)
-	setTimeout(function(){
-		$('.insertNotice').fadeOut(3000);
-			}, time);
-}
-
-function isEmptyObject(obj){
-	for(var key in obj){
-		if(Object.prototype.hasOwnProperty.call(obj, key)){
-			return false;
-		}
-	}
-	return true;
-}
-
-function sentenceCase(name){
-	if(typeof(name) === "string"){
-		var cased = [];
-		name.split(" ").forEach(function(n){
-			cased.push(n[0].toUpperCase() + n.substring(1).toLowerCase()); 
-		});
-
-		return cased.join(" ");
-	}
-	return name;
-}
