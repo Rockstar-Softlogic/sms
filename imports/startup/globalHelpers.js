@@ -57,5 +57,5 @@ registerGlobalHelpers({
 //    .value()
 // }
 function registerGlobalHelpers(helpers){
-  _.each(helpers, (fn, name) => { Template.registerHelper(name, fn); });
+  _.each(helpers,(fn,name)=>{Template.registerHelper(name,fn);});
  }

@@ -6,7 +6,7 @@
 
 				<table>
 						<tr>
-							<th colspan="2" class="customHead">Admission Data</th>
+							<th colspan="2">Admission Data</th>
 						</tr>
 						<tr>
 							<td><strong>Name: </strong></td>
@@ -50,7 +50,7 @@
 
 					<table>
 						<tr>
-							<th colspan="2" class="customHead">Student Profile</th>
+							<th colspan="2">Student Profile</th>
 						</tr>
 						<tr>
 							<td><strong>Contact phone</strong></td>
@@ -69,7 +69,7 @@
 							<td>{{hobby}}</td>
 						</tr>
 						<tr>
-							<th colspan="2" class="customHead">Next of Kin details</th>
+							<th colspan="2">Next of Kin details</th>
 							
 						</tr>
 						<tr>
@@ -89,13 +89,13 @@
 							<td>{{nok.relationship}}</td>
 						</tr>
 						<tfoot>
-							<a href="{{pathFor 'editProfile'}}">Edit profile</a>
+							<a href="{{pathFor 'editStProfile'}}" class="btn btn-primary btn-xs">Edit profile</a>
 						</tfoot>										
 				</table>
 			{{/with}}
 		{{/if}}
 	{{else}}
-		<p>Loading...</p>
+		{{>smsLoading}}
 	{{/if}}
 	
 </template>
@@ -136,13 +136,12 @@
 						</select>
 
 						<select name="term">
-							<option value="1">1st term</option>
-							<option value="2">2nd term</option>
-							<option value="3">3rd term</option>
-							
+							{{#each termArray}}
+								<option value="{{this}}">{{termSuffix this}}</option>
+							{{/each}}
 						</select>
 						
-						<input type="submit" name="submit" value="Show result">
+						<button type="submit" class="btn btn-primary btn-xs">Show result</button>
 
 					</form>
 					{{#with studentInfo}}
@@ -153,7 +152,7 @@
 								<td><strong>Other Name(s)</strong></td>
 								<td>{{lastName}} {{otherName}}</td>
 								<td rowspan="3" style="border: 1px solid black">
-									<img src="http://localhost:3000/student10.png" alt="{{studentId}} passport">
+									<img src="/student10.png" alt="{{studentId}} passport">
 
 								</td>
 							</tr>
@@ -177,13 +176,11 @@
 						{{#with studentRes}}
 						<h2>Result details</h2>
 						<table class="table table-striped">
-
 							<tr>
 								<td><strong>Class</strong></td> <td>{{class}}</td>
 								<td><strong>Term</strong></td> <td>{{term}}</td>
 								<td><strong>Session</strong></td><td>{{session}}</td>
 							</tr>
-
 						</table>
 						<table class="table table-striped serial">
 							<tr>
@@ -194,9 +191,7 @@
 								<th>Total</th>
 								<th>Grade</th>
 								<th>Remark</th>
-
 							</tr>
-
 							{{#if english}}
 							<tr>
 								<td></td>
@@ -208,8 +203,6 @@
 								<td>{{english.remark}}</td>
 							</tr>
 							{{/if}}
-
-
 							{{#if mathematics}}
 							<tr>
 								<td></td>
@@ -232,8 +225,6 @@
 								<td>{{physics.grade}}</td>
 								<td>{{physics.remark}}</td>
 							</tr>
-
-
 							{{/if}}
 
 
@@ -352,7 +343,9 @@
 							{{/if}}
 							
 						</table>
-
+						<br/>
+						<button class="btn btn-primary" onclick="window.print()">Print</button>
+						
 						{{/with}}
 
 					{{else}}
@@ -370,21 +363,18 @@
 					
 					<select name="class">
 					{{#if availableClass}}
-						{{#each availableClass}}	
-								<option value="{{this}}">{{this}}</option>
+						{{#each availableClass}}							<option value="{{this}}">{{this}}</option>
 						{{/each}}
 					{{/if}}
 
 					</select>
 
 					<select name="term">
-						<option value="1">1st term</option>
-						<option value="2">2nd term</option>
-						<option value="3">3rd term</option>
-						
+						{{#each termArray}}
+							<option value="{{this}}">{{termSuffix this}}</option>
+						{{/each}}
 					</select>
-					
-					<input type="submit" name="submit" value="Show payment">
+					<button type="submit" class="btn btn-primary btn-xs">Show payment</button>
 
 				</form>
 				{{#with studentInfo}}
@@ -439,6 +429,8 @@
 							</tr>
 						</table>
 						{{/with}}
+						<br/>
+						<button class="btn btn-primary" onclick="window.print()">Print</button>
 					{{else}}
 						<p style="font-size: 1.5em; text-align: center;">No payment found for the current class and term.</p>
 
@@ -446,7 +438,7 @@
 
 			{{/if}}
 		{{else}}
-			<p>Loading...</p>
+			{{>smsLoading}}
 		{{/if}}
 	
 </template>
@@ -458,27 +450,15 @@
 					<form class="form-inline">
 						<div class="form-group">
 							<select name="subject" class="form-control">
-								<option value="English">Englis Language</option>
-								<option value="Mathematics">Mathematics</option>
-								<option value="Physics">Physics</option>
-								<option value="Chemistry">Chemistry</option>
-								<option value="Biology">Biology</option>
-								<option value="Geography">Geography</option>
-								<option value="Economics">Economics</option>
-								<option value="Computer">Computer Science</option>
-								<option value="Agric">Agric Science</option>
-								<option value="Civic">Civic Education</option>
-								<option value="Commerce">Commerce</option>
-								<option value="Accounting">Accounting</option>
-								<option value="Government">Government</option>
-							
+								{{#each subjects}}
+									<option value="{{this}}">{{this}}</option>
+								{{/each}}
 							</select>
-							<button type="submit" class="btn btn-primary">Filter assignment</button>
+							<button type="submit" class="btn btn-primary btn-xs">Filter assignment</button>
 						</div>
 					</form>
 					<hr/><br>
 				{{#if assignmentList}}
-					
 					{{#each assignmentList}}
 						<div class="row assignmentList">
 							<div class="col-md-2 col-sm-2 col-xs-12 badge">
@@ -486,7 +466,7 @@
 								<p>{{subject}}</p>
 							</div>
 							<div class="col-md-10 col-sm-10 col-xs-12">
-								<h4><a href="assignment/view/{{_id}}">{{title}}</a>
+								<h4><a href="{{pathFor 'stSingleAssignment'}}/{{_id}}">{{title}}</a>
 								{{#if status}}
 									<span class="label label-success">Answered</span>
 								{{else}}
@@ -510,7 +490,7 @@
 				{{/if}}				
 			{{/if}}
 		{{else}}
-			<p>Loading...</p>
+			{{>smsLoading}}
 		{{/if}}
 	
 </template>
@@ -604,7 +584,7 @@
 				</div>
 			{{/if}}
 		{{else}}
-			<p>Loading...</p>
+			{{>smsLoading}}
 		{{/if}}
 
 </template>
@@ -615,7 +595,7 @@
 				
 			{{/if}}
 		{{else}}
-			<p>Loading...</p>
+			{{>smsLoading}}
 		{{/if}}
 	
 </template>
@@ -627,7 +607,7 @@
 			
 			{{/if}}
 		{{else}}
-			<p>Loading...</p>
+			{{>smsLoading}}
 		{{/if}}
 	
 </template>

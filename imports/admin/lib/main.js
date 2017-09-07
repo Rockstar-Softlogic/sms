@@ -126,7 +126,6 @@ Meteor.methods({
 						data.nok['name'] = g.sentenceCase(data.nok.name);
 					}
 					g.Students.insert(data);
-
 					let resultAndPaymentRecord = {
 								meteorIdInStudent: data.meteorIdInStudent,
 								studentId: data.studentId,
@@ -147,25 +146,25 @@ Meteor.methods({
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-			if(target._id && target.studentId && target.meteorIdInStudent && data){
-				console.log(data);return;
-				let stEdit = g.Students.update({"_id": target._id,
-						"meteorIdInStudent": target.meteorIdInStudent,
-						"studentId": target.studentId},
-						{$set: data});
-							 if(data.currentClass){
-								g.Results.update({"meteorIdInStudent": target.meteorIdInStudent, "studentId": target.studentId}, {$set: {"currentClass": data.currentClass}});
-							 	g.Payments.update({"meteorIdInStudent": target.meteorIdInStudent, "studentId": target.studentId}, {$set: {"currentClass": data.currentClass}});		 	
-							 	Meteor.call("log","Edited student profile "+target.studentId);
-							 	return;
-							 }
-							 
-			//log
-			Meteor.call("log","Updated student profile "+target.studentId);
-			
-			}else{
-				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
-			}
+				if(target._id && target.studentId && target.meteorIdInStudent && data){
+				let stEdit = g.Students.update({"_id":target._id,
+							"meteorIdInStudent":target.meteorIdInStudent,
+							"studentId":target.studentId},{$set:data});
+					 if(stEdit && data.currentClass){
+						g.Results.update({"meteorIdInStudent":target.meteorIdInStudent,
+										"studentId":target.studentId},
+										{$set:{"currentClass":data.currentClass}});
+					 	g.Payments.update({"meteorIdInStudent":target.meteorIdInStudent,
+					 					"studentId":target.studentId},
+					 					{$set:{"currentClass":data.currentClass}});		 	
+					 	Meteor.call("log","edited student profile "+target.studentId);
+					 	return;
+					 }
+				//log
+				Meteor.call("log","updated student profile "+target.studentId);
+				}else{
+					throw new Meteor.Error(500, 'Unknown error occurred, try again.');
+				}
 	},
 //insert staff and Editor by admin and editor only
 	newStaff: function(data){
@@ -197,7 +196,7 @@ Meteor.methods({
 						data.nok.name = g.sentenceCase(data.nok.name);
 					}
 					g.Staffs.insert(data);
-					Meteor.call("log",("Added new staff with id "+data.staffId));
+					Meteor.call("log",("added new staff with id "+data.staffId));
 
 				}
 
@@ -209,7 +208,7 @@ Meteor.methods({
 			}
 			if(target._id && target.staffId && data){
 				let staffEdit = g.Staffs.update({_id: target._id, staffId: target.staffId}, {$set: data});
-				Meteor.call("log",("Edited staff employment data, id is "+target.staffId));
+				Meteor.call("log",("edited staff employment data, id is "+target.staffId));
 			}else{
 				throw new Meteor.Error(500, 'Unknown error occurred, try again.');
 			}
@@ -533,8 +532,6 @@ Meteor.methods({
 			}else{
 				throw new Meteor.Error(501, "Cannot push notification! No Session or term found.");
 			}
-		}	
-
-		
+		}		
 	}
 });

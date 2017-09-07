@@ -9,3 +9,9 @@ Template.header.events({
          g.logout();
     }
 });
+Template.stSidebar.events({
+	 'click #logout': function(e){
+    	e.preventDefault();
+    	 g.logout();
+    }
+});

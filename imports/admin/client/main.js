@@ -40,7 +40,7 @@ Template.staffDashboard.helpers({
 		return g.Payments.find({"payment.session":s.session,"payment.term":s.term}).count();
 	},
 	termSchoolFees: function(){
-		let s = g.setting();if(!s)return;//review
+		let s = g.setting();if(!s)return;//rreview
 		let session = s.session,
 			term = s.term,
 			id = s.settingId;
@@ -390,11 +390,11 @@ Template.studentList.helpers({
 			if(filter && (filter.selectedClass || filter.studentId || filter.name)){
 				filter.name?filter.name=g.sentenceCase(filter.name):"";
 				return g.Students.find({$or: [{currentClass: filter.selectedClass},
-												{studentId: filter.studentId},
-												{firstName:filter.name},
-												{lastName:filter.name},
-												{otherName:filter.name}	
-												]}).fetch();
+										{studentId: filter.studentId},
+										{firstName:filter.name},
+										{lastName:filter.name},
+										{otherName:filter.name}	
+										]}).fetch();
 			}
 		return g.Students.find({currentClass: "JSS1"}).fetch();
 	},
@@ -492,10 +492,11 @@ Template.resultList.helpers({
 		let filter = Session.get('resultFilter'),result,filtered;
 			if(filter && (filter.selectedClass || filter.studentId)){
 				result = g.Results.find({
+					"graduated":{$ne:true},
 					$or: [{"currentClass":filter.selectedClass},
 						{"studentId":filter.studentId}]}).fetch();
 			}else{
-				result = g.Results.find({currentClass:"JSS1"}).fetch();
+				result = g.Results.find({"graduated":{$ne:true},currentClass:"JSS1"}).fetch();
 			}
 		if(result){
 			filtered = result.map(function(res){
@@ -572,7 +573,7 @@ Template.singleResult.helpers({
 						return r;
 					}
 			});
-			if(filtered)return filtered[0];
+			if(filtered[0])return filtered[0];
 		}return;
 	},
 	studentInfo: function(){
@@ -684,10 +685,11 @@ Template.paymentList.helpers({
 		let filter = Session.get('paymentFilter'),payment,filtered;
 			if(filter && (filter.selectedClass || filter.studentId)){
 				payment = g.Payments.find({
+					"graduated":{$ne:true},
 					$or: [{currentClass: filter.selectedClass},
 						{studentId: filter.studentId}]}).fetch();
 			}else{
-				payment = g.Payments.find({currentClass:"JSS1"}).fetch();
+				payment = g.Payments.find({"graduated":{$ne:true},currentClass:"JSS1"}).fetch();
 			}
 		if(payment){
 			filtered = payment.map(function(pay){
@@ -740,7 +742,7 @@ Template.singlePayment.helpers({
 		let s = g.setting();if(!s)return;//review
 		let id = FlowRouter.getParam('id'),
 			query = g.Payments.findOne({"studentId":id}),
-			currentClass = g.Students.findOne({"studentId":id}).currentClass,
+			currentClass = query.currentClass,
 			requestedPayment = Session.get('requestedPayment');
 			let filtered;
 			if(query.payment){
@@ -757,12 +759,14 @@ Template.singlePayment.helpers({
 					}
 					return;
 				});
+			
+				if(filtered[0]){
+					let staff = g.Staffs.findOne({"meteorIdInStaff":filtered[0].addedBy});
+						staff?filtered[0].staffName=staff.lastName+" "+staff.firstName:filtered[0].staffName="Super Admin";
+					return filtered[0];
+				}
 			}
-			if(filtered){
-				let staff = g.Staffs.findOne({"meteorIdInStaff":filtered[0].addedBy});
-				staff?filtered[0].staffName=staff.lastName+" "+staff.firstName:filtered[0].staffName="Super Admin";
-				return filtered[0];
-			}return;
+			
 	},
 	studentInfo: function(){
 		let id = FlowRouter.getParam('id');
@@ -1355,12 +1359,12 @@ AutoForm.hooks({
 		},
 	},
 	editStudent:{
-		onSubmit: function(doc){
+		onSubmit:function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc.studentId;
 			Meteor.call("updateStudent", this.currentDoc, doc, function(error){
 				if(error){
-					g.notice("Error: "+ error, 8000);
+					g.notice(error, 8000);
 					g.enableBtn("#editStudent");
 					return;
 				}else{
@@ -1372,12 +1376,12 @@ AutoForm.hooks({
 		},
 	},
 	updateStudent:{
-		onSubmit: function(doc){
+		onSubmit:function(doc){
 			this.event.preventDefault();
 			let id = this.currentDoc.studentId;
 			Meteor.call("updateStudent", this.currentDoc, doc, function(error){
 				if(error){
-					g.notice("Error: "+ error, 8000);
+					g.notice(error, 8000);
 					g.enableBtn("#updateStudent");
 					return;
 				}else{
@@ -1388,7 +1392,6 @@ AutoForm.hooks({
 			});
 		},
 	},
-
 	editResult:{
 		onSubmit: function(data){
 			this.event.preventDefault();
