@@ -29,6 +29,25 @@ Template.login.events({
     	 g.logout();
     }
 });
+Template.networkStatus.helpers({
+    networkStatus:function(){
+        // console.log(Meteor.status());
+        let status = Meteor.status();
+        switch(status.status){
+            case "connected":
+                return status;
+            case "connecting":
+            case "waiting":
+                status.waiting = true;
+                return status;
+            case "offline":
+                status.canTryReconnect = true;
+                return status;
+        }
+    },
+
+});
+
 Template.feedback.events({
     'submit form':function(e){
         e.preventDefault();

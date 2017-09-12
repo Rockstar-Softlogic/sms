@@ -83,9 +83,9 @@
 <template name="networkStatus">
 	<div class="networkStatus">
 		{{#with networkStatus}}
-			<!-- {{#if connected}}
-				<p class="alert alert-info">Network Status: <button class="btn btn-success btn-xs">Connected</button></p>
-			{{else}} -->
+			{{#if connected}}
+				<!-- <p class="alert alert-info">Network Status: <button class="btn btn-success btn-xs">Connected</button></p> -->
+			{{else}}
 				{{#if waiting}}
 					<p class="alert alert-info" title="click to reload">Network Status: <button class="btn btn-warning btn-xs" onclick="window.location.reload()">Reconnecting...</button><br/>
 					<span>Retry count: {{retryCount}}</span>
@@ -96,7 +96,7 @@
 						<span>You're not connected!</span> <button class="btn btn-primary btn-xs" onclick="Meteor.reconnect()">Retry connect</button>
 					</p>
 				{{/if}}
-			<!-- {{/if}}	 -->
+			{{/if}}	
 		{{/with}}
 	</div>		
 </template>

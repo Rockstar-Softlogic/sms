@@ -18,22 +18,6 @@ registerGlobalHelpers({
                 return student;  
             }  
     },
-    networkStatus:function(){
-        // console.log(Meteor.status());
-        let status = Meteor.status();
-        switch(status.status){
-            case "connected":
-                return status;
-            case "connecting":
-            case "waiting":
-                status.waiting = true;
-                return status;
-            case "offline":
-                status.canTryReconnect = true;
-                return status;
-        }
-
-    },
     termSuffix:function(term){
         return g.termSuffix(term);
     },
