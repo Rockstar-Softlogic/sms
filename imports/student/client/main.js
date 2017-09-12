@@ -5,7 +5,6 @@ Template.studentLandingPage.onCreated(function(){
 			self.subscribe("log.list");
 		});
 });
-
 Template.studentLandingPage.helpers({
 	log:function(){
 		let logs = g.Logs.find({},{limit:5}).fetch();
