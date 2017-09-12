@@ -113,6 +113,8 @@
 		{{#if isInRole "staff,editor,admin"}}
 			<div id="dashboard" class="container-fluid">
 				{{>header}}
+				<!-- network status -->
+				{{>networkStatus}}
 				 <div id="mainContent">
 			        <div class="container-fluid">
 			            <!-- Page Heading -->
@@ -137,13 +139,15 @@
 <template name="stSidebar">
 	<nav class="stNav">
 		<div class="smartphone-menu-trigger"></div>
+		{{#with currentStudent}}
 		<header class="avatar">
 			<img src="/student10.png"/>
-	  		<h2>John D.</h2>
+	  		<h2>{{lastName}} {{firstName}} <br/>{{studentId}}</h2>
 		</header>
+		{{/with}}
 		<ul>
 		   	<li>
-	            <a href="#"><i class="fa fa-dashboard"></i><span> Dashboard </span></a>
+	            <a href="{{pathFor 'studentLandingPage'}}"><i class="fa fa-dashboard"></i><span> Dashboard </span></a>
             </li>
             <li>
 	            <a href="{{pathFor 'studentProfile'}}"><i class="fa fa-user"></i><span> Profile </span></a>
@@ -188,6 +192,8 @@
 							</div>
 							<br style="clear:both;" />
 						</header>
+						<!-- network status -->
+						{{>networkStatus}}
 						<div class="stContent" style="min-height:70vh;">
 							{{> Template.dynamic template=stContent}}
 						</div>
@@ -198,7 +204,6 @@
 					</section>
 			    <div class="insertNotice"></div>
 				<div id="processRequest" style="display:none">{{>smsLoading}}</div>
-			    
 			</div>
 		{{/if}}
 	{{/if}}

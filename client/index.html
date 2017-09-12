@@ -23,7 +23,7 @@
 				</div>
 				<div class="col-md-offset-1 col-md-4" style="float:left;">
 					{{#if currentUser}}
-						<h3>You're logged in as {{loggedInUser.username}}</h3>
+						<h3>You're logged in as {{currentUser.username}}</h3>
 						{{#if isInRole 'staff'}}
 							<p>
 								<a href="/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
@@ -66,7 +66,6 @@
 			                </div>
 			            </form>
 			        {{/if}}
-
 				</div>
 				<div style="clear:both;"></div>
 		</section>
@@ -74,13 +73,32 @@
 			{{>footer}}
 		</div>
 </template>
-
 <template name="smsLoading">
 	<div id="smsLoading" title="Processing">
 		<div class="text-center">
 			<h2><span class="fa fa-spin fa-spinner fa-2x"></span> Processing...</h2>
-		</div>		
+		</div>
 	</div>
+</template>
+<template name="networkStatus">
+	<div class="networkStatus">
+		{{#with networkStatus}}
+			<!-- {{#if connected}}
+				<p class="alert alert-info">Network Status: <button class="btn btn-success btn-xs">Connected</button></p>
+			{{else}} -->
+				{{#if waiting}}
+					<p class="alert alert-info" title="click to reload">Network Status: <button class="btn btn-warning btn-xs" onclick="window.location.reload()">Reconnecting...</button><br/>
+					<span>Retry count: {{retryCount}}</span>
+					</p>
+				{{/if}}
+				{{#if canTryReconnect}}
+					<p class="alert alert-danger">
+						<span>You're not connected!</span> <button class="btn btn-primary btn-xs" onclick="Meteor.reconnect()">Retry connect</button>
+					</p>
+				{{/if}}
+			<!-- {{/if}}	 -->
+		{{/with}}
+	</div>		
 </template>
 
 <template name="feedback">
@@ -89,10 +107,10 @@
 			<p class="alert alert-info">Thank you for taking your time to contact us. <br/>We'll get back to you in less than 24 hours if need be.</p>
 			<form method="POST">
 				 <br style="clear:both">
-					<label>Email</label>
 					{{#if currentUser}}
-						<p><strong>{{loggedInUser.username}}</strong></p>
+						<h4><strong>{{loggedInUser.username}}</strong></h4>
 					{{else}}
+					<label>Email</label>
 					<div class="form-group">
 						<input type="email" class="form-control" id="email" name="email" placeholder="Email" minlength="5" required><br/>
 						<span class="text-danger">A valid email address.</span>

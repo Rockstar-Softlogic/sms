@@ -1,9 +1,7 @@
 Meteor.publish({
 	'student.info': function(){
 		let userId = this.userId;
-		
 		if(Roles.userIsInRole(userId, ['student'])){
-
 			currentStudent = g.Students.find({meteorIdInStudent: userId});	
 				if(currentStudent){
 					return currentStudent;
@@ -11,7 +9,6 @@ Meteor.publish({
 		}
 		return this.ready();
 	},
-	
 	'student.result': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['student'])){
@@ -44,7 +41,7 @@ Meteor.publish({
 	'st.staffName': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['student'])){
-			let staff = g.Staffs.find();
+			let staff = g.Staffs.find({},{fields:{firstName:1, lastName:1, otherName: 1, meteorIdInStaff:1, staffId:1}});
 			if(staff) return staff;
 		}
 		return this.ready();

@@ -145,14 +145,17 @@ $topnav-bg: #df421e;
             color:#fff;
         }
     }
-    // section main content
+    //section main content
     section .stContent {
         background-color: #fff;
-        padding: 1.2em 2em;
         border-radius: 2px;
+        margin-top:15px !important;
+        @media(min-width:768px) {
+           padding: 1.2em 10em 1.5em 5em;
+        }    
     }
 }
-// stSidebar template styles
+//stSidebar template styles
 .stNav {
   background: $topnav-bg;
   height: 100vh;
@@ -163,6 +166,7 @@ $topnav-bg: #df421e;
   z-index: 5;
   outline: none;
   color:#fff;
+  // overflow-y: scroll;
 }
 .stNav .avatar {
   background: rgba(0, 0, 0, 0.1);
@@ -179,6 +183,7 @@ $topnav-bg: #df421e;
 .stNav .avatar h2 {
   font-weight: normal;
   margin-bottom: 0;
+  font-size:1.5em;
 }
 .stNav ul {
   list-style: none;
@@ -212,7 +217,7 @@ $topnav-bg: #df421e;
   }
   .stNav {
     width: 90px;
-    overflow-y: scroll;
+    // overflow-y: scroll;
   }
   .stNav .avatar {
     padding: 0.5em;
@@ -321,46 +326,17 @@ $topnav-bg: #df421e;
     pointer-events: none;
   }
 }
-
-
 //student dashboard end
-
-footer{
-    background-color:#abcdef;
-    margin-bottom:1em;
-    a{
-        text-decoration: none;
-        color:#fff;
-        font-weight: bold;
-    }
-    a:hover{
-        text-decoration: none;
-    }
-}
 .insertNotice{
     position: fixed;
     color: white;
     background-color: #000;
     padding: 10px;
-    z-index: 999;
+    z-index: 98;
     border-radius-left: 4px; 
     font-size: 18px;
     display: none;
     bottom: 10px;
     right: 0;
     opacity: 0.8;
-}
-#smsLoading{
-    position:fixed;
-    width:100%;
-    min-height:100vh;
-    top:0%;
-    right:0%;
-    padding:10% 25%;
-    z-index:9999;
-    text-align:center;
-    background-color:rgba(0,0,0,0.2);
-    div{
-        padding:4em;
-    }
 }

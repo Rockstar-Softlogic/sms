@@ -24,7 +24,7 @@ Meteor.publish({
 	'staff.info': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let currentStaff = g.Staffs.find({meteorIdInStaff: userId});	
+			let currentStaff = g.Staffs.find({meteorIdInStaff:userId});	
 				if(currentStaff){
 					return currentStaff;
 				}
@@ -124,7 +124,7 @@ Meteor.publish({
 			if(logs){
 				return logs;
 			}
-		}else if(Roles.userIsInRole(userId, ['staff'])){
+		}else if(Roles.userIsInRole(userId, ['staff','student'])){
 			logs = g.Logs.find({"by":this.userId},{sort:{time:-1}});
 			if(logs){
 				return logs;

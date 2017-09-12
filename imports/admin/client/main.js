@@ -6,7 +6,7 @@ Template.staffDashboard.onCreated(function(){
 			self.subscribe("student.list");
 			self.subscribe("result.list");
 			self.subscribe("payment.list");
-			self.subscribe("staff.list");
+			self.subscribe("staff.name");
 			self.subscribe("log.list");
 		});
 });
@@ -1254,7 +1254,7 @@ Template.logs.helpers({
 				let name;
 				if(Meteor.userId() === log.by){
 					name = "You";
-				}else{
+				}else{//differentiate btw staff and student logs here
 					let query = g.Staffs.findOne({"meteorIdInStaff":log.by});
 					query?name = query.lastName+" "+query.firstName+" ("+query.staffId+")":name="Super Admin";	
 				}

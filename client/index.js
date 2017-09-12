@@ -29,7 +29,6 @@ Template.login.events({
     	 g.logout();
     }
 });
-
 Template.feedback.events({
     'submit form':function(e){
         e.preventDefault();

@@ -1,23 +1,50 @@
-
+<template name="studentLandingPage">
+	{{#if Template.subscriptionsReady}}
+	<section id="studentLandingPage">
+		<div class="notification" style="overflow-y:scroll;">
+			<h4>Notification <span class="fa fa-info"></span></h4>
+			<article>
+				{{{setting.notification}}}
+			</article>
+		</div>
+		<div class="log">
+			<h4>Recent Activities</h4>
+			{{#each log}}
+				<strong>*</strong> <span>{{name}} {{action}} @{{dateFormat time}}</span><br/>
+			{{/each}}
+			<a href="{{pathFor 'stLogs'}}">See more...</a>
+		</div>
+	</section>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
 <template name="studentProfile">
 	{{#if Template.subscriptionsReady}}
-		{{#if isInRole 'student'}}
-			{{#with studentInfo}}
-
+			{{#with currentStudent}}
+				<h3>{{lastName}} {{firstName}} Profile</h3><hr/>
 				<table>
 						<tr>
 							<th colspan="2">Admission Data</th>
 						</tr>
 						<tr>
-							<td><strong>Name: </strong></td>
-							<td> {{lastName}}, {{firstName}} {{otherName}}</td>
+							<td><strong>Last Name </strong></td>
+							<td> {{lastName}}</td>
+						</tr>
+						<tr>
+							<td><strong>First Name </strong></td>
+							<td>{{firstName}}</td>
+						</tr>
+						<tr>
+							<td><strong>Other Name </strong></td>
+							<td>{{otherName}}</td>
 						</tr>
 						<tr>
 							<td><strong>Current class</strong></td>
 							<td>{{currentClass}}</td>
 						</tr>
 						<tr>
-							<td><strong>StudentId</strong></td>
+							<td><strong>Student Id</strong></td>
 							<td>{{studentId}}</td>
 						</tr>
 						<tr>
@@ -46,8 +73,6 @@
 						</tr>										
 					</table>
 						<br/><br/>
-
-
 					<table>
 						<tr>
 							<th colspan="2">Student Profile</th>
@@ -93,17 +118,16 @@
 						</tfoot>										
 				</table>
 			{{/with}}
-		{{/if}}
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
-	
+
 </template>
 
 <template name="editStProfile">
 		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
-				{{#autoForm schema="g.Schemas.UpdateStudent" type="normal" id="editStProfile" doc=editable}}
+				<h3>Update Profile</h3><hr/>
+				{{#autoForm schema="g.Schemas.UpdateStudent" type="normal" id="editStProfile" doc=currentStudent}}
 				{{> afQuickField name="presentAddress"}}
 				{{> afQuickField name="homeAddress"}}
 				{{> afQuickField name="phone"}}
@@ -114,16 +138,12 @@
 					<button type="submit" class="btn btn-primary">Update</button>
 				</div>
 				{{/autoForm}}
-			{{/if}}
 		{{/if}}
-
 </template>
-
 
 <template name="stResult">
 		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
-					
+					<h3>Student Results</h3><hr/>
 					<form class='searchResult'>
 						
 						<select name="class">
@@ -144,7 +164,7 @@
 						<button type="submit" class="btn btn-primary btn-xs">Show result</button>
 
 					</form>
-					{{#with studentInfo}}
+					{{#with currentStudent}}
 						<table class="table table-striped">
 							<tr>
 								<td><strong>First Name</strong></td>
@@ -166,7 +186,7 @@
 								<td><strong>Current Class</strong></td>
 								<td>{{currentClass}}</td>
 								<td><strong>Current Term</strong></td>
-								<td>{{currentTerm}}</td>
+								<td>{{termSuffix setting.term}}</td>
 							</tr>
 							
 						</table>
@@ -351,14 +371,16 @@
 					{{else}}
 						<p style="font-size: 1.5em; text-align: center;">No result found for the current class and term!</p>
 					{{/if}}
-			{{/if}}
+		{{else}}
+			{{>smsLoading}}
 		{{/if}}
 
 </template>
 
 <template name="stPayment">
 		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
+				<h3>Student Payments</h3><hr/>
+
 				<form class='searchPayment'>
 					
 					<select name="class">
@@ -377,7 +399,7 @@
 					<button type="submit" class="btn btn-primary btn-xs">Show payment</button>
 
 				</form>
-				{{#with studentInfo}}
+				{{#with currentStudent}}
 						<table class="table table-striped">
 							<tr>
 								<td><strong>First Name</strong></td>
@@ -385,7 +407,7 @@
 								<td><strong>Other Name(s)</strong></td>
 								<td>{{lastName}} {{otherName}}</td>
 								<td rowspan="3" style="border: 1px solid black">
-									<img src="http://localhost:3000/student10.png" alt="{{studentId}} passport">
+									<img src="/student10.png" alt="{{studentId}} passport">
 
 								</td>
 							</tr>
@@ -399,54 +421,70 @@
 								<td><strong>Current Class</strong></td>
 								<td>{{currentClass}}</td>
 								<td><strong>Current Term</strong></td>
-								<td>{{currentTerm}}</td>
+								<td>{{termSuffix setting.term}}</td>
 							</tr>
 							
 						</table>
 
 					{{/with}}
-					{{#if studentPay}}
-						{{#with studentPay}}
-						<h2>Payment details</h2>
+					{{#with studentPay}}
+							<h3>Payment details</h3>
 						<table class="table table-striped">
-
 							<tr>
-								<td><strong>Class</strong></td> <td>{{class}}</td>
-								<td><strong>Term</strong></td> <td>{{term}}</td>
-								<td><strong>Session</strong></td><td>{{session}}</td>
+								<td>Class</td>
+								<td>{{class}}</td>
 							</tr>
-
-						</table>
-						<table class="table table-striped serial">
 							<tr>
-								<th>S/N</th>
-								<th>Subjects</th>
-								<th>CA</th>
-								<th>Exam</th>
-								<th>Total</th>
-								<th>Grade</th>
-								<th>Remark</th>
+								<td>Term</td>
+								<td>{{termSuffix term}}</td>
+							</tr>
+							<tr>
+								<td>Session</td>
+								<td>{{session}}</td>
+							</tr>
+							<tr>
+								<td>Payment Category</td>
+								<td>{{category}}</td>
+							</tr>
+							<tr>
+								<td>Amount Approved</td>
+								<td>{{amount}}</td>
+							</tr>
+							<tr>
+								<td>Payment Method</td>
+								<td>{{paymentType}}</td>
+							</tr>
+							<tr>
+								<td>Payment Status</td>
+								<td>{{paymentStatus}}</td>
+							</tr>
+							<tr>
+								<td>Payment Date</td>
+								<td>{{dateFormat date}}</td>
+							</tr>
+							<tr>
+								<td>Transaction ID</td>
+								<td>{{transactionId}}</td>
+							</tr>
+							<tr>
+								<td>Receiver's Name</td>
+								<td>{{staffName}}</td>
 							</tr>
 						</table>
-						{{/with}}
 						<br/>
 						<button class="btn btn-primary" onclick="window.print()">Print</button>
-					{{else}}
-						<p style="font-size: 1.5em; text-align: center;">No payment found for the current class and term.</p>
-
-					{{/if}}
-
-			{{/if}}
+						{{else}}
+							<h4 class="text-center">No payment found for the current class and term.</h4>
+						{{/with}}
+						<br/>
 		{{else}}
 			{{>smsLoading}}
-		{{/if}}
-	
+		{{/if}}	
 </template>
 
 <template name="stAssignment">
 		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
-				<h3>Assignment list</h3> 
+				<h3>Assignment list</h3> <hr/>
 					<form class="form-inline">
 						<div class="form-group">
 							<select name="subject" class="form-control">
@@ -477,8 +515,8 @@
 								{{/if}}
 								</h4>
 								<div>
-									<span><strong>Start: </strong>{{startDate}}</span>
-									<span><strong>Due date: </strong>{{endDate}}</span>
+									<span><strong>Start: </strong>{{dateFormat startDate}}</span>
+									<span><strong>Due date: </strong>{{dateFormat endDate}}</span>
 									<span><strong>Max score: </strong>{{totalScore}}</span>
 								</div>
 								
@@ -488,16 +526,13 @@
 				{{else}}
 					<p>No assignment found for your class</p>
 				{{/if}}				
-			{{/if}}
 		{{else}}
 			{{>smsLoading}}
 		{{/if}}
-	
 </template>
 
 <template name="stSingleAssignment">
 		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
 				<div class="assignment">
 					{{#with assignment}}
 						<h3>
@@ -505,7 +540,7 @@
 							{{#if dueDate}}
 								<span class="label label-danger">expired</span>
 							{{/if}}
-						</h3>
+						</h3><hr/>
 						{{#if stAnswer}}
 							<span style="color: green;">Answered</span>
 							{{#if stAnswer.score}}
@@ -515,16 +550,14 @@
 							<span class="text-warning">Not Answered</span>
 						{{/if}}
 						<hr/>
-
 						<article>
 							<p><strong>Question</strong></p>
 							<p>{{content}}</p>
-
 							<span><strong>Class:</strong> {{class}}</span>
 							<span><strong>Subject:</strong> {{subject}}</span>
 							<span><strong>Mark:</strong> {{totalScore}}</span>
-							<span><strong>Start date:</strong> {{startDate}}</span>
-							<span><strong>End date:</strong> {{endDate}}</span><br/>
+							<span><strong>Start date:</strong> {{dateFormat startDate}}</span>
+							<span><strong>End date:</strong> {{dateFormat endDate}}</span><br/>
 							<p>
 								Posted by: <strong>{{author}}</strong> 
 							</p>
@@ -534,7 +567,6 @@
 								{{/if}}
 							</p>
 							<hr/>
-
 							{{#if stAnswer}}
 								<p><strong>Your submitted answer</strong></p>
 								{{#with stAnswer}}
@@ -556,13 +588,9 @@
 										{{else}}
 											No comment
 										{{/if}}
-										
 									</p>
-
 									<span>Submitted on: {{date}}</span>
-
 								{{/with}}
-
 							{{else}}
 								{{#if dueDate}}
 									<span class="fa fa-ban fa-2x"> Submission not allowed</span>
@@ -571,43 +599,44 @@
 									<form class="answer form-group">
 										<textarea name="answer" cols="45" rows="5" placeholder="Your answer here" class="form-control"></textarea><br/>
 
-										<button type="submit">Submit Answer</button>
+										<button type="submit" class="btn btn-success">Submit Answer</button>
 									</form>
 								{{/if}}
 							{{/if}}
 						</article>
-						
-						
-						
-
 					{{/with}}
 				</div>
-			{{/if}}
 		{{else}}
 			{{>smsLoading}}
 		{{/if}}
-
 </template>
 		
 <template name="stMessage">
-		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
-				
-			{{/if}}
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
-	
+	{{#if Template.subscriptionsReady}}
+		
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>
 
-
-<template name="studentFeedback">
-		{{#if Template.subscriptionsReady}}
-			{{#if isInRole 'student'}}
-			
-			{{/if}}
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
-	
+<template name="stLogs">
+	{{#if Template.subscriptionsReady}}
+			<h3>Your activity logs</h3><hr/>
+			<table class="serial">
+				<tr>
+					<th>S/N</th>
+					<th>Action</th>
+					<th>Time</th>
+				</tr>
+				{{#each log}}
+				<tr>
+					<td></td>
+					<td>{{name}} {{action}}</td>
+					<td>{{dateFormat time}}</td>
+				</tr>
+				{{/each}}
+			</table>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>

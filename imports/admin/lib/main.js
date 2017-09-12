@@ -323,8 +323,8 @@ Meteor.methods({
 				let student = g.Students.findOne({
 					"meteorIdInStudent":doc.target,
 					"studentId":doc.studentId});
-					console.log(doc.studentId,doc.target);
-					console.log(student);return;
+					// console.log(doc.studentId,doc.target);
+					// console.log(student);return;
 				let payment = {};//build payment object securely
 					payment.class = student.currentClass;
 					payment.term = setting.term;

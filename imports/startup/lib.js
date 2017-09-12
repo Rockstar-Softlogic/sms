@@ -12,7 +12,7 @@ g.setting = function(){
 	if(Meteor.isClient){
 		let config = Meteor.subscribe('setting');
 		if(config.ready()){
-			return g.Settings.findOne({_id: "default"});
+			return g.Settings.findOne({_id:"default"});
 		}
 	}
 }
@@ -55,7 +55,7 @@ g.meteorCall = function(method,options){
 			g.notice(successMsg,4000);
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
-				FlowRouter.go(FlowRouter.path(redirect));
+				FlowRouter.go(redirect);
 			};
 		}
 	});
