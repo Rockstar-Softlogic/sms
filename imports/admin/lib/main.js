@@ -560,6 +560,29 @@ Meteor.methods({
 			}
 		Meteor.call("log",("demoted a graduated student with id "+doc.studentId+" to SSS3"));
 	},
+	demoteStudent:function(studentIdArray){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+			throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		if(studentIdArray.length < 1){
+			throw new Meteor.Error(500, 'Insufficient information to perform Operation');
+		}
+		if(Meteor.isServer){
+			studentIdArray.forEach(function(id){
+				let std = g.Students.findOne({"meteorIdInStudent":id});
+				let newClass = g.demoteStudents(std.currentClass);
+						g.Students.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+							{$set:{"currentClass":newClass}});
+					//update currentClass in result and payment
+						g.Payments.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+							{$set:{"currentClass":newClass}});
+						g.Results.update({"meteorIdInStudent":std.meteorIdInStudent}, 
+							{$set:{"currentClass":newClass}});
+			});
+			Meteor.call("log",("demoted "+studentIdArray.length+" student(s)"));
+		}
+
+	},
 	pushNotification:function(notification){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 			throw new Meteor.Error(500, 'Unauthorized Operation');

@@ -438,10 +438,6 @@ Template.studentList.helpers({
 		let filter = Session.get('studentFilter');
 		return filter;
 	},
-	demoteStudentBtnChecked:function(){
-		let btn = $("td input[type='checkbox']:checked");
-		if(btn>0)Session.set("studentIsSelected",true);
-	}
 });
 Template.studentList.events({
 	'submit form': function(e){
@@ -454,20 +450,43 @@ Template.studentList.events({
 						selectedClass: selectedClass};
 			Session.set('studentFilter', filter);
 	},
-	'click .selectedStudent': function(e){
-		bootbox.alert('e.target.selectSt.value');
-	},
 	'change .checkAllBoxes':function(e){
 		$("td input[type='checkbox']").not(this).prop("checked",$("input[type='checkbox']").prop("checked"));
+		if($("td input[type='checkbox']:checked").length > 0){
+			$(".demoteStudent").show("slow");
+		}else{
+			$(".demoteStudent").hide("fast");
+		}	
 	},
 	'click td input[type="checkbox"]':function(e){
 		$("input.checkAllBoxes").prop("checked",false);
+		if($("td input[type='checkbox']:checked").length > 0){
+			$(".demoteStudent").show("slow");
+		}else{
+			$(".demoteStudent").hide("fast");
+		}	
 	},
 	'click .demoteStudent':function(){
 		let checkedBoxes = $("td input[type='checkbox']:checked").map(function(){
-			console.log(this.value);
+			return this.value;
 		}).get();
-		console.log(checkedBoxes);
+
+		if(checkedBoxes && checkedBoxes.length>0){
+			let warning = "<h4>You're about to demote "+checkedBoxes.length+" student(s)<br/> Are you sure? </h4>";
+			bootbox.confirm(warning,function(result){
+				if(result){
+					g.meteorCall("demoteStudent",{
+						doc:checkedBoxes,
+						successMsg:"Operation was successful"
+					});
+					$(".demoteStudent").hide("fast");
+				}	
+			});	
+		}else{
+			bootbox.alert("No student was selected!");
+			return;
+		}
+		
 	}
 
 });

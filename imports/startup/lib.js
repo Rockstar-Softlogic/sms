@@ -89,6 +89,24 @@ g.promoteStudents = function(currentClass){
 			return currentClass;
 	}
 }
+g.demoteStudents = function(currentClass){
+	switch(currentClass){
+		case "Graduated":
+			return "SSS3";
+		case "SSS3":
+			return "SSS2";
+		case "SSS2":
+			return "SSS1";
+		case "SSS1":
+			return "JSS3";
+		case "JSS3":
+			return "JSS2";
+		case "JSS2":
+			return "JSS1";
+		default:
+			return currentClass;
+	}
+}
 //Sentence case
 g.sentenceCase = function(name){
 	if(typeof(name) === "string"){

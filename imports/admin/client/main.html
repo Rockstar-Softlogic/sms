@@ -744,13 +744,11 @@
 			<button type="submit" class="btn btn-primary btn-xs">Filter students</button>
 		</form>
 		{{#if students}}
-			{{#if demoteStudentBtnChecked}}
-			<button class="demoteStudent btn btn-danger btn-xs">Demote student</button>
-			{{/if}}
+			<button class="demoteStudent btn btn-danger btn-xs" style="display:none;">Demote student</button>
 		<table class="table table-bordered serial">
 			<tr>
 				<th>S/N</th>
-				<th><input type="checkbox" name="checkAllBoxes" class="checkAllBoxes" onclick="{{checkAllCheckBoxes}}"></th>
+				<th><input type="checkbox" name="checkAllBoxes" class="checkAllBoxes"></th>
 				<th>Name</th>
 				<th>Class</th>
 				<th>ID</th>
@@ -762,7 +760,7 @@
 				
 				<td></td>
 				<td class="text-center">
-				<input type="checkbox" name="checkStudent" value="{{_id}}" style="display:inline;">
+				<input type="checkbox" name="checkStudent" value="{{meteorIdInStudent}}" style="display:inline;">
 				</td>
 				<td>{{lastName}}, {{firstName}} {{otherName}}</td>
 				<td>{{currentClass}} </td>
