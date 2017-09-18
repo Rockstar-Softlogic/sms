@@ -1,13 +1,4 @@
 
-// @media print{
-// 	button,a{
-// 		display:none;
-// 	}
-// 	.serial td:first-child{
-// 		width:20px;
-// 	}
-// }
-
 #staffDashboard{
 	section{
 		margin: 0.8em 0 0 1.5em;
@@ -51,6 +42,24 @@
 		}
 	}	
 }
+#generalSearch{
+	.searchResult{
+		margin-top:.5em;
+		border-bottom:1px dotted;
+		p{
+			font-weight:600;
+			font-size:1.1em;
+			span{
+				display: inline-block;
+				padding:5px;
+			}
+		}
+		article{
+			padding:2px 5px;
+			font-size:16px;
+		}
+	}
+}
 #ctrlpanel{
 	.schoolFees ul{
 		font-weight:bold;
@@ -72,6 +81,7 @@ button#uploadBtn{
 table{
 	margin: 5px;
 	border-collapse: collapse;
+	// table-layout:auto;
 
 	tr{
 		border: 1px solid grey;
@@ -94,7 +104,11 @@ table{
 	td{
 		padding: 5px;
 		border: 1px solid black;
-		white-space: nowrap;
+		// white-space: nowrap;
+		// white-space: -o-pre-wrap; 
+	    // word-wrap: break-word;
+	    // white-space: pre-wrap; 
+	    // white-space: -moz-pre-wrap; 
 
 		img{
 			max-width: 100px;
@@ -125,14 +139,13 @@ table{
 
 table.serial {
     counter-reset: rowNumber;
-    
     tr:not(:first-child) {
     	counter-increment: rowNumber;
 		
 		td:first-child{
 			width:10px;
 		}
-		td:first-child::before {
+		td:first-child::after {
     		content: counter(rowNumber);
 			}
 

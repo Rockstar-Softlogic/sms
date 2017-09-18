@@ -139,7 +139,7 @@ Meteor.methods({
 					g.Results.insert(resultAndPaymentRecord);
 					g.Payments.insert(resultAndPaymentRecord);
 					Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
-
+					return insertToUser;
 				}
 		}, //end insertStudent method
 	updateStudent: function(target, data){
@@ -197,7 +197,7 @@ Meteor.methods({
 					}
 					g.Staffs.insert(data);
 					Meteor.call("log",("added new staff with id "+data.staffId));
-
+					return insertToUser;
 				}
 
 		
@@ -309,6 +309,7 @@ Meteor.methods({
 			// log
 			Meteor.call("log",("created new result for "+studentId));
 	},//end updateResult
+	//payment by cash
 	updatePaymentByCash:function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 			throw new Meteor.Error(500, 'Unauthorized Operation');
@@ -318,7 +319,7 @@ Meteor.methods({
 			if(!setting || !setting.session || !setting.term){
 				throw new Meteor.Error(501, "No Session or term found.");
 			}
-			//is server only
+			//server only
 			if(Meteor.isServer){
 				let student = g.Students.findOne({
 					"meteorIdInStudent":doc.target,
@@ -330,23 +331,65 @@ Meteor.methods({
 					payment.term = setting.term;
 					payment.session = setting.session;
 					payment.category = doc.paymentCategory;
-					payment.transactionId = student.studentId+(new Date().toString().split(" ").join("").substring(0,20));
+					payment.transactionId = (student.studentId+(new Date().toString().split(" ").join("").substring(0,20))).split(":").join("");
 					payment.amount = doc.amount;
 					payment.paymentStatus = "Paid";
 					payment.paymentType = doc.method;
 					payment.paid = true;
 					payment.date = new Date();
 					payment.addedBy = this.userId;
-					let paymentUpdate = g.Payments.update({
-										"meteorIdInStudent":student.meteorIdInStudent,
-										"studentId":student.studentId},
-										{$push:{"payment":payment}});
+				let paymentUpdate = g.Payments.update({
+									"meteorIdInStudent":student.meteorIdInStudent,
+									"studentId":student.studentId},
+									{$push:{"payment":payment}});
 			//log this action
-				Meteor.call("log",("add new payment for "+
-					student.lastName+" "+student.firstName+" ("+
-					student.studentId+") in "+student.currentClass));
+				if(paymentUpdate){	
+					Meteor.call("log",("add new payment for "+
+						student.lastName+" "+student.firstName+" ("+
+						student.studentId+") in "+student.currentClass));
+				}
 			}//end if server
 			
+	},
+	updatePaymentByCard:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+			throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		let setting = g.Settings.findOne({"_id":"default"});
+			if(!setting || !setting.session || !setting.term){
+				throw new Meteor.Error(501, "No Session or term found.");
+			}
+		if(Meteor.isServer){
+			let student = g.Students.findOne({
+					"meteorIdInStudent":doc.target,
+					"studentId":doc.studentId});
+			let payment = {};//build payment object securely
+					payment.class = student.currentClass;
+					payment.term = setting.term;
+					payment.session = setting.session;
+					payment.category = doc.paymentCategory;
+					payment.transactionId = doc.transactionId;
+					payment.amount = doc.amount;
+					payment.paymentStatus = "Paid";
+					payment.paymentType = doc.method;
+					payment.paid = true;
+					payment.date = new Date();
+					payment.addedBy = this.userId;
+					// from payment gateway response
+					payment.approvedAmount = doc.response.apprAmt;
+					payment.paymentDescription = doc.response.desc;
+					payment.payRef = doc.response.payRef;
+			let paymentUpdate = g.Payments.update({
+								"meteorIdInStudent":student.meteorIdInStudent,
+								"studentId":student.studentId},
+								{$push:{"payment":payment}});
+			//log this action
+			if(paymentUpdate){
+				Meteor.call("log",("made online payment for "+
+					student.lastName+" "+student.firstName+" ("+
+					student.studentId+") in "+student.currentClass));
+			}
+		}//payment
 	},
 	editResult: function(target, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff']) || !target.class || !target.term || !target.session){
@@ -404,22 +447,23 @@ Meteor.methods({
 		Meteor.call("log",("edited "+doc.subject+" assignment for "+doc.class));
 		return tryUpdate;
 	},
-	scoreAssignment: function(doc){
+	scoreAssignment: function(answer){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
-		let id = doc.id;
-		delete doc.id;
-		let query = g.Assignments.findOne({_id: id});
+		let query = g.Assignments.findOne({"_id":answer.assignmentId});
 			if(query.addedBy !== this.userId){
 				throw new Meteor.Error('Scoring denied', 'You do not have the right to mark this answer.');
 			}
 
 		let maxScore = query.totalScore;
-			if(!maxScore || doc.score > maxScore || doc.score < 0 || !(doc.score)){
+			if(!maxScore || answer.score > maxScore || answer.score < 0 || !(answer.score)){
 				throw new Meteor.Error("Invalid score", "Mark given is out of range");
 			}else{
-				g.Assignments.update({_id: id, "answer.id": doc.id}, {$set: {"answer.$.score": doc.score, "answer.$.comment": doc.comment}})
+				g.Assignments.update({"_id":answer.assignmentId,
+									"answer.id": answer.id},
+									{$set:{"answer.$.score":answer.score,
+									"answer.$.comment":answer.comment}})
 			}
 	},
 	newMessage: function(message){
@@ -514,14 +558,14 @@ Meteor.methods({
 											{$set:{"graduated":false}});
 				g.Graduates.remove({"_id":insertToStudent});
 			}
-		Meteor.call("log",("demoted student with id "+doc.studentId+" to SSS3"));
+		Meteor.call("log",("demoted a graduated student with id "+doc.studentId+" to SSS3"));
 	},
 	pushNotification:function(notification){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
 			throw new Meteor.Error(500, 'Unauthorized Operation');
 		}
 		let checkWord = notification.split(" ");
-		if(checkWord.length < 8){
+		if(checkWord.length < 5){
 			throw new Meteor.Error("400","Notification too short!");
 		}
 		if(Meteor.isServer){

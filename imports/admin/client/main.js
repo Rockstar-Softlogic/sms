@@ -59,8 +59,8 @@ Template.staffDashboard.helpers({
 				if(Meteor.userId() === log.by){
 					name = "You";
 				}else{
-					let query = g.Staffs.findOne({"meteorIdInStaff":log.by});
-					query?name = query.lastName+" "+query.firstName+" ("+query.staffId+")":name="superAdmin";	
+					let query = g.Staffs.findOne({"meteorIdInStaff":log.by}) || g.Students.findOne({"meteorIdInStudent":log.by});
+					query?name = query.lastName+" "+query.firstName+" ("+ (query.staffId || query.studentId)+")":name="super Admin";	
 				}
 				log.name = name;
 				return log;
@@ -92,6 +92,44 @@ Template.staffDashboard.events({
 
 	}
 });
+Template.generalSearch.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("student.list");
+			self.subscribe("payment.list");
+		});
+});
+Template.generalSearch.helpers({
+	findStudent:function(){
+		let st = Session.get("studentFinder");
+		if(st)return g.Students.find({$or:[
+					{"studentId":st},
+					{"firstName":st},
+					{"lastName":st},
+					{"otherName":st}]});
+	},
+	findPayment:function(){
+		let payId = Session.get("paymentFinder");
+		if(payId)return g.Payments.findOne({
+					"payment.transactionId":payId});
+	}
+
+});
+
+Template.generalSearch.events({
+	'submit #findStudent form':function(e){
+		e.preventDefault();
+		let query = e.target.student.value;
+		Session.set("studentFinder",query);
+	},
+	'submit #findPayment form':function(e){
+		e.preventDefault();
+		let query = e.target.payment.value;
+		Session.set("paymentFinder",query);
+		
+	}
+});
+
 Template.ctrlpanel.helpers({
 	termSchoolFees: function(){
 		let s = g.setting();if(!s)return;//needs review
@@ -255,7 +293,7 @@ Template.editStaff.onCreated(function(){
 Template.editStaff.helpers({
 	editStaffInfo: function(){
 		let id = FlowRouter.getParam('id');
-		return g.Staffs.findOne({staffId: id});
+		return g.Staffs.findOne({staffId:id});
 	},
 });
 Template.updateStaff.onCreated(function(){
@@ -269,7 +307,7 @@ Template.updateStaff.onCreated(function(){
 Template.updateStaff.helpers({
 	updateStaffInfo: function(){
 		let id = FlowRouter.getParam('id');
-		return g.Staffs.findOne({staffId: id});
+		return g.Staffs.findOne({staffId:id});
 	},
 });
 //End List of Staff in School
@@ -347,16 +385,14 @@ Template.passportUpload.events({
 						}
 					else{
 						let pathToGo = target.diff;
-						if(pathToGo == 'student'){
-							g.notice("Passport uploaded successfully", 4000);
-							next = FlowRouter.path('/dashboard/student/view/'+target.id);
-									FlowRouter.go(next);
-						}else if(pathToGo == 'staff'){
-							g.notice("Passport uploaded successfully", 4000);
-							next = FlowRouter.path('/dashboard/staff/view/'+target.id);
-									FlowRouter.go(next);}
+							if(pathToGo == 'student'){
+								g.notice("Passport has been uploaded", 4000);
+								FlowRouter.go("singleStudent",{id:target.id});
+							}else if(pathToGo == 'staff'){
+								g.notice("Passport has been uploaded", 4000);
+								FlowRouter.go("singleStaff",{id:target.id});
+							}
 						}
-						
 					});
 				}
 				reader.readAsDataURL(file);
@@ -401,6 +437,10 @@ Template.studentList.helpers({
 	studentFilter:function(){
 		let filter = Session.get('studentFilter');
 		return filter;
+	},
+	demoteStudentBtnChecked:function(){
+		let btn = $("td input[type='checkbox']:checked");
+		if(btn>0)Session.set("studentIsSelected",true);
 	}
 });
 Template.studentList.events({
@@ -416,7 +456,20 @@ Template.studentList.events({
 	},
 	'click .selectedStudent': function(e){
 		bootbox.alert('e.target.selectSt.value');
+	},
+	'change .checkAllBoxes':function(e){
+		$("td input[type='checkbox']").not(this).prop("checked",$("input[type='checkbox']").prop("checked"));
+	},
+	'click td input[type="checkbox"]':function(e){
+		$("input.checkAllBoxes").prop("checked",false);
+	},
+	'click .demoteStudent':function(){
+		let checkedBoxes = $("td input[type='checkbox']:checked").map(function(){
+			console.log(this.value);
+		}).get();
+		console.log(checkedBoxes);
 	}
+
 });
 //End List of student in School
 //Single student view page
@@ -806,6 +859,11 @@ Template.singlePayment.helpers({
 			}
 			return;
 	},
+	paymentMethod:function(method){
+		let ret;
+		method=="Online"?ret=true:ret=false;
+		return ret;
+	}
 });
 Template.singlePayment.events({
 	'submit form': function(e){
@@ -825,7 +883,7 @@ Template.updatePayment.helpers({
 		//get this term payments
 		let query = g.Settings.findOne({"_id":id,"session":session}).term;
 		stInfo.fees = query[query.length-1]; //attach current term school fees to session
-		stInfo.transactionId = stInfo.studentId+(new Date().toString().split(" ").join("").substring(0,20));
+		stInfo.transactionId = (stInfo.studentId+(new Date().toString().split(" ").join("").substring(0,20)).split(":").join(""));
 		// update the session
 		Session.set('st.info',stInfo);
 		//get all payments category
@@ -852,7 +910,7 @@ Template.updatePayment.helpers({
 });
 
 Template.updatePayment.events({
-	"submit form":function(e){
+	"submit form#createPaymentReceipt":function(e){
 		e.preventDefault();
 		let paymentCat = e.target.paymentCat.value,
 			method = e.target.paymentMethod.value,
@@ -876,7 +934,8 @@ Template.updatePayment.events({
 					if(result){
 						g.meteorCall("updatePaymentByCash",{
 							doc:stInfo,
-							successMsg:"Payment was successfully"
+							successMsg:"Payment was successfully",
+							redirect: FlowRouter.path("singlePayment",{id:stInfo.studentId})
 						});
 					}
 				});
@@ -903,8 +962,8 @@ Template.assignmentList.helpers({
 	assignments: function(){
 		let filter = Session.get("assignmentFilter"),assList,
 			s = g.setting();if(!s)return;//needs review
-			if(filter && (filter.class || filter.subject)){
-				assList = g.Assignments.find({"session":filter.session,"term":filter.term,$or:[{"class":filter.class},{"subject":filter.subject}]}).fetch().reverse();
+			if(filter && (filter.class && filter.subject)){
+				assList = g.Assignments.find({$or:[{"class":filter.class},{"subject":filter.subject}],"session":filter.session,"term":filter.term,}).fetch().reverse();
 			}else{			
 				assList = g.Assignments.find({"class":"JSS1","session":s.session,"term":s.term}).fetch().reverse();
 			}
@@ -930,7 +989,7 @@ Template.assignmentList.events({
 			term = Number(e.target.term.value);
 		let obj = {class:requestedClass,subject:requestedSubject,session:session,term:term};
 			Session.set('assignmentFilter', obj);
-	}
+	},
 });
 Template.singleAssignment.onCreated(function(){
 	let self = this;
@@ -976,7 +1035,7 @@ Template.singleAssignment.events({
 		e.preventDefault();
 		let score = e.target.score.value;
 		let comment = e.target.comment.value;
-		this.id = e.target.id.value;
+		this.assignmentId = e.target.id.value;
 		this.score = score;
 		this.comment = comment;
 		g.meteorCall("scoreAssignment",{doc:this,
@@ -1245,6 +1304,7 @@ Template.logs.onCreated(function(){
 		self.autorun(function(){
 			self.subscribe("log.list");
 			self.subscribe("staff.list");
+			self.subscribe("student.list");
 		});
 });
 Template.logs.helpers({
@@ -1255,8 +1315,8 @@ Template.logs.helpers({
 				if(Meteor.userId() === log.by){
 					name = "You";
 				}else{//differentiate btw staff and student logs here
-					let query = g.Staffs.findOne({"meteorIdInStaff":log.by});
-					query?name = query.lastName+" "+query.firstName+" ("+query.staffId+")":name="Super Admin";	
+					let query = g.Staffs.findOne({"meteorIdInStaff":log.by}) || g.Students.findOne({"meteorIdInStudent":log.by});
+					query?name = query.lastName+" "+query.firstName+" ("+ (query.staffId || query.studentId)+")":name="super Admin";
 				}
 				log.name = name;
 				return log;
@@ -1314,8 +1374,7 @@ AutoForm.hooks({
 							}
 							else{	
 								g.notice('Result successfully added!', 4000);
-								let pathToGo = FlowRouter.path('/dashboard/result/view/' + get.studentId);
-								FlowRouter.go(pathToGo);
+								FlowRouter.go('singleResult',{id:get.studentId});
 							}
 						});
 					}else{
@@ -1335,8 +1394,7 @@ AutoForm.hooks({
 					return;
 				}else{
 					g.notice('Staff employment data updated successfully');
-					let pathToGo = FlowRouter.path('/dashboard/staff/view/' + id);
-						FlowRouter.go(pathToGo);
+					FlowRouter.go("singleStaff",{id:id});
 				}
 			});
 		},
@@ -1352,8 +1410,7 @@ AutoForm.hooks({
 					return;
 				}else{
 					g.notice('Staff profile updated successfully');
-					let pathToGo = FlowRouter.path('/dashboard/staff/view/' + id);
-						FlowRouter.go(pathToGo);
+					FlowRouter.go("singleStaff",{id:id});
 				}
 			});
 		},
@@ -1369,8 +1426,7 @@ AutoForm.hooks({
 					return;
 				}else{
 					g.notice('Student admission data updated successfully');
-					let pathToGo = FlowRouter.path('/dashboard/student/view/' + id);
-						FlowRouter.go(pathToGo);
+					FlowRouter.go("singleStudent",{id:id});
 				}
 			});
 		},
@@ -1386,8 +1442,7 @@ AutoForm.hooks({
 					return;
 				}else{
 					g.notice('Student profile updated successfully');
-					let pathToGo = FlowRouter.path('/dashboard/student/view/' + id);
-						FlowRouter.go(pathToGo);
+					FlowRouter.go("singleStudent",{id:id});
 				}
 			});
 		},
@@ -1403,8 +1458,7 @@ AutoForm.hooks({
 							return;
 						}else{
 							g.notice('Result successfully updated');
-							let pathToGo = FlowRouter.path('/dashboard/result/view/' + resultId);
-								FlowRouter.go(pathToGo);
+							FlowRouter.go("singleResult",{id:resultId});
 						}
 					});
 				}else{
@@ -1449,7 +1503,8 @@ AutoForm.hooks({
 			g.meteorCall("newAssignment",{doc:doc,
 				submitBtnId:"#newAssignment",
 				successMsg:"Assignment was created okay.",
-				redirect:"assignmentList"});
+				redirect:"singleAssignment"});
+			Modal.hide("newAssignment");
 		}
 	},
 	editAssignment: {
@@ -1460,7 +1515,7 @@ AutoForm.hooks({
 			g.meteorCall("editAssignment",{doc:doc,
 				submitBtnId:"#editAssignment",
 				successMsg:"Assignment updated.",
-				redirect:"/dashboard/assignment/view/"+id});
+				redirect:FlowRouter.go("singleAssignment",{id:id})});
 		}
 	}
 });

@@ -11,7 +11,7 @@
 	                <span class="icon-bar"></span>
 	                <span class="icon-bar"></span>
 	            </button>
-	            <a class="navbar-brand" href="{{pathFor 'dashboard'}}">
+	            <a class="navbar-brand" href="{{pathFor 'login'}}">
 	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
 	            </a>
 	        </div>
@@ -23,7 +23,7 @@
 	            <li><a href="#" data-placement="bottom" data-toggle="tooltip" title="Messages"><i class="fa fa-envelope"></i></a>
 	            </li>          
 	            <li class="dropdown">
-	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentStaff.staffId}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
 	                <ul class="dropdown-menu">
 	                    <li><a href="{{pathFor 'profile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
 	                    <li><a href="#"><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
@@ -51,7 +51,7 @@
                     {{/if}}
                     <li><a href="#"><i class="fa fa-book"></i> Manage Subjects </a></li>
                     <li><a href="#"><i class="fa fa-info"></i> Notifications/News </a></li>
-                    <li><a href="#"><i class="fa fa-search"></i> Search </a></li>
+                    <li><a href="{{pathFor 'generalSearch'}}"><i class="fa fa-search"></i> Search </a></li>
                 </ul>
             </li>
             {{#if isInRole 'admin, editor'}}
@@ -95,7 +95,7 @@
             <li>
 	            <a href="#" data-toggle="collapse" data-target="#submenu-9"><i class="fa fa-fw fa-book"></i> ASSIGNMENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
 	            <ul id="submenu-9" class="collapse">
-	                <li><a href="{{pathFor 'newAssignment'}}"><i class="fa fa-plus"></i> Create new </a></li>
+	                <li><a href="#" onclick="Modal.show('newAssignment')"><i class="fa fa-plus"></i> Create new </a></li>
 	                <li><a href="{{pathFor 'assignmentList'}}"><i class="fa fa-list"></i> Assignment list </a></li>
 	            </ul>
             </li>
@@ -129,7 +129,12 @@
 			            <!-- /.row -->
 			        </div>
 			    </div>
-			    <div class="insertNotice"></div>
+			    <div class="crudNotice alert alert-info">
+			    	<div></div>
+			    	<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
+						<span arial-hidden='true'>&times;</span>
+					</button>
+			    </div>
 				<div class="processRequest" style="display:none">{{>smsLoading}}</div>
 			</div>
 		{{/if}}
@@ -202,7 +207,12 @@
 							{{> footer}}
 						</div>
 					</section>
-			    <div class="insertNotice"></div>
+			   <div class="crudNotice alert alert-info">
+			    	<div></div>
+			    	<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
+						<span arial-hidden='true'>&times;</span>
+					</button>
+			    </div>
 				<div id="processRequest" style="display:none">{{>smsLoading}}</div>
 			</div>
 		{{/if}}

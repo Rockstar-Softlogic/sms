@@ -55,7 +55,8 @@ g.meteorCall = function(method,options){
 			g.notice(successMsg,4000);
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
-				FlowRouter.go(redirect);
+				result.length>2?FlowRouter.go(redirect,{id:result}):FlowRouter.go(redirect);
+				
 			};
 		}
 	});
@@ -113,13 +114,13 @@ g.enableBtn = function(id){
 	return $(id+" button[type='submit']").attr("disabled",false);
 }
 //bottom right corner notice
-g.notice = function(text, time = 4000){
+g.notice = function(text, time = 10000){
 	let alert = "<h3><b>Notification</b></h3><hr/><br/><h4>"+text+"</h4>";
-	$('.insertNotice').text(text);
-	$('.insertNotice').show('slow');
-	bootbox.alert(alert);
+	$('.crudNotice div').text(text);
+	$('.crudNotice').show("slow");
+	// bootbox.alert(alert);
 	setTimeout(function(){
-		$('.insertNotice').fadeOut(3000);
+		$('.crudNotice').fadeOut(3000);
 			}, time);
 }
  g.termSuffix = function(term){

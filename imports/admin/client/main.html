@@ -109,7 +109,72 @@
 			{{>smsLoading}}
 		{{/if}}
 </template>
-
+<template name="generalSearch">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-10 col-md-offset-1" id="generalSearch">
+			<h3>Search</h3><hr/>
+		<!-- Nav tabs -->
+			  <ul class="nav nav-tabs" role="tablist">
+			    <li role="presentation" class="active">
+			    	<a href="#findStudent" aria-controls="findStudent" role="tab" data-toggle="tab">Student</a>
+			    </li>
+			    <li role="presentation">
+			    	<a href="#findPayment" aria-controls="findPayment" role="tab" data-toggle="tab">Payment</a>
+			    </li>
+			  </ul>
+			 <div class="tab-content" style="margin:15px;">
+			    <div role="tabpanel" class="tab-pane fade in active" id="findStudent">
+			    	<form>
+			    	<div class="form-group">
+			    		<label>Student Id or Name</label><br/>
+			    		<input type="text" name="student" class="form-control search" placeholder="student Id or Name" required>
+			    	</div>
+			    	<button class="btn btn-primary btn-xs">Search</button>
+			    	</form>
+			    	{{#each findStudent}}
+			    		<div class="searchResult">
+							<p>
+								<span><a href="{{pathFor 'singleStudent'}}/{{studentId}}">{{lastName}} {{firstName}} {{otherName}}</a></span>
+								<span>{{studentId}}</span>
+								<span>{{currentClass}}</span>
+							</p>	
+			    		</div>
+			    	{{/each}}
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="findPayment">
+			    	<form>
+			    	<div class="form-group">
+			    		<label>Transaction Id</label><br/>
+			    		<input type="text" name="payment" class="form-control search" placeholder="transaction Id" required>
+			    	</div>
+			    	<button class="btn btn-primary btn-xs">Search</button>
+			    	</form>
+			    	{{#with findPayment}}
+			    		<div class="searchResult">
+							<p>
+								<span>{{lastName}} {{firstName}} {{otherName}}</span>
+								<span>{{studentId}}</span>
+								<span>{{currentClass}}</span>
+								<span><a href="{{pathFor 'singlePayment'}}/{{studentId}}" class="btn btn-info btn-xs">Payments</a></span>
+							</p>
+							{{#each payment}}
+							<article>
+								<small>
+									
+										{{class}} | {{termSuffix term}} term | {{transactionId}},
+									
+								</small>
+							</article>	
+							{{/each}}
+			    		</div>
+			    	{{/with}}
+			    </div>
+			 </div>
+		 </div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
 <template name="profile">
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-11">
@@ -679,9 +744,13 @@
 			<button type="submit" class="btn btn-primary btn-xs">Filter students</button>
 		</form>
 		{{#if students}}
+			{{#if demoteStudentBtnChecked}}
+			<button class="demoteStudent btn btn-danger btn-xs">Demote student</button>
+			{{/if}}
 		<table class="table table-bordered serial">
 			<tr>
 				<th>S/N</th>
+				<th><input type="checkbox" name="checkAllBoxes" class="checkAllBoxes" onclick="{{checkAllCheckBoxes}}"></th>
 				<th>Name</th>
 				<th>Class</th>
 				<th>ID</th>
@@ -690,7 +759,11 @@
 			</tr>
 		{{#each students}}
 			<tr>
+				
 				<td></td>
+				<td class="text-center">
+				<input type="checkbox" name="checkStudent" value="{{_id}}" style="display:inline;">
+				</td>
 				<td>{{lastName}}, {{firstName}} {{otherName}}</td>
 				<td>{{currentClass}} </td>
 				<td>{{studentId}}</td>
@@ -955,7 +1028,7 @@
 
 <template name="singleResult">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-10">
+		<div class="col-md-offset-1 col-md-10" id="singleResult">
 			{{#with studentInfo}}
 				<h2>{{firstName}}, {{lastName}} {{otherName}} Result</h2>
 				<hr style="border-bottom: 3px dashed #abcdef;"/>
@@ -1156,6 +1229,7 @@
 
 
 <template name="updateResult">
+	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-sm-10">
 		{{#if resultFor}}
 			{{#with resultFor}}
@@ -1176,10 +1250,12 @@
 			{{> quickForm schema="g.Schemas.ResultArray" id="updateResult" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
 
 		{{else}}
-			{{>smsLoading}}
 			<p>No student is selected for this result. Select a student first.</p>
 		{{/if}}
-	</div>
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>
 
 <template name="editResult">
@@ -1301,7 +1377,7 @@
 
 <template name="singlePayment">
 		{{#if Template.subscriptionsReady}}
-			<div class="col-md-offset-1 col-md-8">
+			<div class="col-md-offset-1 col-md-8" id="singlePayment">
 				{{#with studentInfo}}
 					<h2>{{firstName}}, {{lastName}} {{otherName}} Payments</h2>
 					<hr style="border-bottom: 3px dashed #abcdef;"/>
@@ -1363,9 +1439,25 @@
 								<td>{{category}}</td>
 							</tr>
 							<tr>
-								<td>Amount Approved</td>
+								<td>Amount</td>
 								<td>{{amount}}</td>
 							</tr>
+							<!-- online payment -->
+							{{#if paymentMethod paymentType}}
+							<tr>
+								<td>Amount Approved</td>
+								<td>{{approvedAmount}}</td>
+							</tr>
+							<tr>
+								<td>Gateway Description</td>
+								<td>{{paymentDescription}}</td>
+							</tr>
+							<tr>
+								<td>Payment Reference</td>
+								<td>{{payRef}}</td>
+							</tr>
+							{{/if}}
+							<!-- end online payment fields -->
 							<tr>
 								<td>Payment Method</td>
 								<td>{{paymentType}}</td>
@@ -1404,7 +1496,7 @@
 		<div class="col-md-offset-1 col-md-8">
 			<h3>Payment details</h3><hr/>
 			{{#if paymentFor}}
-				<form>
+				<form id="createPaymentReceipt">
 					<select name="paymentCat">
 						{{#each paymentFor.category}}
 							<option value="{{this}}">{{this}}</option>
@@ -1455,28 +1547,41 @@
 						<span>Cash payment means that you've collected this payment by hand.</span><br/>
 						<span>Online payment would be processed by interswitch payment gateway.</span>
 					</strong></p>
+					{{#if failedPaymentReason}}
+						<p class="text-danger"><strong>Payment failed due to {{failedPaymentReason}}. Try again!</strong></p>
+					{{/if}}
 					{{#if paymentMethod method}}
 						<div id="onlinePayment">
 							<a data-isw-payment-button data-isw-ref='kGM0Ul8XP'>
 							  <script type='text/javascript' 
 							    src='https://qa.interswitchng.com/paymentgateway/public/js/webpay.js' 
 							    data-isw-customer-ref='{{transactionId}}' 
-							    data-isw-customer-callback='callbackOne'
+							    data-isw-customer-callback='cardPaymentCallback'
 							    data-isw-trans-amount='{{amount}}00'> 
 							  </script>
 							</a>
 							<script>
-							  function callbackOne(response){
-							  	if(!response){bootbox.alert("Error occured")} 
-							    console.log(response);
+							  function cardPaymentCallback(response){
+							  		if(!response){
+								  		return;
+								  	}
+								  	let paymentInfo = Session.get('st.info'); 
+									if(response.resp==="00" && response.desc=="Approved by Financial Institution" && response.payRef!==response.txnref){
+										paymentInfo.response = response;
+										g.meteorCall("updatePaymentByCard",{doc:paymentInfo,
+											successMsg:"Payment was successful",
+											redirect:FlowRouter.path("singlePayment",{id:paymentInfo.studentId})
+										});
+									}else{
+										paymentInfo.failedPaymentReason = response.desc;
+										Session.set("st.info",paymentInfo);
+									}
 							  }
 							</script>
 						</div>
 					{{else}}
 						<button class="btn btn-primary" id="proceedPayment" title="Click to confirm payment details above">Proceed</button>
 					{{/if}}
-					
-					
 				{{/with}}
 			{{else}}
 				<p>No student is selected for this payment. Select a student first.</p>
@@ -1488,15 +1593,6 @@
 		{{/if}}
 	
 </template>
-
-<template name="editPayment">
-		{{#if Template.subscriptionsReady}}
-		
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
-</template>
-
 <!-- Payments templates end -->
 <!-- ******************************************* -->
 <!-- *************Break Break Break************* -->
@@ -1504,7 +1600,7 @@
 <template name="assignmentList">
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-11 col-md-offset-1">
-		<h3>Assignment list <a href="{{pathFor 'newAssignment'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Assignment</a></h3><hr/>
+		<h3>Assignment list <button class="btn btn-primary btn-xs" onclick="Modal.show('newAssignment')"><span class="fa fa-plus"></span> New Assignment</button></h3><hr/>
 			<h4 class="text-info">
 				{{#if assignmentFilter}}
 					<strong>Showing <em>{{assignmentFilter.subject}} and {{assignmentFilter.class}}</em> assignments.</strong>
@@ -1662,29 +1758,40 @@
 		{{/if}}
 	
 </template>
-
 <template name="newAssignment">
-		{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-10">
-			<h3>New assignment</h3><hr/> <br/>
-			{{#autoForm schema="g.Schemas.Assignment" id="newAssignment" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
-				{{> afQuickField name="title"}}
-				{{> afQuickField name="content"}}
-				{{> afQuickField name="class" options="allowed" firstOption="Class"}}
-				{{> afQuickField name="subject" options="allowed" firstOption="Subject"}}
-				{{> afQuickField name="totalScore"}}
-				{{> afQuickField name="startDate"}}
-				{{> afQuickField name="endDate" buttonClasses="glyphicon glyphicon-calendar"}}
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Create</button>
+		<!-- Moddal start -->
+	<div class="modal fade">
+			<div class="modal-dialog" role='document'>
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss='modal' arial-label='Close'>
+							<span arial-hidden='true'>&times;</span>
+						</button>
+						<h3 class="modal-title" id='myModalLabel'>
+							New assignment
+						</h3>
+					</div>
+					<div class="modal-body">
+						{{#autoForm schema="g.Schemas.Assignment" id="newAssignment" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+							{{> afQuickField name="title"}}
+							{{> afQuickField name="content"}}
+							{{> afQuickField name="class" options="allowed" firstOption="Class"}}
+							{{> afQuickField name="subject" options="allowed" firstOption="Subject"}}
+							{{> afQuickField name="totalScore"}}
+							{{> afQuickField name="startDate"}}
+							{{> afQuickField name="endDate" buttonClasses="glyphicon glyphicon-calendar"}}
+							<div class="form-group">
+								<button type="submit" class="btn btn-primary">Create</button>
+							</div>
+						{{/autoForm}}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger" data-dismiss='modal'>Close</button>
+					</div>
 				</div>
-			{{/autoForm}}
-		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+			</div>
+	</div>
 </template>
-
 <template name="editAssignment">
 		{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-10">
