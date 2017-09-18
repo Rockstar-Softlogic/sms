@@ -56,8 +56,25 @@ registerGlobalHelpers({
     },
     dateFormat:function(date){
         return date.toString().substr(0,21);
+    },
+    networkIndicator:function(){
+        if(Meteor.isClient){
+          Meteor.autorun(function(){
+            var stat;
+            if (Meteor.status().status === "connected") {
+                stat = 'lime'
+            }else if (Meteor.status().status === "connecting") {
+                stat = 'yellow'
+            }else {
+                stat = 'red';
+            }
+            Session.set('networkStatus',stat);
+          });
+
+        }//end isClient
+        return Session.get('networkStatus');
     }
-})
+});
 //end global template helpers
 // function registerGlobalHelpers(helpers){
 //   _.chain(helpers)

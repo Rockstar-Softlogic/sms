@@ -1,3 +1,15 @@
+Meteor.startup(function() {
+	var theURL = "http://rssl-smsapp.herokuapp.com/";
+	if (process.env.NODE_ENV === "development") {
+        theURL = "http://localhost:3000";
+    }
+    Meteor.absoluteUrl.defaultOptions.rootUrl = theURL;
+    process.env.ROOT_URL = theURL;
+    process.env.MOBILE_ROOT_URL = theURL;
+    process.env.MOBILE_DDP_URL = theURL;
+    process.env.DDP_DEFAULT_CONNECTION_URL = theURL;
+});
+
 Meteor.methods({
 	updateStudentProfile: function(data){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){

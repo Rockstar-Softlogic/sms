@@ -120,6 +120,7 @@
 			            <!-- Page Heading -->
 			            <div class="row" id="main" >
 			                <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
+			                	<div style="width:20px;height:20px;border-radius:50% !important;background-color:{{networkIndicator}};"></div>
 								{{> Template.dynamic template=content}}
 			                </div>
 			            </div>
@@ -200,6 +201,7 @@
 						<!-- network status -->
 						{{>networkStatus}}
 						<div class="stContent" style="min-height:70vh;">
+							<div style="width:20px;height:20px;border-radius:50% !important;background-color:{{networkIndicator}};"></div>
 							{{> Template.dynamic template=stContent}}
 						</div>
 					 <!--  footer -->
