@@ -473,27 +473,37 @@ Meteor.methods({
 		if(typeof message !== "object"){
 			throw new Meteor.Error(500, 'Invalid message received');
 		}
-		let username = g.Staffs.findOne({meteorIdInStaff: this.userId});
+		let username = g.Staffs.findOne({"meteorIdInStaff": this.userId});
 		message.senderName = (username.lastName || ' ') + ' ' + (username.firstName || ' ') + ' ' + (username.otherName || ' ');
+		message.readBy = []; message.readBy.push(this.userId);
 		let msgInsert = g.Messages.insert(message);
 			Meteor.call("log",("created new a message '"+message.subject+"'"));
 		return msgInsert;
 	},
-	replyAssignment: function(doc){
+	markMessageAsRead:function(msgId){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff','student'])){
+			throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		let updateMsg = g.Messages.update({"_id":msgId},{$addToSet:{"readBy":this.userId}});
+		let messageSubject = g.Messages.findOne({"_id":msgId}).subject;
+			Meteor.call("log",("You opened the message with subject '"+messageSubject+"'"));
+	},
+	replyMessage: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
 			}
 		if(!doc.reply || doc.reply.length < 5){
-				throw new Meteor.Error(401, 'Reply too short. At least 6 characters.');
+				throw new Meteor.Error(401, 'Reply too short. At least 5 characters.');
 		}
 		let userId = this.userId, staff, staffName;
 		if(Meteor.isServer){
-			staff = g.Staffs.findOne({meteorIdInStaff:userId});
+			staff = g.Staffs.findOne({"meteorIdInStaff":userId});
 			staffName = (staff.lastName || "") + " " + (staff.firstName || "") + " " + (staff.otherName || "");
 		}
-		let replyObj = {reply:doc.reply,userId:userId,name:staffName, replyDate:new Date()};
-		let msgUpdate = g.Messages.update({_id: doc.id},{$push:{replies: replyObj}});
-			Meteor.call("log",("replied to a message"));
+		let replyObj = {"reply":doc.reply,"userId":userId,"name":staffName, "replyDate":new Date()};
+		let msgUpdate = g.Messages.update({"_id": doc.id},{$push:{"replies":replyObj}});
+		let messageSubject = g.Messages.findOne({"_id":doc.id}).subject;
+			Meteor.call("log",("replied to a message with subject '"+messageSubject+"'"));
 		return msgUpdate;
 	},
 	promoteStudents: function(){

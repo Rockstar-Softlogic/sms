@@ -44,7 +44,7 @@ Meteor.publish({
 	'staff.name': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let staffList = g.Staffs.find({}, {fields:{firstName:1, lastName:1, otherName: 1, meteorIdInStaff:1, staffId:1}});	
+			let staffList = g.Staffs.find({}, {fields:{firstName:1, lastName:1, otherName: 1, meteorIdInStaff:1, staffId:1,phone:1}});	
 				if(staffList){
 					return staffList;
 				}
@@ -110,7 +110,7 @@ Meteor.publish({
 	'message.list': function(){
 			let userId = this.userId;
 				if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-					let messages = g.Messages.find({$or: [{from: userId}, {to: userId}, {to: 'all_staff'}]});	
+					let messages = g.Messages.find({$or:[{"senderId":userId},{"to":userId}]});	
 						if(messages){
 							return messages;
 						}

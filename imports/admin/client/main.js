@@ -1085,42 +1085,32 @@ Template.newMessage.onCreated(function(){
 
 Template.newMessage.helpers({
 	staff: function(){
-		return g.Staffs.find({meteorIdInStaff: {$ne: Meteor.userId()}});
+		return g.Staffs.find({"meteorIdInStaff":{$ne:Meteor.userId()}});
 	},
-
 });
 
 Template.newMessage.events({
 	'submit form': function(e){
 		e.preventDefault();
-		let msgStaff = $('select.msgStaff option:selected').map(function(){ return this.value;}).get(),
-			staffName = [],
-			allStaff = [],
-			msgClass = [],
+		let msgStaff = $('select.msgStaff option:selected').map(function(){return this.value;}).get(),
+			staffName = $('select.msgStaff option:selected').map(function(){return $(this).attr("name")}).get(),
+			msgClass = $('#msgClass input:checked').map(function(){return this.value}).get(),
 			msgTitle = e.target.title.value,
 			msgBody = e.target.body.value;
 			
-			$('select.msgStaff option:selected').map(function(){
-				staffName.push($(this).attr('name'));
-			});
-
-			$('#msgClass input:checked').map(function(){
-				msgClass.push($(this).attr('value'));
-			});
-			$('#all_staff input:checked').map(function(){
-				allStaff.push($(this).attr('value'));
-			});
-			msgStaff = msgStaff.concat(allStaff);
-
 		if(msgStaff.length && msgClass.length){
 			g.notice('Cannot send the same message to staff and student at the same time.', 8000);
 			return;
 		}
-		let msgObj = {to: msgStaff.concat(msgClass), subject: msgTitle, content: msgBody, staffName: staffName, studentName: msgClass};
+		let msgObj = {"to":msgStaff.concat(msgClass),"subject":msgTitle,"content":msgBody,"staffName":staffName};
 		g.meteorCall("newMessage",{doc:msgObj,
 				successMsg:"Your message was sent successfully.",
-				redirect:"message"});
+				redirect:"singleMessage"});
+		// e.target.title.value = e.target.body.value = "";
 	},
+	'change input.all_staff':function(){
+		$("input.all_staff").prop("checked")?$("select option").prop("selected",true):$("select option").prop("selected",false);
+	}
 });
 
 Template.inboxMessage.onCreated(function(){
@@ -1131,31 +1121,48 @@ Template.inboxMessage.onCreated(function(){
 });
 
 Template.inboxMessage.helpers({
-	inboxMessage: function(){
+	inboxMsg: function(){
 		let userId = Meteor.userId(),
-			inbox = g.Messages.find({$or: [{to: userId}, {to: 'all_staff'}]}).fetch().reverse();
+			inboxFilter = Session.get("inboxFilter"),inbox;
+			
+			if(inboxFilter==="unread"){
+				inbox = g.Messages.find({"to":userId,"readBy":{$ne:userId}}).fetch().reverse();
+			}else if(inboxFilter==="read"){
+				inbox = g.Messages.find({"to":userId,"readBy":userId}).fetch().reverse();
+			}else{
+				inbox = g.Messages.find({"to":userId}).fetch().reverse();
+			}
 			if(inbox){
-				inbox.forEach(function(data){
-					data.senderName?data.senderName = data.senderName.substr(0, 20) + '...':data.senderName = 'Unknown sender';
-					data.subject = data.subject.substr(0, 75) + '...' || 'No subject';
-					data.createdAt = data.createdAt.toString().substr(4, 17);
-					if(data.replies){
-						data.count = data.replies.length;
+				inbox.forEach(function(msg){
+					msg.senderName = msg.senderName.substr(0, 10)+"..." || '[Unknown sender]';
+					msg.subject = msg.subject.substr(0, 30)+"..." || '[No subject]';
+					msg.read = msg.readBy.indexOf(userId)>-1?"fa fa-check text-success":"fa fa-envelope text-info";
+					if(msg.replies){
+						msg.count = msg.replies.length;
 					}
-					return data;
+					return msg;
 				});
-				return inbox;
+				return inbox;	
 			}
 	},
 	inboxCount: function(){
 		let userId = Meteor.userId();
-		let count = g.Messages.find({$or: [{to: userId}, {to: 'all_staff'}]}).count();
-		let unread = g.Messages.find({$and: [{$or: [{to:userId}, {to:'all_staff'}]}, {readStatus: false}]}).count();
-		let read = g.Messages.find({$and: [{$or: [{to:userId}, {to:'all_staff'}]}, {readStatus: true}]}).count();
-		return {count: count, unread: unread, read: read};
-
-
+		let count = g.Messages.find({"to":userId}).count();
+		let read = g.Messages.find({"to":userId,"readBy":userId}).count();
+		let unread = count - read;
+		return {'count':count,'unread':unread,'read':read};
 	}
+});
+Template.inboxMessage.events({
+	'click .inboxBtn':function(){
+		Session.set('inboxFilter',"inbox");
+	},
+	'click .unreadBtn':function(){
+		Session.set('inboxFilter',"unread");
+	},
+	'click .readBtn':function(){
+		Session.set('inboxFilter',"read");
+	},
 });
 
 Template.sentMessage.onCreated(function(){
@@ -1164,27 +1171,18 @@ Template.sentMessage.onCreated(function(){
 			self.subscribe('message.list');
 		});
 });
-
 Template.sentMessage.helpers({
-	sentMessage: function(){
+	sentMsg: function(){
 		let userId = Meteor.userId(),
-			sent = g.Messages.find({from: userId}).fetch().reverse();
-			
+			sent = g.Messages.find({"senderId":userId}).fetch().reverse();
 				if(sent){
 					sent.forEach(function(data){
-						if(data.to[0] == 'all_staff'){
-							data.staffName = 'All Staffs';
-						}else if(data.staffName){
-							data.staffName = data.staffName.join(", ").substr(0, 20);
+						if(data.staffName){
+							data.staffName = data.staffName.join(", ").substr(0, 10)+"...";
 						}else{
-							data.staffName = 'Unknown Recipient';
+							data.staffName = '[Unknown recipient]';
 						}
-						data.subject = data.subject.substr(0, 75) + '...' || 'No Subject';
-						data.createdAt = data.createdAt.toString().substr(4, 17);
-	
-						if(data.studentName){
-							data.studentName = data.studentName.join(", ").substr(0, 20);
-						}
+						data.subject = data.subject.substr(0, 30) + '...' || '[No subject]';
 						if(data.replies){
 							data.count = data.replies.length;
 						}
@@ -1195,48 +1193,41 @@ Template.sentMessage.helpers({
 	},
 	sentCount: function(){
 		let userId = Meteor.userId();
-		let count = g.Messages.find({from: userId}).count();
+		let count = g.Messages.find({"senderId":userId}).count();
 		return count;
 	}
-
 });
-
 Template.singleMessage.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('message.list');
 		});
 });
-
+Template.singleMessage.onRendered(function(){
+	Meteor.call("markMessageAsRead",FlowRouter.getParam("id"));
+});
 Template.singleMessage.helpers({
 	message: function(){
 		let id = FlowRouter.getParam('id');
-		let msg = g.Messages.findOne({_id:id});
-			if(msg.to[0] == 'all_staff'){
-					msg.staffName = 'All Staffs';
-				}else if(msg.staffName){
-					msg.staffName = msg.staffName;
-				}else{
-					msg.staffName = 'Unknown Recipient';
-				}
-			msg.createdAt = msg.createdAt.toString().substr(4, 17);
+		let msg = g.Messages.findOne({"_id":id});
+			if(msg.staffName){
+				msg.staffName = msg.staffName;
+			}else{
+				msg.staffName = 'Unknown Recipient';
+			}
 		return msg;
 	},
 	msgReply: function(){
 		let id = FlowRouter.getParam("id");
-		let replies = g.Messages.findOne({_id:id}).replies;
+		let replies = g.Messages.findOne({"_id":id}).replies;
 			if(replies){
-				replies.forEach(function(doc){
-				doc.replyDate = doc.replyDate.toString().substr(0, 21);
-				return doc;
-				});
 				return replies.reverse();	
 			}
 		return false;
 	},
 	count: function(){
 		let id = FlowRouter.getParam("id");
-		let replies = g.Messages.findOne({_id:id}).replies;
+		let replies = g.Messages.findOne({"_id":id}).replies;
 		if(replies){
 			return replies.length;	
 		}else{
@@ -1250,11 +1241,55 @@ Template.singleMessage.events({
 		let id = FlowRouter.getParam("id");
 		let reply = e.target.reply.value;
 		let doc = {id:id,reply:reply};
-		g.meteorCall("replyAssignment",{doc:doc,
+		g.meteorCall("replyMessage",{doc:doc,
 			successMsg:"Your reply was submitted."});
 		e.target.reply.value="";
 	},
 
+});
+//Short message service
+Template.newSms.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("staff.name");
+		});
+});
+Template.newSms.helpers({
+	staff: function(){
+		return g.Staffs.find({"meteorIdInStaff":{
+			$ne:Meteor.userId()}}).fetch().map(function(st){
+				if(st.phone){
+					st.phone = st.phone[0];
+					return st;					
+				}
+			});
+	},
+});
+Template.newSms.events({
+	'change input.all_staff':function(){
+		$("input.all_staff").prop("checked")?$("select option").prop("selected",true):$("select option").prop("selected",false);
+	},
+	'submit form': function(e){
+		e.preventDefault();
+		let smsStaff = $('select.smsStaff option:selected').map(function(){return this.value;}).get(),
+			smsClass = $('.smsClass input:checked').map(function(){return this.value}).get(),
+			smsMessage = e.target.message.value;
+			
+		let smsObj = {"message":smsMessage,"smsStaff":smsStaff,"smsClass":smsClass};
+		console.log(smsObj);
+		// g.meteorCall("sendSMS",{doc:smsObj,
+		// 		successMsg:"Your message was sent successfully.",
+		// 		redirect:"sms"});
+		// e.target.title.value = e.target.body.value = "";
+	},
+	'input textarea[name="message"]':function(e){
+		let base = 160,//1 sms
+			count = e.target.value.length,//current msg length
+			sms = Math.ceil(count/base),//number of sms cost
+			next = base * sms;//next character limit
+		$(".smsCost span.characterCount").text(count+"/"+(next||base));
+		$(".smsCost span.smsCount").text(sms);
+	}
 });
 ///graduate list
 Template.graduatedStudents.onCreated(function(){

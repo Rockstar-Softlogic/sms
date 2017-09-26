@@ -1819,7 +1819,7 @@
 
 <template name='messages'>
 		{{#if Template.subscriptionsReady}}
-		<div class="messages col-md-10 col-md-offset-1">
+		<div class="messages col-md-11 col-md-offset-1">
 			<h3>Messages</h3><hr/>
 		<!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist">
@@ -1861,12 +1861,13 @@
 		{{#if Template.subscriptionsReady}}
 			<h3>Inbox messages</h3><hr/>
 			{{#with inboxCount}}
-				<button class="btn btn-primary">Inbox: <span class="badge">{{count}}</span></button>
-				<button class="btn btn-primary">Unread: <span class="badge">{{unread}}</span></button>
-				<button class="btn btn-primary">Read: <span class="badge">{{read}}</span></button>
+				<button class="btn inboxBtn" title="Inbox messages">Inbox: <span class="badge">{{count}}</span></button>
+				<button class="btn unreadBtn" title="Unread messages"><i class="fa fa-envelope text-info"> </i>Unread: <span class="badge">{{unread}}</span></button>
+				<button class="btn readBtn" title="Read messages"><i class="fa fa-check text-success"> </i>Read: <span class="badge">{{read}}</span></button>
+				<hr/>
 			{{/with}}
 			<section class="inbox">
-				{{#if inboxMessage}}
+				{{#if inboxMsg}}
 					<table class="inboxMsg">
 						<tr>
 							<th></th>
@@ -1875,19 +1876,19 @@
 							<th>Date received</th>
 							<th>Action</th>
 						</tr>
-						{{#each inboxMessage}}
+						{{#each inboxMsg}}
 								<tr>
 									<td>
-										<input type="checkbox" name="id" value="{{_id}}">
+										<span class="{{read}}"></span>
 									</td>
 									<td>
 										{{senderName}}
 									</td>
 									<td>
-										{{subject}} <span class="label label-primary" title="Number of replies">{{count}}</span>
+										{{subject}} <span class="badge" title="Number of replies">{{count}}</span>
 									</td>
 									<td>
-										{{createdAt}}
+										{{dateFormat createdAt}}
 									</td>
 									<td>
 										<a href="{{pathFor 'message'}}/{{_id}}" style="text-decoration: none;">
@@ -1912,9 +1913,10 @@
 <template name="sentMessage">
 		{{#if Template.subscriptionsReady}}
 			<h3>Sent messages</h3><hr/>
-				<button class="btn btn-primary">Sent: <span class="badge">{{sentCount}}</span></button>
+				<button class="btn" title="Sent messages">Sent: <span class="badge">{{sentCount}}</span></button>
+				<br/>
 			<section class="sent">
-				{{#if sentMessage}}
+				{{#if sentMsg}}
 					<table class="sentMsg">
 						<tr>
 							<th></th>
@@ -1923,7 +1925,7 @@
 							<th>Date sent</th>
 							<th>Action</th>
 						</tr>
-						{{#each sentMessage}}
+						{{#each sentMsg}}
 							
 								<tr>
 									<td>
@@ -1933,10 +1935,10 @@
 										{{staffName}} {{studentName}}
 									</td>
 									<td>
-										{{subject}} <span class="label label-primary" title="Number of replies">{{count}}</span>
+										{{subject}} <span class="badge" title="Number of replies">{{count}}</span>
 									</td>
 									<td>
-										{{createdAt}}
+										{{dateFormat createdAt}}
 									</td>
 									<td>
 										<a href="{{pathFor 'message'}}/{{_id}}" style="text-decoration: none;">
@@ -1955,19 +1957,15 @@
 			{{>smsLoading}}
 		{{/if}}
 </template>
-
-
-
-
 <template name="singleMessage">
 		{{#if Template.subscriptionsReady}}
 		<div class="col-md-10 col-md-offset-1">
 			{{#with message}}
 				<h3>{{subject}}</h3><hr/>
-				<p><strong>From: {{senderName}}</strong></p>
-				<p><strong>To: {{staffName}} {{studentName}}</strong></p>
-				<p><strong>Date: {{createdAt}}</strong></p>
-				<p><strong>Replies: {{count}}</strong></p>
+				<p><strong>Sender: {{senderName}}</strong></p><hr/>
+				<p><strong>Receiver: {{staffName}}</strong></p><hr/>
+				<p><strong>Date: {{dateFormat createdAt}}</strong></p><hr/>
+				<p><strong>Replies: {{count}}</strong></p><hr/>
 				<hr/>
 				<article>
 					<p style="padding: 1em;">
@@ -1985,11 +1983,11 @@
 			</form>
 
 			{{#if msgReply}}
-				<h3>Replies <span class="label label-primary" title="{{count}} replies">{{count}}</span></h3><hr/>
+				<h3>Replies <span class="badge" title="{{count}} replies">{{count}}</span></h3><hr/>
 				{{#each msgReply}}
 				<div class="reply">
-					<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}}</strong></span>
-					<span title="Posted date"><strong>{{replyDate}}</strong></span>
+					<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}} </strong></span>
+					<span title="Posted date"><strong> {{dateFormat replyDate}}</strong></span>
 
 					</p>
 					<p style="padding-left:2em;">{{reply}}</p>
@@ -2028,11 +2026,9 @@
 						</li>
 					</ul>
 			</div>
+			<label>Staff (<small>if sms is for staff</small>)</label><br/>
+			<input type="checkbox" class="all_staff">All Staffs
 			<form>
-				<label for="staff">Staff (<small>if message is for staff</small>)</label><br/>
-				<div class="form-group" id="all_staff">
-					<input type="checkbox" value="all_staff">All Staffs
-				</div>
 				<div class="form-group">
 					<select name="staff" class="form-control msgStaff" multiple="true">
 						{{#each staff}}
@@ -2050,11 +2046,11 @@
 				</div><br/>
 				<div class="form-group">
 					<label for="title">Subject</label><br/>
-					<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="15">
+					<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="5">
 				</div>
 				<div class="form-group">
 					<label for="content">Message body</label><br/>
-					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="50"></textarea>
+					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="10"></textarea>
 				</div>
 
 				<button type="submit" class="btn btn-primary">Send message</button>
@@ -2082,7 +2078,10 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-8">
 			<h3>Short Message Services</h3><hr/>
-
+			<div class="info">
+				<h4>SMS Balance: 15,711</h4><br/>
+				<h4><u>Recently sent SMS</u></h4>
+			</div>
 		</div>
 	{{else}}
 		{{>smsLoading}}
@@ -2094,7 +2093,37 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-8">
 			<h3>Compose SMS</h3><hr/>
-			
+			<label>Staff (<small>if SMS is for staff</small>)</label><br/>
+			<input type="checkbox" class="all_staff">All Staffs
+			<form>
+				<div class="form-group">
+					<label class="text-info">Showing only staffs with phone number.</label>
+					<select name="staff" class="form-control smsStaff" multiple="true">
+						{{#each staff}}
+							<option value="{{phone}}">{{lastName}} {{firstName}} ({{phone}})</option>
+						{{/each}}
+					</select>
+				</div>
+				<div class="smsClass">
+					<label>Class of students (<small>if SMS is for one or more classes</small>)</label> <br/>
+					{{#each classes}}
+					<span class="checkbox-inline">
+						<input type="checkbox" name="class" value="{{this}}">{{this}}(73)
+					</span>
+					{{/each}}
+				</div><br/>
+				<div class="form-group">
+					<label>Message</label><br/>
+					<textarea class="form-control" rows="6" required placeholder="Message" name="message" minlength="10"></textarea>
+				</div>
+				<p class="smsCost">
+					<b>
+					Character: <span class="characterCount">0/160</span> =>
+					Cost: <span class="smsCount">0</span> SMS
+					</b>	
+				</p>
+				<button type="submit" class="btn btn-primary">Send SMS</button>
+			</form><br/>
 			
 		</div>
 	{{else}}
@@ -2264,7 +2293,7 @@
 <template name="logs">
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-8">
-			<h3>Activity logs</h3><hr/>
+			<h3>Activity log</h3><hr/>
 			<table class="serial">
 				<tr>
 					<th>S/N</th>

@@ -42,7 +42,6 @@ g.meteorCall = function(method,options){
 		submitBtnId = options.submitBtnId,
 		successMsg = options.successMsg,
 		redirect = options.redirect;
-
 	$("div.processRequest").show("fast");
 	Meteor.call(method,doc,function(error,result){
 		if(error){
@@ -56,7 +55,6 @@ g.meteorCall = function(method,options){
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
 				result.length>2?FlowRouter.go(redirect,{id:result}):FlowRouter.go(redirect);
-				
 			};
 		}
 	});

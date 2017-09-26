@@ -34,7 +34,6 @@ dburles:collection-helpers
 aldeed:schema-deny
 aldeed:schema-index
 ongoworks:security
-twbs:bootstrap
 rajit:bootstrap3-datepicker
 aldeed:autoform-bs-datepicker
 arillo:flow-router-helpers
@@ -42,9 +41,9 @@ reactive-dict@1.1.9
 cfs:filesystem
 aldeed:autoform
 aldeed:collection2-core
-#fezvrasta:bootstrap-material-design
 http@1.2.12
 peppelg:bootstrap-3-modal
 mizzao:bootboxjs
 sacha:spin
 dynamic-import
+coursierprive:tether
