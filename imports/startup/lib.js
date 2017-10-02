@@ -1,12 +1,15 @@
 //global functions and variables
-g.subjectArray = ["English", "Mathematics", "Physics", "Chemistry", 'Biology', 'Geography', 'Economics','Computer', 'Agric', 'Civic', 'Commerce', 'Accounting', 'Government'];
+g.subjectArray = ["English", "Mathematics", "Physics", "Chemistry", 'Biology', 'Geography', 'Economics','Computer', 'Agricultural Science', 'Civic Education', 'Commerce', 'Accounting', 'Government','Literature', 'Further Mathematics'];
 g.classArray = ["JSS1", "JSS2", "JSS3", "SSS1", "SSS2", "SSS3"];
 g.monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 g.termArray = [1, 2, 3];
 g.clubArray = ["Science", "Press", "Health", "Social", "Saviour"];
-g.stateArray = ["Abia","Adamawa","Akwa-Ibom","Anambra","Bauchi"];
+g.stateArray = ["FCT","Abia","Adamawa","Anambra","Akwa-Ibom","Bauchi", "Bayelsa","Benue","Cross-River","Delta","Ebonyi","Enugu","Edo","Ekiti","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"];
 g.gradeArray = ["A", "B", "C", "D", "E", "F"];
 g.remarkArray = ['Excellent', 'Credit', 'Pass', 'Fail', 'Not Offered'];
+g.bloodGroupArray = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
+g.genotypeArray = ["AA","AS","SS","AC","SC","CC"];
+g.medicalConditionArray = ["Typhoid","Measles","Sickle cell","Tuberculosis","Asthma","HIV"];
 //app setting
 g.setting = function(){
 	if(Meteor.isClient){
@@ -17,7 +20,7 @@ g.setting = function(){
 	}
 }
 //Session Array
-g.sessionArray = function(start=2016){
+g.sessionArray = function(start=2017){
 		start = Number(start),
 		now = new Date().getFullYear(),
 		list = [];
@@ -54,7 +57,9 @@ g.meteorCall = function(method,options){
 			g.notice(successMsg,4000);
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
-				result.length>2?FlowRouter.go(redirect,{id:result}):FlowRouter.go(redirect);
+				//result would normally be 9 in length when returning an insert
+				//else not an insert
+				result?result.length>2?FlowRouter.go(redirect,{id:result}):FlowRouter.go(redirect):false;
 			};
 		}
 	});

@@ -120,7 +120,7 @@ table{
 	}
 }
 
-#Profile, #singleStudent, #singleStaff{
+#profile, #singleStudent, #singleStaff{
 	table{
 		caption{
 			font-size: 2em;
@@ -148,27 +148,8 @@ table.serial {
 		td:first-child::after {
     		content: counter(rowNumber);
 			}
-
 	}
-
-	
 }
-
-
-/* .setting{
-	.setting-row{
-		margin: 1em 0;
-		border-radius: 3px;
-		padding: 5px;
-		border: 1px dashed black;
-
-		h4{
-			background-color: #eee;
-			padding: 5px;
-		}
-	}
-} */
-
 .assignmentList{
 	margin:2px 0 10px 0;
 	padding:5px 0 10px 0;
@@ -178,17 +159,15 @@ table.serial {
 	}
 	div{
 		span{
-		
 		padding: 4px;
 		margin: 3px;
 		display: inline-block;
 		cursor: pointer;
-	}
+		}
 		span:hover{
 			background-color: #eee;
 		}
 	}
-	
 }
 
 

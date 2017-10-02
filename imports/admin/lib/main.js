@@ -98,50 +98,6 @@ Meteor.methods({
 			Meteor.call("log","Updated term school fees");
 
 	},
-	newStudent: function(data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
-				throw new Meteor.Error('500', 'Unauthorized Operation');
-			}
-			let duplicateLookUp;
-			if(Meteor.isServer){
-				duplicateLookUp = Meteor.users.find({$or: [{'emails.address': data.email}, {'username': data.studentId}]}).count();
-				if(duplicateLookUp !== 0){
-					throw new Meteor.Error('Error occurred', 'Student email or Id already exist.');
-				}
-			}
-				let pass = "@012345#";
-				let insertToUser = Accounts.createUser({
-						email: data.email,
-						username: data.studentId,
-						password: pass,
-					});
-				if(insertToUser){
-					Roles.addUsersToRoles(insertToUser, ['student']);
-					data.meteorIdInStudent = insertToUser;
-					data['firstName'] = g.sentenceCase(data.firstName);
-					data['lastName'] = g.sentenceCase(data.lastName);
-					data['otherName'] = g.sentenceCase(data.otherName);
-
-					if(data.nok){
-						data.nok['name'] = g.sentenceCase(data.nok.name);
-					}
-					g.Students.insert(data);
-					let resultAndPaymentRecord = {
-								meteorIdInStudent: data.meteorIdInStudent,
-								studentId: data.studentId,
-								email: data.email,
-								firstName: data.firstName,
-								lastName: data.lastName,
-								otherName: data.otherName,
-								fullName: data.fullName,
-								currentClass: data.currentClass,
-							};
-					g.Results.insert(resultAndPaymentRecord);
-					g.Payments.insert(resultAndPaymentRecord);
-					Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
-					return insertToUser;
-				}
-		}, //end insertStudent method
 	updateStudent: function(target, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
@@ -166,42 +122,6 @@ Meteor.methods({
 					throw new Meteor.Error(500, 'Unknown error occurred, try again.');
 				}
 	},
-//insert staff and Editor by admin and editor only
-	newStaff: function(data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
-				throw new Meteor.Error('500', 'Unauthorized Operation');
-			}
-			let duplicateLookUp;
-			if(Meteor.isServer){
-				duplicateLookUp = Meteor.users.find({$or: [{'emails.address': data.email}, {'username': data.staffId}]}).count();
-				if(duplicateLookUp !== 0){
-					throw new Meteor.Error('Error occurred', 'Staff email or Id already exist.');
-				}
-			}
-				let pass = "@012345#";
-				let insertToUser = Accounts.createUser({
-						email: data.email,
-						username: data.staffId,
-						password: pass,
-					});
-				if(insertToUser){
-					Roles.addUsersToRoles(insertToUser, ['staff']);
-					//add userId to the staff Collection
-					data.meteorIdInStaff = insertToUser;
-					data.firstName = g.sentenceCase(data.firstName);
-					data.lastName = g.sentenceCase(data.lastName);
-					data.otherName = g.sentenceCase(data.otherName);
-					
-					if(data.nok){
-						data.nok.name = g.sentenceCase(data.nok.name);
-					}
-					g.Staffs.insert(data);
-					Meteor.call("log",("added new staff with id "+data.staffId));
-					return insertToUser;
-				}
-
-		
-		}, //end insertStaff method
 	editStaff: function(target, data){
 			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
 				throw new Meteor.Error(500, 'Unauthorized Operation');
@@ -347,6 +267,7 @@ Meteor.methods({
 					Meteor.call("log",("add new payment for "+
 						student.lastName+" "+student.firstName+" ("+
 						student.studentId+") in "+student.currentClass));
+					return paymentUpdate;
 				}
 			}//end if server
 			
@@ -486,7 +407,7 @@ Meteor.methods({
 		}
 		let updateMsg = g.Messages.update({"_id":msgId},{$addToSet:{"readBy":this.userId}});
 		let messageSubject = g.Messages.findOne({"_id":msgId}).subject;
-			Meteor.call("log",("You opened the message with subject '"+messageSubject+"'"));
+			Meteor.call("log",("opened the message with subject '"+messageSubject+"'"));
 	},
 	replyMessage: function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){

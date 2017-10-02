@@ -146,7 +146,7 @@ Meteor.methods({
 		});
 	},
 	toggleAdmin:function(doc){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin','editor'])){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
 				throw new Meteor.Error('500', 'Unauthorized Operation');
 			}
 			let staffId = doc.staffId,
@@ -168,5 +168,69 @@ Meteor.methods({
 				throw new Meteor.Error(500, "Request not understood!");
 			}
 	},
+	newStudent: function(data){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error('500', 'Unauthorized Operation');
+			}
+			// let duplicateId,duplicateEmail;
+				// duplicateId = Accounts.findUserByUsername(data.studentId);
+				// duplicateEmail = Accounts.findUserByEmail(data.email);
+				let pwd = "@012345#",
+					newUser = {username:data.studentId,password:pwd};
+				if(data.email){
+					newUser.email = data.email;
+				}
+				let insertToUser = Accounts.createUser(newUser);
+				if(insertToUser){
+					Roles.addUsersToRoles(insertToUser, ['student']);
+					data.meteorIdInStudent = insertToUser;
+					data['firstName'] = g.sentenceCase(data.firstName);
+					data['lastName'] = g.sentenceCase(data.lastName);
+					data['otherName'] = g.sentenceCase(data.otherName)||"";
+					if(data.nok){
+						data.nok['name'] = g.sentenceCase(data.nok.name);
+					}
+					g.Students.insert(data);
+					let resultAndPaymentRecord = {
+							meteorIdInStudent: data.meteorIdInStudent,
+							studentId: data.studentId,
+							email: data.email||"",
+							firstName: data.firstName,
+							lastName: data.lastName,
+							otherName: data.otherName,
+							currentClass: data.currentClass,
+						};
+					g.Results.insert(resultAndPaymentRecord);
+					g.Payments.insert(resultAndPaymentRecord);
+					Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
+					return insertToUser;
+				}
+		}, //end insertStudent method
+		//insert staff and Editor by admin and editor only
+	newStaff: function(data){
+			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+				throw new Meteor.Error('500', 'Unauthorized Operation');
+			}
+			let pwd = "@012345#",
+				newUser = {username:data.staffId,password:pwd};
+			if(data.email){
+				newUser.email = data.email;
+			}
+			let insertToUser = Accounts.createUser(newUser);
+			if(insertToUser){
+				Roles.addUsersToRoles(insertToUser, ['staff']);
+				//add userId to the staff Collection
+				data.meteorIdInStaff = insertToUser;
+				data.firstName = g.sentenceCase(data.firstName);
+				data.lastName = g.sentenceCase(data.lastName);
+				data.otherName = g.sentenceCase(data.otherName);
+				if(data.nok){
+					data.nok.name = g.sentenceCase(data.nok.name);
+				}
+				g.Staffs.insert(data);
+				Meteor.call("log",("added new staff with id "+data.staffId));
+				return insertToUser;
+			}
+		}, //end insertStaff method
 });
 

@@ -57,6 +57,9 @@ registerGlobalHelpers({
     dateFormat:function(date){
         return date.toString().substr(0,21);
     },
+    dayMonthYear:function(date){
+         return date.toString().substr(0,16);
+    },
     networkIndicator:function(){
         if(Meteor.isClient){
           Meteor.autorun(function(){

@@ -177,109 +177,92 @@
 </template>
 <template name="profile">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-11">
+		<div class="col-md-11">
 			{{#with currentStaff}}
 				<h3>{{lastName}} {{firstName}} {{otherName}} Profile</h3> <hr/>
-						<div class="col-md-8">
+						<div class="col-md-8" id="profile">
+							<table class="table">
+							<caption><h4>Employment Data</h4></caption>
+							<tr>
+								<td>Last Name</td><td>{{lastName}}</td>
+							</tr>
+							<tr>
+								<td>First Name</td><td>{{firstName}}</td>
+							</tr>
+							<tr>
+								<td>Other Name</td><td>{{otherName}}</td>
+							</tr>
+							<tr>	
+								<td>Gender</td> <td>{{gender}}</td>
+							</tr>
+							<tr>
+								<td>Date of Birth</td> <td>{{dayMonthYear dob}}</td>
+							</tr>
+							<tr>
+								<td>Staff ID</td> <td>{{staffId}}</td>
+							</tr>
+							<tr>
+								<td>Email</td> <td>{{email}}</td>
+							</tr>
+							<tr>
+								<td>Subject Taught</td> <td>{{subjectTaught}}</td>
+							</tr>
+							<tfoot><span><a href="{{pathFor 'editStaff'}}/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></span></tfoot>
+						</table>
+						<!-- Other Information -->
+						<table class="table">
+							<caption><h4>Other Information</h4></caption> 
+							<tr>
+								<td>Origin</td> <td>{{town}}, {{state}} State</td>
+							</tr>
+							<tr>
+								<td>Present Address</td> <td>{{presentAddress}}</td>
+							</tr>
+							<tr>
+								<td>Home Address</td> <td>{{homeAddress}}</td>
+							</tr>
+							<tr>
+								<td>Contact Number</td> <td>{{phone}}</td>
+							</tr>
+							<tr>
+								<td>Hobbies</td> <td>{{hobby}}</td>
+							</tr>
+							<tr>
+								<td>Club and Society</td> <td>{{club}}</td>
+							</tr>
+							<tr>
+								<td colspan="2" class="text-center"><h4>Medical Record</h4></td>
+							</tr>
+							<tr>
+								<td>Blood Group</td><td>{{medicalHistory.bloodGroup}}</td>
+							</tr>
+							<tr>
+								<td>Genotype</td><td>{{medicalHistory.genotype}}</td>
+							</tr>
+							<tr>
+								<td>Condition</td><td>{{medicalHistory.medicalCondition}}</td>
+							</tr>
+							<tr>
+								<td colspan="2" class="text-center"><h4>Next of Kin</h4></td>
+							</tr>
+							<tr>
+								<td>Name</td> <td>{{nok.name}}</td>
+							</tr>
+							<tr>
+								<td>Address</td> <td>{{nok.address}}</td>
+							</tr>
+							<tr>
+								<td>Contact</td> <td>{{nok.phone}}</td>
+							</tr>
+							<tr>
+								<td>Relationship</td> <td>{{nok.relationship}}</td>
+							</tr>
 							
-							<table>
-								<tr>
-									<th colspan="2" class="customHead">Employment Data</th>
-								</tr>
-								<tr>
-									<td><strong>Last Name: </strong></td>
-									<td> {{lastName}}</td>
-								</tr>
-								<tr>
-									<td><strong>First Name: </strong></td>
-									<td>{{firstName}}</td>
-								</tr>
-								<tr>
-									<td><strong>Other Name: </strong></td>
-									<td>{{otherName}}</td>
-								</tr>
-								<tr>
-									<td><strong>staff Id</strong></td>
-									<td>{{staffId}}</td>
-								</tr>
-								<tr>
-									<td><strong>Email</strong></td>
-									<td>{{email}}</td>
-								</tr>
-								<tr>
-									<td><strong>Gender</strong></td>
-									<td>{{gender}}</td>
-								</tr>
-								<tr>
-									<td><strong>Date of birth</strong></td>
-									<td>{{dob}}</td>
-								</tr>
-								<tr>
-									<td><strong>State of origin</strong></td>
-									<td>{{state}}</td>
-								</tr>
-								<tr>
-									<td><strong>Town</strong></td>
-									<td>{{town}}</td>
-								</tr>
-								<tr>
-									<td><strong>Club and Soceity</strong></td>
-									<td>{{club}}</td>
-								</tr>
-								<tr>
-									<td><strong>Subject taught</strong></td>
-									<td>{{subjectTaught}}</td>
-								</tr>										
-							</table>
-								<br/>
-
-							<table>
-								<tr>
-									<th colspan="2" class="customHead">Staff Profile</th>
-								</tr>
-								<tr>
-									<td><strong>Contact phone</strong></td>
-									<td>{{phone}}</td>
-								</tr>
-								<tr>
-									<td><strong>Home Address</strong></td>
-									<td>{{homeAddress}}</td>
-								</tr>
-								<tr>
-									<td><strong>Present Address</strong></td>
-									<td>{{presentAddress}}</td>
-								</tr>
-								<tr>
-									<td><strong>Hobby</strong></td>
-									<td>{{hobby}}</td>
-								</tr>
-								<tr>
-									<th colspan="2" class="customHead">Next of Kin details</th>
-									
-								</tr>
-								<tr>
-									<td><strong>Name</strong></td>
-									<td>{{nok.name}}</td>
-								</tr>
-								<tr>
-									<td><strong>Address</strong></td>
-									<td>{{nok.address}}</td>
-								</tr>
-								<tr>
-									<td><strong>Phone contact</strong></td>
-									<td>{{#each nok.phone}} {{this}} {{/each}}</td>
-								</tr>	
-								<tr>
-									<td><strong>Relationship</strong></td>
-									<td>{{nok.relationship}}</td>
-								</tr>
-								<tfoot>
-									<a href="{{pathFor 'editProfile'}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a>
-								</tfoot>										
-							</table>
+							<tfoot><span><a href="{{pathFor 'updateStaff'}}/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a></span></tfoot>
+						</table>
 
 						</div>
-						<div class="col-md-4" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
+						<div class="col-md-3 col-md-offset-1" style="border-left: 1px solid black; margin: 0 auto; text-align: justify;">
 							<div class="passport" style="text-align: center;">
 								<img src="/staff5.png" alt="{{lastName}} {{firstName}} passport">
 								<p><strong>{{studentId}}</strong></p>
@@ -300,7 +283,7 @@
 
 <template name="editProfile">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-md-8 col-md-offset-2">
+	<div class="col-md-10 col-md-offset-2">
 		{{#with currentStaff}}
 		<table style="margin: 5px auto;">
 			<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="/staff5.png" alt="{{firstName}} passport"></td></tr>
@@ -309,12 +292,25 @@
 		</table>
 		{{/with}}
 		{{#autoForm schema="g.Schemas.UpdateStaff" id="editProfile" type="normal" doc=currentStaff validation='blur'}} 
-			{{> afQuickField name = "presentAddress"}}
-			{{> afQuickField name = "homeAddress"}}
-			{{> afQuickField name = "phone"}}
-			{{> afQuickField name = "hobby"}}
-			{{> afQuickField name = "club" options="allowed" firstOption="Club and Society"}}
-			{{> afQuickField name = "nok"}}
+			<fieldset>
+				<legend>Profile Information</legend>
+				<fieldset class="col-md-5">
+					{{>afQuickField name="state" options="allowed"}}
+					{{>afQuickField name="town"}}
+					{{>afQuickField name="homeAddress"}}
+					{{>afQuickField name="presentAddress"}}
+					{{>afQuickField name="nok"}}
+				</fieldset>
+				<fieldset class="col-md-5">
+					{{>afQuickField name="dob"}}
+					{{>afQuickField name="phone"}}
+					{{>afQuickField name="hobby"}}
+					{{>afQuickField name="club" options="allowed"}}
+					{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+					{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+					{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+				</fieldset>
+			</fieldset><br style="clear:both;"/>		
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Update Profile</button>
 			</div>
@@ -522,10 +518,12 @@
 	{{#with staff}}	
 	<section id="singleStaff" class="row">
 			<h3>{{lastName}}, {{firstName}} {{otherName}} Profile 
+				{{#if isInRole 'admin'}}
 				<span class="btn btn-danger btn-xs" id="removeAdmin">Remove Admin</span>
 				<span class="btn btn-danger btn-xs" id="makeAdmin">Make Admin</span>
+				{{/if}}
 			</h3>
-			<hr style="border-bottom: 3px dashed orangered; border-top: 3px dotted orangered;" />
+			<hr style="border-bottom:3px dashed orangered;border-top:3px dotted orangered;"/>
 					<div class="col-md-8">	
 						<table class="table">
 							<caption>Employment Data</caption>
@@ -543,7 +541,7 @@
 								<td>Gender</td> <td>{{gender}}</td>
 							</tr>
 							<tr>
-								<td>Date of Birth</td> <td>{{dob}}</td>
+								<td>Date of Birth</td> <td>{{dayMonthYear dob}}</td>
 							</tr>
 							<tr>
 								<td>Staff ID</td> <td>{{staffId}}</td>
@@ -552,7 +550,19 @@
 							<tr>
 								<td>Email</td> <td>{{email}}</td>
 							</tr>
+							<tr>
+								<td>Subject Taught</td> <td>{{subjectTaught}}</td>
+							</tr>
 						
+							
+
+							<tfoot><span><a href="{{pathFor 'editStaff'}}/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></span></tfoot>
+						</table>
+
+
+						<!-- Other Information -->
+						<table class="table">
+							<caption>Other Information</caption> 
 							<tr>
 								<td>Origin</td> <td>{{town}}, {{state}} State</td>
 							</tr>
@@ -562,40 +572,41 @@
 							<tr>
 								<td>Home Address</td> <td>{{homeAddress}}</td>
 							</tr>
-
-							<tfoot><span><a href="{{pathFor 'editStaff'}}/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></span></tfoot>
-						</table>
-
-
-						<!-- Other Information -->
-						<table class="table">
-							<caption>Other Information</caption> 
-							
 							<tr>
-								<td>Subject Taught</td> <td>{{subjectTaught}}</td>
+								<td>Contact Number</td> <td>{{phone}}</td>
+							</tr>
+							<tr>
+								<td>Hobbies</td> <td>{{hobby}}</td>
 							</tr>
 							<tr>
 								<td>Club and Society</td> <td>{{club}}</td>
 							</tr>
 							<tr>
-								<td>Hobbies</td> <td>{{hobby}}</td>
-							</tr>
-								<tr>
-								<td>Contact Number</td> <td>{{phone}}</td>
+								<td colspan="2" class="text-center"><h4>Medical Record</h4></td>
 							</tr>
 							<tr>
-								<td>Next of kin name</td> <td>{{nok.name}}</td>
+								<td>Blood Group</td><td>{{medicalHistory.bloodGroup}}</td>
 							</tr>
 							<tr>
-								<td>Next of kin address</td> <td>{{nok.address}}</td>
-							
-							</tr>
-							
-							<tr>
-								<td>Next of kin contact</td> <td>{{nok.phone}}</td>
+								<td>Genotype</td><td>{{medicalHistory.genotype}}</td>
 							</tr>
 							<tr>
-								<td>Next of kin relationship</td> <td>{{nok.relationship}}</td>
+								<td>Condition</td><td>{{medicalHistory.medicalCondition}}</td>
+							</tr>
+							<tr>
+								<td colspan="2" class="text-center"><h4>Next of Kin</h4></td>
+							</tr>
+							<tr>
+								<td>Name</td> <td>{{nok.name}}</td>
+							</tr>
+							<tr>
+								<td>Address</td> <td>{{nok.address}}</td>
+							</tr>
+							<tr>
+								<td>Contact</td> <td>{{nok.phone}}</td>
+							</tr>
+							<tr>
+								<td>Relationship</td> <td>{{nok.relationship}}</td>
 							</tr>
 							
 							<tfoot><span><a href="{{pathFor 'updateStaff'}}/{{staffId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a></span></tfoot>
@@ -622,8 +633,63 @@
 
 <template name="newStaff">
 	<div class="col-md-offset-1 col-md-10">
-		<h3>Add new staff</h3><hr/>
-		{{> quickForm collection="g.Staffs" id="newStaff" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+		<h3>New staff</h3><hr/>
+		{{#autoForm collection="g.Staffs" id="newStaff" type="normal" validation='blur'}}
+				<p><b>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</b></p>
+				<section class="col-md-5 col-sm-5">
+					<fieldset>
+						<legend>Employment Data <span class="fa fa-asterisk text-danger"></span></legend>
+						{{>afQuickField name="firstName"}}
+						{{>afQuickField name="lastName"}}
+						{{>afQuickField name="otherName"}}
+						{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
+						{{>afQuickField name="dob"}}
+						{{>afQuickField name="staffId"}}
+						{{>afQuickField name="subjectTaught"}}
+					</fieldset>
+				</section>
+				<section class="col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5">
+					<fieldset>
+						<legend>Medical History </legend>
+						{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+						{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+						{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+					</fieldset>
+					<fieldset>
+						<legend>Next of Kin</legend>
+						{{>afQuickField name="nok.name"}}
+						{{>afQuickField name="nok.address"}}
+						{{>afQuickField name="nok.phone"}}
+						{{>afQuickField name="nok.relationship"}}
+					</fieldset>
+				</section><br style="clear:both;"/>
+				<!-- other information -->
+				<fieldset>
+					<legend>Other Information</legend>
+					<fieldset class="col-md-5">
+						{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
+						{{>afQuickField name="town"}}
+						{{>afQuickField name="homeAddress"}}
+						{{>afQuickField name="presentAddress"}}
+						{{>afQuickField name="email"}}
+						{{>afQuickField name="club" options="allowed"}}
+					</fieldset>
+					<fieldset class="col-md-5 col-md-offset-1">
+						{{>afQuickField name="phone"}}
+						{{>afQuickField name="hobby"}}
+					</fieldset>
+				</fieldset><br style="clear:both;"/>
+				<!-- miscellaneous fields -->
+				{{>afQuickField name="createdAt"}}
+				{{>afQuickField name="addedBy"}}
+				<br style="clear:both;">
+				<div class="form-group">										<button type="reset" class="btn btn-danger">Reset</button>
+					&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary btn-lg">Submit</button>
+
+				</div>
+
+				
+			{{/autoForm}}
 	</div>
 </template>
 
@@ -639,15 +705,19 @@
 			</table>
 		{{/with}}
 			{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
-				{{> afQuickField name="firstName"}}
-				{{> afQuickField name="lastName"}}
-				{{> afQuickField name="otherName"}}
-				{{> afQuickField name="dob"}}
-				{{> afQuickField name="gender" options="allowed" firstOption="Gender"}}
-				{{> afQuickField name="state" options="allowed" firstOption="State of origin"}}
-				{{> afQuickField name="town"}}
-				{{> afQuickField name="subjectTaught"}}
-				{{> afQuickField name="club" options="allowed" firstOption="Club and Soceity"}}
+			<fieldset>
+				<legend>Employment Data</legend>
+				<fieldset class="col-md-5">
+					{{> afQuickField name="firstName"}}
+					{{> afQuickField name="lastName"}}
+					{{> afQuickField name="otherName"}}
+					{{> afQuickField name="gender" options="allowed"}}
+				</fieldset>
+				<fieldset class="col-md-5 col-md-offset-1">
+					{{> afQuickField name="subjectTaught"}}
+				</fieldset>
+			</fieldset>
+			<br style="clear:both;"/>
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Update</button>
 				</div>
@@ -661,7 +731,7 @@
 
 <template name="updateStaff">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-10">
+		<div class="col-md-offset-1 col-md-11">
 			{{#with updateStaffInfo}}
 			<table style="margin: 5px auto;">
 				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/staff5.png" alt="{{firstName}} passport"></td></tr>
@@ -670,12 +740,27 @@
 			</table>
 			{{/with}}
 			{{#autoForm schema="g.Schemas.UpdateStaff" id="updateStaff" type="normal" doc=updateStaffInfo validation='blur'}} 
-				{{> afQuickField name = "presentAddress"}}
-				{{> afQuickField name = "homeAddress"}}
-				{{> afQuickField name = "phone"}}
-				{{> afQuickField name = "hobby"}}
-				{{> afQuickField name = "club" options="allowed" firstOption="Club and Society"}}
-				{{> afQuickField name = "nok"}}
+				<fieldset>
+						<legend>Profile Information</legend>
+						<fieldset class="col-md-5">
+							{{>afQuickField name="state" options="allowed"}}
+							{{>afQuickField name="town"}}
+							{{>afQuickField name="homeAddress"}}
+							{{>afQuickField name="presentAddress"}}
+							{{>afQuickField name="nok"}}
+						</fieldset>
+						
+						<fieldset class="col-md-5 col-md-offset-1">
+							{{>afQuickField name="dob"}}
+							{{>afQuickField name="phone"}}
+							{{>afQuickField name="hobby"}}
+							{{>afQuickField name="club" options="allowed"}}
+							<!-- {{>afQuickField name="medicalHistory"}} -->
+							{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+							{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+							{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+						</fieldset>
+					</fieldset>	<br style="clear:both;"/>	
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Update</button>
 				</div>
@@ -757,7 +842,6 @@
 			</tr>
 		{{#each students}}
 			<tr>
-				
 				<td></td>
 				<td class="text-center">
 				<input type="checkbox" name="checkStudent" value="{{meteorIdInStudent}}" style="display:inline;">
@@ -766,7 +850,7 @@
 				<td>{{currentClass}} </td>
 				<td>{{studentId}}</td>
 				<td>{{gender}}</td>
-				<td style="text-align: center;"><a href="{{pathFor 'singleStudent'}}/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info-circle"></span> More Details</a> <br/>
+				<td style="text-align: center;"><a href="{{pathFor 'singleStudent'}}/{{studentId}}" class="btn btn-info btn-xs"><span class="fa fa-info-circle"></span> More details</a> <br/>
 				</td>
 			</tr>
 		{{/each}}
@@ -809,28 +893,39 @@
 									<td>Student ID</td> <td>{{studentId}}</td>
 								</tr>
 								<tr>
-									<td>Email</td> <td>{{email}}</td>
+									<td>Date of Birth</td> <td>{{dayMonthYear dob}}</td>
+								</tr>
+								<tr><td colspan="2" class="text-center"><h4>Parent/Guardian</h4></td></tr>
+								<tr>
+									<td>Name</td>
+									<td>{{parentOrGuardian.name}}</td>
 								</tr>
 								<tr>
-									<td>Date of Birth</td> <td>{{dob}}</td>
+									<td>Address</td>
+									<td>{{parentOrGuardian.address}}</td>
 								</tr>
 								<tr>
-									<td>State</td> <td>{{state}} State</td>
-								</tr>
-								<tr>
-									<td>Town</td> <td>{{town}}</td>
-								</tr>
-								
-								<tr>
-									<td>Club and Society</td> <td>{{club}}</td>
+									<td>Contact Number</td>
+									<td>{{parentOrGuardian.phone}}</td>
 								</tr>
 								<tfoot><span class="edit"><a href="{{pathFor 'editStudent'}}/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit admission info</a></span></tfoot>
 							</table>
 							<!-- Other Information -->
 							<table class="table">
-								<caption>Other Information</caption> 
+								<caption>Personal Information</caption>
+
 								<tr>
 									<td>Contact Number</td> <td>{{phone}}</td>
+								</tr>
+								<tr>
+									<td>Email</td> <td>{{email}}</td>
+								</tr>
+								
+								<tr>
+									<td>State</td> <td>{{state}} State</td>
+								</tr>
+								<tr>
+									<td>Town</td> <td>{{town}}</td>
 								</tr>
 								<tr>
 									<td>Present Address</td> <td>{{presentAddress}}</td>
@@ -841,20 +936,40 @@
 								<tr>
 									<td>Hobbies</td> <td>{{hobby}}</td>
 								</tr>
-								
 								<tr>
-									<td>Next of kin name</td> <td>{{nok.name}}</td>
+									<td>Club and Society</td> <td>{{club}}</td>
 								</tr>
 								<tr>
-									<td>Next of kin address</td> <td>{{nok.address}}</td>
+									<td colspan="2" class="text-center"><h4>Next of Kin</h4></td>
+								</tr>
+								<tr>
+									<td>Name</td> <td>{{nok.name}}</td>
+								</tr>
+								<tr>
+									<td>Address</td> <td>{{nok.address}}</td>
 								
 								</tr>
 								
 								<tr>
-									<td>Next of kin contact</td> <td>{{nok.phone}}</td>
+									<td>Contact</td> <td>{{nok.phone}}</td>
 								</tr>
 								<tr>
-									<td>Next of kin relationship</td> <td>{{nok.relationship}}</td>
+									<td>Relationship</td> <td>{{nok.relationship}}</td>
+								</tr>
+								<tr>
+									<td colspan="2" class="text-center"><h4>Medical History</h4></td>
+								</tr>
+								<tr>
+									<td>Blood Group</td>
+									<td>{{medicalHistory.bloodGroup}}</td>
+								</tr>
+								<tr>
+									<td>Genotype</td>
+									<td>{{medicalHistory.genotype}}</td>
+								</tr>
+								<tr>
+									<td>Blood Group</td>
+									<td>{{medicalHistory.medicalCondition}}</td>
 								</tr>
 								<tfoot><span class="edit"><a href="{{pathFor 'updateStudent'}}/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit profile</a></span></tfoot>
 							</table>
@@ -872,13 +987,65 @@
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
-	
 </template>
-
 <template name="newStudent">	
-	<div class="col-md-offset-1 col-md-8">
-		<h3>Add new student</h3><hr/>
-			{{> quickForm collection="g.Students" id="newStudent" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+	<div class="col-md-offset-1 col-md-11">
+		<h3>New student</h3><hr/>
+			{{#autoForm collection="g.Students" id="newStudent" type="normal" validation='blur'}}
+				<p><b>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</b></p>
+				<section class="col-md-5 col-sm-5">
+					<fieldset>
+						<legend>Personal Information <span class="fa fa-asterisk text-danger"></span></legend>
+						{{>afQuickField name="firstName"}}
+						{{>afQuickField name="lastName"}}
+						{{>afQuickField name="otherName"}}
+						{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
+						{{>afQuickField name="dob"}}
+					</fieldset>
+					<fieldset>
+						<legend>Admission Data <span class="fa fa-asterisk text-danger"></span></legend>
+						{{>afQuickField name="currentClass" options="allowed" firstOption="Select class"}}
+						{{>afQuickField name="studentId"}}
+					</fieldset>
+					<fieldset>
+						<legend>Other Information</legend>
+						{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
+						{{>afQuickField name="town"}}
+						{{>afQuickField name="homeAddress"}}
+						{{>afQuickField name="presentAddress"}}
+						{{>afQuickField name="phone"}}
+						{{>afQuickField name="email"}}
+						{{>afQuickField name="hobby"}}
+						{{>afQuickField name="club" options="allowed"}}
+					</fieldset>
+				</section>
+				<section class="col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5">
+					<fieldset>
+						<legend>Parent or Guardian <span class="fa fa-asterisk text-danger"></span></legend>
+						{{>afQuickField name="parentOrGuardian"}}
+					</fieldset>
+					<fieldset>
+						<legend>Medical History </legend>
+						{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+						{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+						{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+					</fieldset>
+					<fieldset>
+						<legend>Next of Kin</legend>
+						{{>afQuickField name="nok"}}
+					</fieldset>
+				</section>
+				<!-- miscellaneous fields -->
+				{{>afQuickField name="createdAt"}}
+				{{>afQuickField name="addedBy"}}
+				<br style="clear:both;">
+				<div class="form-group">										<button type="reset" class="btn btn-danger">Reset</button>
+					&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary btn-lg">Submit</button>
+
+				</div>
+
+				
+			{{/autoForm}}
 	</div>
 </template>
 
@@ -895,16 +1062,20 @@
 				</table>
 			{{/with}}
 			{{#autoForm schema="g.Schemas.EditStudent" id="editStudent" type="normal" doc=editStudentInfo validation='blur'}}
-			{{> afQuickField name="firstName"}}
-			{{> afQuickField name="lastName"}}
-			{{> afQuickField name="otherName"}}
-			{{> afQuickField name="currentClass" options="allowed" firstOption="Current class"}}
-			{{> afQuickField name="gender" options="allowed" firstOption="Gender"}}
-			{{> afQuickField name="dob"}}
-			{{> afQuickField name="state" options="allowed" firstOption="State of origin"}}
-			{{> afQuickField name="town"}}
-			{{> afQuickField name="club" options="allowed" firstOption="Club and Soceity"}}
-
+			<fieldset>
+				<legend>Admission Data</legend>
+				<fieldset class="col-md-5">
+					{{> afQuickField name="firstName"}}
+					{{> afQuickField name="lastName"}}
+					{{> afQuickField name="otherName"}}
+					{{> afQuickField name="currentClass" options="allowed" firstOption="Current class"}}
+					{{> afQuickField name="gender" options="allowed"}}
+				</fieldset>
+				<fieldset class="col-md-5 col-md-offset-1">
+					{{> afQuickField name="parentOrGuardian"}}
+				</fieldset>
+			</fieldset>
+			<br style="clear:both;"/>
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Update</button>
 				</div>
@@ -917,7 +1088,7 @@
 
 <template name="updateStudent">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-10">
+		<div class="col-md-offset-1 col-md-11">
 		<h3>Update student details</h3><hr/>
 		{{#with updateStudentInfo}}
 			<table style="margin: 5px auto;">
@@ -927,12 +1098,28 @@
 			</table>
 		{{/with}}
 			{{#autoForm schema="g.Schemas.UpdateStudent" id="updateStudent" type="normal" doc=updateStudentInfo validation='blur'}}
-				{{> afQuickField name="homeAddress"}}
-				{{> afQuickField name="presentAddress"}}
-				{{> afQuickField name="phone"}}
-				{{> afQuickField name = "club" options="allowed" firstOption="club and soceity"}}
-				{{> afQuickField name="hobby"}}
-				{{> afQuickField name="nok"}}
+					<fieldset>
+						<legend>Profile Information</legend>
+						<fieldset class="col-md-5">
+							{{>afQuickField name="state" options="allowed"}}
+							{{>afQuickField name="town"}}
+							{{>afQuickField name="homeAddress"}}
+							{{>afQuickField name="presentAddress"}}
+							{{>afQuickField name="nok"}}
+						</fieldset>
+						
+						<fieldset class="col-md-5">
+							{{>afQuickField name="dob"}}
+							{{>afQuickField name="phone"}}
+							{{>afQuickField name="hobby"}}
+							{{>afQuickField name="club" options="allowed"}}
+							<!-- {{>afQuickField name="medicalHistory"}} -->
+							{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+							{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+							{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+						</fieldset>
+					</fieldset>					
+				<br style="clear:both;"/>
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Update</button>	
 				</div>
@@ -1794,7 +1981,6 @@
 		{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-10">
 			<h3>Edit assignment</h3><hr/> <br/>
-			
 			{{#autoForm schema="g.Schemas.Assignment" id="editAssignment" type="normal" afFieldInput-placeholder="schemaLabel" doc=assignmentToEdit validation='blur'}}
 				{{> afQuickField name="title"}}
 				{{> afQuickField name="content"}}
@@ -1812,11 +1998,9 @@
 			{{>smsLoading}}
 		{{/if}}
 </template>
-
 <!-- ******************************************* -->
 <!-- *************Break Break Break************* -->
 <!-- ******************************************* -->
-
 <template name='messages'>
 		{{#if Template.subscriptionsReady}}
 		<div class="messages col-md-11 col-md-offset-1">
@@ -1848,7 +2032,6 @@
 			    </div>
 			    <div role="tabpanel" class="tab-pane fade" id="newMessage">
 			    	{{> newMessage}}
-
 			    </div>
 			 </div>
 		 </div>
@@ -1895,13 +2078,12 @@
 											<button class="btn btn-info btn-xs">Open</button>	
 										</a>
 										<button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span> Delete</button>
-	
 									</td>
 								</tr>
 						{{/each}}
 					</table>
 				{{else}}
-					<p>No inbox messages</p>
+					<p>No message</p>
 				{{/if}}
 			</section>
 
@@ -2237,7 +2419,7 @@
 								<td>Email</td> <td>{{email}}</td>
 							</tr>
 							<tr>
-								<td>Date of Birth</td> <td>{{dob}}</td>
+								<td>Date of Birth</td> <td>{{dayMonthYear dob}}</td>
 							</tr>
 							<tr>
 								<td>State</td> <td>{{state}} State</td>
