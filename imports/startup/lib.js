@@ -19,7 +19,6 @@ g.subjectArray = function(){
 		}
 	}
 }
-
 //app setting
 g.setting = function(){
 	if(Meteor.isClient){
@@ -83,7 +82,6 @@ g.countCorrectAnswer = function(answers){
 		}
 	return correct;
 }
-
 g.promoteStudents = function(currentClass){
 	switch(currentClass){
 		case "JSS1":
