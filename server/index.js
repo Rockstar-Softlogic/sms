@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import '../imports/admin/server/main.js';
 import '../imports/student/server/main.js';
-
 Meteor.startup(() => {
   // code to run on server at startup
 });
@@ -18,7 +17,6 @@ function initAdmin(){
 	}
 }
 initAdmin();
-
 function fakeAdmin(){
 	let lookUp = Meteor.users.findOne({username:"admin", "emails.0.address":"admin@rssl.com", roles:'admin'});
 	if(!lookUp){
@@ -32,6 +30,14 @@ function fakeAdmin(){
 	}
 }
 fakeAdmin();
-
+function initSubject(){
+	let findSubject = g.Subjects.findOne({"_id":"default"});
+	if(!findSubject){
+		g.Subjects.insert({"_id":"default","subjects":[],"category":{}});
+		console.log("Subject collection created");
+		return
+	}console.log("Subject collection is existing");
+}
+initSubject();
 
 

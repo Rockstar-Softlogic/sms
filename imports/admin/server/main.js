@@ -131,7 +131,17 @@ Meteor.publish({
 			}
 		}
 		return this.ready();
-	}
+	},
+	'subject.list': function(){
+		let userId = this.userId;
+		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
+			let subjectList = g.Subjects.find({});	
+				if(subjectList){
+					return subjectList;
+				}
+		}
+		return this.ready();
+	},
 });
 
 Meteor.methods({

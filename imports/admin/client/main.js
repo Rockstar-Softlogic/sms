@@ -1259,9 +1259,9 @@ Template.newSms.helpers({
 		return g.Staffs.find({"meteorIdInStaff":{
 			$ne:Meteor.userId()}}).fetch().map(function(st){
 				if(st.phone){
-					st.phone = st.phone[0];
-					return st;					
+					st.phone = st.phone[0];				
 				}
+				return st;
 			});
 	},
 });
@@ -1377,6 +1377,92 @@ Template.logs.helpers({
 			});
 
 		return logs;
+	}
+});
+Template.subjectMgmt.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("subject.list");
+		});
+});
+Template.subjectMgmt.helpers({
+	subjects:function(){
+		let output = g.Subjects.findOne({"_id":"default"});
+		// console.log(output);
+		return output;
+	},
+	category:function(){
+		let filter = Session.get("subjectCategory");
+		if(filter){
+			return g.Subjects.findOne({"_id":"default"}).category[filter];
+		}
+	}
+});
+Template.subjectMgmt.events({
+	"submit form.addNewSubject":function(e){
+		e.preventDefault();
+		let subjectName = e.target.subjectName.value;
+		g.meteorCall("addNewSubject",{
+			doc:subjectName,
+			successMsg:"Subject was added"
+		});
+		e.target.subjectName.value = "";
+	},
+	"submit form.addNewSubjectCategory":function(e){
+		e.preventDefault();
+		let subjectCategory = e.target.subjectCategory.value;
+		g.meteorCall("addNewSubjectCategory",{
+			doc:subjectCategory,
+			successMsg:"Subject category was created"
+		});
+		e.target.subjectCategory.value = "";
+	},
+	"submit .modifySubjectCategory>form":function(e){
+		e.preventDefault();
+		let subjectCategory = e.target.subjectCategory.value;
+		Session.set("subjectCategory",subjectCategory);
+	},
+	"click .subjectList>ol>li":function(e){
+		let subjectName = e.target.attributes.name?e.target.attributes.name.value:undefined;
+		if(subjectName){
+			g.meteorCall("removeSubject",{
+				doc:subjectName,
+				successMsg:"Subject was removed."
+			});
+		}
+	},
+	"click .subjectCategory>ol>li":function(e){
+		let subjectCategory = e.target.attributes.name.value;
+		g.meteorCall("removeSubjectCategory",{
+			doc:subjectCategory,
+			successMsg:"Subject category was removed."
+		});
+	},
+	"click .subjectList>ol>li>span.fa":function(e){
+		let subjectName = e.target.parentElement.attributes.name.value;
+		let subjectCategory = Session.get("subjectCategory");
+		if(!subjectCategory){
+			bootbox.alert("<h4>No subject category is selected.</h4>");
+			return;
+		}else{
+			g.meteorCall("addSubjectToCategory",{
+				doc:{subject:subjectName,category:subjectCategory},
+				successMsg:`${subjectName} added to ${subjectCategory} category`
+			});
+		}
+	},
+	"click .modifySubjectCategory>ol>li>span.fa":function(e){
+		let subjectName = e.target.parentElement.attributes.name.value;
+		let subjectCategory = Session.get("subjectCategory");
+		if(!subjectCategory){
+			bootbox.alert("<h4>No subject category is selected.</h4>");
+			return;
+		}else{
+			g.meteorCall("removeSubjectFromCategory",{
+				doc:{subject:subjectName,category:subjectCategory},
+				successMsg:`${subjectName} removed from ${subjectCategory} category`
+			});
+		}
 	}
 });
 //Autoform hooks and addHooks

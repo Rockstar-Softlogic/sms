@@ -49,7 +49,7 @@
                     {{#if isInRole 'admin,editor'}}
                     <li><a href="{{pathFor 'ctrlpanel'}}"><i class="fa fa-cog"></i> Settings </a></li>
                     {{/if}}
-                    <li><a href="#"><i class="fa fa-book"></i> Manage Subjects </a></li>
+                    <li><a href="{{pathFor 'subjectMgmt'}}"><i class="fa fa-book"></i> Manage Subjects </a></li>
                     <li><a href="#"><i class="fa fa-info"></i> Notifications/News </a></li>
                     <li><a href="{{pathFor 'generalSearch'}}"><i class="fa fa-search"></i> Search </a></li>
                 </ul>
@@ -130,7 +130,7 @@
 			            <!-- /.row -->
 			        </div>
 			    </div>
-			    <div class="crudNotice alert alert-info">
+			    <div class="crudNotice alert">
 			    	<div></div>
 			    	<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
 						<span arial-hidden='true'>&times;</span>

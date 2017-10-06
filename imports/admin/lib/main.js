@@ -531,5 +531,87 @@ Meteor.methods({
 				throw new Meteor.Error(501, "Cannot push notification! No Session or term found.");
 			}
 		}		
-	}
+	},
+	addNewSubject:function(subjectName){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(typeof(subjectName) !== "string"){
+			throw new Meteor.Error("400", "Not a valid subject name");
+		}
+		let add = g.Subjects.update({"_id":"default"},{$addToSet:{"subjects":subjectName}});
+		if(add){
+				Meteor.call("log",("added new subject '"+subjectName+"'"));
+				return;
+		}
+	},
+	removeSubject:function(subjectName){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		let remove = g.Subjects.update({"_id":"default"},{$pull:{"subjects":subjectName}});
+		if(remove){
+			Meteor.call("log",("removed a subject '"+subjectName+"' from school subjects."));
+				return;
+		}
+	},
+	addNewSubjectCategory:function(subjectCategory){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(typeof(subjectCategory) !== "string"){
+			throw new Meteor.Error("400", "Not a valid subject category name");
+		}
+		let category = {};
+			category[`category.${subjectCategory}`] = [];
+		let add = g.Subjects.update({"_id":"default"},{$set:category});
+		if(add){
+				Meteor.call("log",("created new subject category '"+subjectCategory+"'"));
+				return;
+		}
+	},
+	removeSubjectCategory:function(subjectCategory){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		let category = {};
+			category[`category.${subjectCategory}`] = 1;
+		let remove = g.Subjects.update({"_id":"default"},{$unset:category});
+		if(remove){
+			Meteor.call("log",("removed a subject category '"+subjectCategory+"'"));
+				return;
+		}
+	},
+	addSubjectToCategory:function(obj){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(!obj.category || !obj.subject){
+			throw new Meteor.Error(400, 'Invalid parameters');
+		}
+		let category = obj.category,subject = obj.subject,
+			target = {};
+			target[`category.${category}`] = subject;
+		let add = g.Subjects.update({"_id":"default"},{$addToSet:target});
+		if(add){
+			Meteor.call("log",("added "+subject+" to '"+category+"' category."));
+				return;
+		}
+	},
+	removeSubjectFromCategory:function(obj){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+			}
+		if(!obj.category || !obj.subject){
+			throw new Meteor.Error(400, 'Invalid parameters');
+		}
+		let category = obj.category,subject = obj.subject,
+			target = {};
+			target[`category.${category}`] = subject;
+		let remove = g.Subjects.update({"_id":"default"},{$pull:target});
+		if(remove){
+			Meteor.call("log",("removed "+subject+" from '"+category+"' category."));
+				return;
+		}
+	},
 });

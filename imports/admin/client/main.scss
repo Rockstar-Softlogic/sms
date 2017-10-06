@@ -60,6 +60,73 @@
 		}
 	}
 }
+
+#subjectMgmt{
+	section.subject{
+		border: 1px solid grey;
+		padding-bottom:5px;
+	}
+	section.modifySubjectCategory{
+		ol{
+			list-style-type: none;
+			counter-reset: subject;
+			padding-left:10px;
+		}
+		ol>li{
+			max-width: 99%;
+			background-color:#eeefff;
+			margin:4px 0;
+			// border-bottom:2px solid #fff;
+			padding:5px 10px;
+			font-size:1.3em;
+			span.fa{
+				cursor:pointer;
+			}
+		}
+		ol>li:before{
+			counter-increment: subject;
+			content: counter(subject);
+			font-weight: bold;
+			padding-right:10px;
+		}
+	}
+	.subjectList, .subjectCategory{
+		h4{
+			background-color:#ddd;
+			border:1px solid #888;
+			padding:5px;
+			// text-align:center;
+			font-size:1.4em;
+			cursor: pointer;
+		}
+		ol{
+			max-height: 20em;
+			overflow: auto;
+			background-color:#eeefff;
+			li{
+				max-width: 95%;
+				background-color:#eeefff;
+				pointer-events:none;
+				margin:2px;
+				border-bottom:2px solid #fff;
+				padding:5px;
+				font-size:1.2em;
+				span{
+					pointer-events: all;
+					cursor: pointer;
+				}
+			}
+			li:before{
+				content: "\f146";
+				font-family: fontAwesome;
+				padding:10px;
+				pointer-events: all;
+				cursor: pointer;
+			}
+		}
+	}
+}
+
 #ctrlpanel{
 	.schoolFees ul{
 		font-weight:bold;

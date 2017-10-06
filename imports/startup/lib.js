@@ -1,5 +1,4 @@
 //global functions and variables
-g.subjectArray = ["English", "Mathematics", "Physics", "Chemistry", 'Biology', 'Geography', 'Economics','Computer', 'Agricultural Science', 'Civic Education', 'Commerce', 'Accounting', 'Government','Literature', 'Further Mathematics'];
 g.classArray = ["JSS1", "JSS2", "JSS3", "SSS1", "SSS2", "SSS3"];
 g.monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 g.termArray = [1, 2, 3];
@@ -10,6 +9,17 @@ g.remarkArray = ['Excellent', 'Credit', 'Pass', 'Fail', 'Not Offered'];
 g.bloodGroupArray = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 g.genotypeArray = ["AA","AS","SS","AC","SC","CC"];
 g.medicalConditionArray = ["Typhoid","Measles","Sickle cell","Tuberculosis","Asthma","HIV"];
+
+//subjects Array
+g.subjectArray = function(){
+	if(Meteor.isClient){
+		let config = Meteor.subscribe('subject.list');
+		if(config.ready()){
+			return g.Subjects.findOne({"_id":"default"}).subjects;
+		}
+	}
+}
+
 //app setting
 g.setting = function(){
 	if(Meteor.isClient){
@@ -49,12 +59,12 @@ g.meteorCall = function(method,options){
 	Meteor.call(method,doc,function(error,result){
 		if(error){
 			$("div.processRequest").hide("fast");
-			g.notice(error,8000);
+			g.notice(error,8000,"alert-danger");
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			return;
 		}else{
 			$("div.processRequest").hide("fast");
-			g.notice(successMsg,4000);
+			g.notice(successMsg,4000,"alert-info");
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
 				//result would normally be 9 in length when returning an insert
@@ -135,8 +145,10 @@ g.enableBtn = function(id){
 	return $(id+" button[type='submit']").attr("disabled",false);
 }
 //bottom right corner notice
-g.notice = function(text, time = 10000){
-	let alert = "<h3><b>Notification</b></h3><hr/><br/><h4>"+text+"</h4>";
+g.notice = function(text,time=8000,type="alert-info"){
+	// let alert = "<h3><b>Notification</b></h3><hr/><br/><h4>"+text+"</h4>";
+	//boostrap alert class
+	$(".crudNotice").removeClass("alert-danger").addClass(type);
 	$('.crudNotice div').text(text);
 	$('.crudNotice').show("slow");
 	// bootbox.alert(alert);
@@ -221,15 +233,19 @@ g.logout = function(){
                     if(error){
                         bootbox.alert(error);   
                     }else{
-                        Object.keys(Session.keys).forEach(function(key){
-                            Session.set(key, undefined);
-                        });
-                        Session.keys = {};
-                        return;
+                        g.clearSession();
                     }
      		   });
             }
         });
+}
+//remove all session
+g.clearSession = function(){
+	Object.keys(Session.keys).forEach(function(key){
+                    Session.set(key, undefined);
+                });
+        Session.keys = {};
+        return;
 }
 //remark function
 g.remark = function(grade){
@@ -265,4 +281,12 @@ g.calculateGrade = function(num){
 	else if(num >= 40) return "E";
 	else return "F";
 
+}
+g.getObjectKey = function(object){
+	if(typeof object !== "object")return;
+	let keyArray = [];
+	for(let prop in object){
+		keyArray.push(prop);
+	}
+	return keyArray;
 }

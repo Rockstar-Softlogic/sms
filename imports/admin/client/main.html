@@ -2496,3 +2496,70 @@
 		{{>smsLoading}}
 	{{/if}}
 </template>
+
+<template name="subjectMgmt">
+	{{#if Template.subscriptionsReady}}
+	<div class="col-md-12" id="subjectMgmt">
+		<h4>Subject Management</h4><hr/>
+		<section class="col-md-5 subject">
+			<h4>Subjects</h4><hr/>
+			<article class="subjectList">
+				<h4>List <span class="fa fa-caret-right pull-right"></span></h4>
+				<ol>
+				{{#each subjects.subjects}}
+					<li name="{{this}}">{{this}} <span class="fa fa-plus pull-right" title="Add this subject to the currently selected category."></span></li> 
+					
+				{{else}}
+					<p>No subject found</p>
+				{{/each}}
+				</ol>
+				<form class="addNewSubject">
+					<input type="text" name="subjectName" placeholder="Add new subject" required>
+					<button type="submit" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add</button>
+				</form>
+			</article><hr/>
+			<article class="subjectCategory">
+				<h4>Category <span class="fa fa-caret-right pull-right"></span></h4>
+				<ol>
+				{{#each getObjectKey subjects.category}}
+					<li name="{{this}}">{{this}}()</li>
+				{{else}}
+					<p>No subject category found</p>
+				{{/each}}
+				</ol>
+				<form class="addNewSubjectCategory">
+					<input type="text" name="subjectCategory" placeholder="Add new subject category" required>
+					<button type="submit" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Create</button>
+				</form>
+			</article>
+		</section>
+		<section class="col-md-6 col-md-offset-1 modifySubjectCategory">
+			<form>
+				<h4>Modify a subject category</h4>
+				<select name="subjectCategory">
+					{{#if getSession "subjectCategory"}}
+						<option>*{{getSession "subjectCategory"}}</option>
+					{{else}}	
+						<option selected disabled>Select a category</option>
+					{{/if}}
+					{{#each getObjectKey subjects.category}}
+						<option value="{{this}}">{{this}}</option>
+					{{else}}
+						<option selected disabled>No category</option>
+					{{/each}}
+				</select>
+				<button type="submit" class="btn btn-primary btn-xs">Show</button>
+			</form><hr/>
+			<ol>
+				{{#each category}}
+					<li name="{{this}}">{{this}} <span class="fa fa-trash pull-right" title="delete this subject from this category."></span></li>
+				{{else}}
+					<p>Subject category empty.</p>
+				{{/each}}	
+			</ol>
+		</section>
+	</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>

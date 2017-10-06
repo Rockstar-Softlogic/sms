@@ -1,9 +1,6 @@
 //global template helpers
 Template.registerHelper("g.Schemas", g.Schemas);
 registerGlobalHelpers({
-    loggedInUser:function(){
-        return Meteor.user();
-    },
     currentStaff:function(){//currentUser is already in use so currentStaff;
             let sub = Meteor.subscribe('staff.info');
             if(sub.ready()){
@@ -29,7 +26,7 @@ registerGlobalHelpers({
         return session;
     },
     yearArray:function(){
-        let year = g.yearsArray(2016);
+        let year = g.yearsArray(2017);
         return year;
     },
     classes:function(){
@@ -76,6 +73,16 @@ registerGlobalHelpers({
 
         }//end isClient
         return Session.get('networkStatus');
+    },
+    getObjectKey:function(object){
+        return g.getObjectKey(object);
+    },
+    arrayLength:function(array){
+        return array.length;
+    },
+    getSession:function(sessionName){
+        let get = Session.get(sessionName);
+        if(get)return get;return;
     }
 });
 //end global template helpers
