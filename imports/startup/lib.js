@@ -13,8 +13,8 @@ g.medicalConditionArray = ["Typhoid","Measles","Sickle cell","Tuberculosis","Ast
 //subjects Array
 g.subjectArray = function(){
 	if(Meteor.isClient){
-		let config = Meteor.subscribe('subject.list');
-		if(config.ready()){
+		let subject = Meteor.subscribe('subject.list');
+		if(subject.ready()){
 			return g.Subjects.findOne({"_id":"default"}).subjects;
 		}
 	}

@@ -1375,7 +1375,6 @@ Template.logs.helpers({
 				log.name = name;
 				return log;
 			});
-
 		return logs;
 	}
 });
