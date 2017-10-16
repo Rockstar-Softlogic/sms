@@ -134,8 +134,8 @@ Meteor.publish({
 	},
 	'subject.list': function(){
 		let userId = this.userId;
-		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-			let subjectList = g.Subjects.find({});	
+		if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff','student'])){
+			let subjectList = g.Subjects.find({"_id":"default"});	
 				if(subjectList){
 					return subjectList;
 				}

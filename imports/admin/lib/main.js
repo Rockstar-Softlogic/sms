@@ -34,7 +34,7 @@ Meteor.methods({
 
 					doc['currentTerm'] = 1;
 					Meteor.call("setTermAndSchoolFees", doc, id, session);
-					Meteor.call("log","Created new session");
+					Meteor.call("log","created new session");
 
 			}else{
 				throw new Meteor.Error('Session Error', 'Error occurred while creating new session.');
@@ -614,4 +614,50 @@ Meteor.methods({
 				return;
 		}
 	},
+	importData:function(obj){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+				throw new Meteor.Error(500, 'Unauthorized Operation');
+		}
+		if(obj.target=="staffs"){
+			 bulkInsertNewUser("newStaff",obj.doc,function(results){
+			 	console.log("output is ",results);
+			 	//do something with the ouptut
+			 });
+		}else if(obj.target=="students"){
+			bulkInsertNewUser("newStudent",obj.doc,function(results){
+			 	console.log("output is ",results);
+			 	//do something with the ouptut
+			 });
+		}else if(obj.target=="results" && g.classArray.indexOf(obj.class)<0 || g.subjectArray.indexOf(obj.subject)<0){
+		}
+	}
 });
+
+function bulkInsertNewUser(type,userInfo,callback){
+	// userInfo is an array of object of new user
+	let output = [];
+	let count = userInfo.length,//number of call to make
+		success = 0,failure = 0;
+	if(Meteor.isServer){
+		userInfo.forEach(function(user,index){
+			Meteor.call(type,user,function(error,result){
+				let id = user.staffId || user.studentId;
+				if(error){
+					output.push(`${id} was not imported, error is ${error.reason}`);
+					++failure;
+				}else{
+					output.push(`${id} was created ok.`);
+					++success;
+				}
+				//return the result using the callback when completed;
+				if(--count===0){
+					output.unshift(`${failure} user(s) was not imported.`);
+					output.unshift(`${success} user(s) was created`);
+					output.unshift(`${success+failure} total users in the import file.`);
+					// console.log(output);
+					 callback(output);
+				};
+			});
+		});
+	}
+}//end bulkInsertNewUser

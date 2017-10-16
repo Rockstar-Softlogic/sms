@@ -1,5 +1,3 @@
-//using flowRouter
-import { FlowRouter } from 'meteor/kadira:flow-router';
 //onlogin and onlogout
 if(Meteor.isClient){
 		Accounts.onLogin(function(){
@@ -90,6 +88,19 @@ staffRoute.route('/subjectMgmt', {
 	name: 'subjectMgmt',
 	action(){
 		BlazeLayout.render('dashboard', {content: 'subjectMgmt'});
+	}
+});
+///import and export
+staffRoute.route('/import', {
+	name: 'import',
+	action(){
+		BlazeLayout.render('dashboard', {content: 'import'});
+	}
+});
+staffRoute.route('/export', {
+	name: 'export',
+	action(){
+		BlazeLayout.render('dashboard', {content: 'export'});
 	}
 });
 	

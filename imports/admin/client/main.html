@@ -488,7 +488,6 @@
 				<th>Staff ID</th>
 				<th>Subjects</th>
 				<th>Gender</th>
-				<th>Club</th>
 				<th>Actions</th>
 			</tr>
 		{{#each staffs}}
@@ -498,7 +497,6 @@
 				<td>{{staffId}}</td>
 				<td>{{subjectTaught}} <br/></td> 
 				<td>{{gender}}</td>
-				<td>{{club}}</td>
 				<td><a href="{{pathFor 'singleStaff'}}/{{staffId}}" class="btn btn-info btn-xs"> <span class="fa fa-info-circle"></span> More Details</a></td>
 			</tr>
 		{{/each}}
@@ -811,13 +809,13 @@
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-offset-1 col-md-11">	
 		<h3>Student list &nbsp; <a href="{{pathFor 'newStudent'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Student</a></h3><hr/>
-		<h4 class="text-info">
-			{{#if studentFilter}}
-				<strong>Showing <em>{{studentFilter.selectedClass}}</em> students.</strong>
+		<h5 class="text-info">
+			{{#with getSession "studentFilter"}}
+				<strong>Showing <em>{{selectedClass}}</em></strong>
 			{{else}}
 				<strong>Showing <em>JSS1</em> students.</strong>
-			{{/if}}
-		</h4>
+			{{/with}}
+		</h5>
 		<form class="filter">
 			<input type="text" name="name" placeholder="name">	
 			<input type="text" name="studentId" placeholder="student Id">
@@ -856,7 +854,13 @@
 		{{/each}}
 		</table>
 		{{else}}
-			<h4>No student found!</h4>
+			<h5>
+				{{#with getSession "studentFilter"}}
+					<strong>No student found in <em>{{selectedClass}}</em></strong>
+				{{else}}
+					<strong>No student found in JSS1</strong>
+				{{/with}}
+			</h5>
 		{{/if}}
 	</div>
 	{{else}}
@@ -1130,20 +1134,83 @@
 	{{/if}}
 	
 </template>
+<template name="import">
+	<div class="col-md-10 col-md-offset-1">
+		<h3>Import Data</h3><hr/>
+		<form>
+			<select name="data">
+				<option disabled selected>Data to import</option>
+				<option value="staffs">Staffs</option>
+				<option value="students">Students</option>
+				<option value="results">Results</option>
+			</select>
+			<select name="class" style="display:none;">
+				<option disabled selected>Select class</option>
+			{{#each classes}}
+				<option value="{{this}}">{{this}}</option>
+			{{/each}}
+			</select>
+			<select name="subject" style="display:none;">
+				<option disabled selected>Select subject</option>
+			{{#each subjects}}
+				<option value="{{this}}">{{this}}</option>
+			{{/each}}
+			</select>
+			<input type="file" name="file" id="file">
+			<button type="submit" class="btn btn-primary">Import</button>
+		</form><hr/>
+		<section class="preview" style="display:none;">
+			<h4>Preview as JSON</h4>
+			<pre style="max-height:30em;overflow:auto;"></pre>
+		</section><br/>
+	</div>
+</template>
+<template name="export">
+	<div class="col-md-10 col-md-offset-1">
+		<h3>Export Data</h3><hr/>
+		<form>
+			<select name="data">
+				<option disabled selected>Data to export</option>
+				<option value="staffs">Staffs</option>
+				<option value="students">Students</option>
+				<option value="graduated">Graduated Student</option>
+				<option value="results">Results</option>
+			</select>
+			<select name="class" style="display:none;">
+				<option disabled selected>Select class</option>
+			{{#each classes}}
+				<option value="{{this}}">{{this}}</option>
+			{{/each}}
+			</select>
+			<select name="graduatedYear" style="display:none;">
+				{{#each yearArray}}
+					<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<button type="submit" class="btn btn-primary btn-xs">Export</button>
+		</form><hr/>
+		<section class="preview" style="display:none;">
+			<h4>Preview</h4>
+			<pre style="max-height:30em;overflow:auto;"></pre>
+			<button class="btn btn-primary exportAsJSON" title="JavaScript Object Notation">Export as JSON</button>
+			<button class="btn btn-primary exportAsXLSX" title="xlsx, xls, ods">Export as Spreadsheet</button>	
+		</section><br/>
+	</div>
+</template>
 <!-- Student templates end -->
 
 <!-- Result templates begin -->
 <template name="resultList">
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-11">
-			<h3>Result List <button class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Result</button></h3><hr/>
-			<h4 class="text-info">
-				{{#if resultFilter}}
-					<strong>Showing result for <em>{{resultFilter.selectedClass}}</em> class.</strong>
+			<h3>Result List <a href="{{pathFor 'uploadResult'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Result</a></h3><hr/>
+			<h5 class="text-info">
+				{{#with getSession "resultFilter"}}
+					<strong>Showing result for <em>{{selectedClass}}</em> class.</strong>
 				{{else}}
 					<strong>Showing result for <em>JSS1</em> class.</strong>
-				{{/if}}
-			</h4>
+				{{/with}}
+			</h5>
 			<form class="filter">
 				<input type="text" name="studentId" placeholder="student Id">
 				<select name='class'>
@@ -1196,13 +1263,13 @@
 			{{/each}}
 			</table>
 			{{else}}
-				<h4>
-				{{#if resultFilter}}
-					<strong>No result found for <em>{{resultFilter.selectedClass}}</em> class.</strong>
+				<h5>
+				{{#with getSession "resultFilter"}}
+					<strong>No result found for <em>{{selectedClass}}</em> class.</strong>
 				{{else}}
 					<strong>No result found for <em>JSS1</em> class.</strong>
-				{{/if}}
-				</h4>
+				{{/with}}
+				</h5>
 
 			{{/if}}
 	</div>
@@ -1275,128 +1342,17 @@
 							<th>Grade</th>
 							<th>Remark</th>
 						</tr>
-						{{#if english}}
-						<tr>
-							<td></td>
-							<td>English Language</td>
-							<td>{{english.ca}}</td>
-							<td>{{english.exam}}</td>
-							<td>{{english.total}}</td>
-							<td>{{english.grade}}</td>
-							<td>{{english.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if mathematics}}
-						<tr>
-							<td></td>
-							<td>Mathematics</td>
-							<td>{{mathematics.ca}}</td>
-							<td>{{mathematics.exam}}</td>
-							<td>{{mathematics.total}}</td>
-							<td>{{mathematics.grade}}</td>
-							<td>{{mathematics.remark}}</td>
-						</tr>
-						{{/if}}
-
-						{{#if physics}}
-						<tr>
-							<td></td>
-							<td>Physics</td>
-							<td>{{physics.ca}}</td>
-							<td>{{physics.exam}}</td>
-							<td>{{physics.total}}</td>
-							<td>{{physics.grade}}</td>
-							<td>{{physics.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if chemistry}}
-						<tr>
-							<td></td>
-							<td>Chemistry</td>
-							<td>{{chemistry.ca}}</td>
-							<td>{{chemistry.exam}}</td>
-							<td>{{chemistry.total}}</td>
-							<td>{{chemistry.grade}}</td>
-							<td>{{chemistry.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if biology}}
-						<tr>
-							<td></td>
-							<td>Biology</td>
-							<td>{{biology.ca}}</td>
-							<td>{{biology.exam}}</td>
-							<td>{{biology.total}}</td>
-							<td>{{biology.grade}}</td>
-							<td>{{biology.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if account}}
-						<tr>
-							<td></td>
-							<td>Accounting</td>
-							<td>{{account.ca}}</td>
-							<td>{{account.exam}}</td>
-							<td>{{account.total}}</td>
-							<td>{{account.grade}}</td>
-							<td>{{account.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if commerce}}
-						<tr>
-							<td></td>
-							<td>Commerce</td>
-							<td>{{commerce.ca}}</td>
-							<td>{{commerce.exam}}</td>
-							<td>{{commerce.total}}</td>
-							<td>{{commerce.grade}}</td>
-							<td>{{commerce.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if economics}}
-						<tr>
-							<td></td>
-							<td>Economics</td>
-							<td>{{economics.ca}}</td>
-							<td>{{economics.exam}}</td>
-							<td>{{economics.total}}</td>
-							<td>{{economics.grade}}</td>
-							<td>{{economics.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if literature}}
-						<tr>
-							<td></td>
-							<td>Literature</td>
-							<td>{{literature.ca}}</td>
-							<td>{{literature.exam}}</td>
-							<td>{{literature.total}}</td>
-							<td>{{literature.grade}}</td>
-							<td>{{literature.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if government}}
-						<tr>
-							<td></td>
-							<td>Government</td>
-							<td>{{government.ca}}</td>
-							<td>{{government.exam}}</td>
-							<td>{{government.total}}</td>
-							<td>{{government.grade}}</td>
-							<td>{{government.remark}}</td>
-						</tr>
-						{{/if}}
-						{{#if geography}}
-						<tr>
-							<td></td>
-							<td>Geography</td>
-							<td>{{geography.ca}}</td>
-							<td>{{geography.exam}}</td>
-							<td>{{geography.total}}</td>
-							<td>{{geography.grade}}</td>
-							<td>{{geography.remark}}</td>
-						</tr>
-						{{/if}}
+							{{#each resultObjectToArray singleRes}}
+							<tr>
+								<td></td>
+								<td>{{this.name}}</td>
+								<td>{{this.value.ca}}</td>
+								<td>{{this.value.exam}}</td>
+								<td>{{this.value.total}}</td>
+								<td>{{this.value.grade}}</td>
+								<td>{{this.value.remark}}</td>
+							</tr>
+							{{/each}}
 						{{#with studentInfo}}
 						<br/>
 						<tfoot><a href="{{pathFor 'editResult'}}/{{studentId}}" class="btn btn-primary btn-xs"><span class="fa fa-edit"></span> edit</a></tfoot>
@@ -1488,13 +1444,13 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-sm-10">
 		<h3>Payment List <button class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Payment</button></h3><hr/>
-		<h4 class="text-info">
-				{{#if paymentFilter}}
-					<strong>Showing payment for <em>{{paymentFilter.selectedClass}}</em> class.</strong>
+		<h5 class="text-info">
+				{{#with getSession "paymentFilter"}}
+					<strong>Showing payment for <em>{{selectedClass}}</em> class.</strong>
 				{{else}}
 					<strong>Showing payment for <em>JSS1</em> class.</strong>
-				{{/if}}
-		</h4>
+				{{/with}}
+		</h5>
 		<form class="filter">
 			<input type="text" name="studentId" placeholder="student Id">
 			<select name='class'>
@@ -1545,13 +1501,13 @@
 		{{/each}}
 		</table>
 		{{else}}
-			<h4>
-				{{#if paymentFilter}}
-					<strong>No payment record found for <em>{{paymentFilter.selectedClass}}</em> class.</strong>
+			<h5>
+				{{#with getSession "paymentFilter"}}
+					<strong>No payment record found for <em>{{selectedClass}}</em> class.</strong>
 				{{else}}
 					<strong>No payment record found for <em>JSS1</em> class.</strong>
-				{{/if}}
-			</h4>
+				{{/with}}
+			</h5>
 		{{/if}}
 	</div>
 	{{else}}
@@ -1786,13 +1742,13 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-11 col-md-offset-1">
 		<h3>Assignment list <button class="btn btn-primary btn-xs" onclick="Modal.show('newAssignment')"><span class="fa fa-plus"></span> New Assignment</button></h3><hr/>
-			<h4 class="text-info">
-				{{#if assignmentFilter}}
-					<strong>Showing <em>{{assignmentFilter.subject}} and {{assignmentFilter.class}}</em> assignments.</strong>
+			<h5 class="text-info">
+				{{#with getSession "assignmentFilter"}}
+					<strong>Showing <em>{{subject}} and {{class}}</em> assignments.</strong>
 				{{else}}
 					<strong>Showing <em>JSS1</em> assignments.</strong>
-				{{/if}}	
-			</h4>
+				{{/with}}	
+			</h5>
 			<form class="form-inline">
 				<div class="form-group">
 					<select name="session">
@@ -1821,30 +1777,30 @@
 			{{#if assignments}}
 				{{#each assignments}}
 					<div class="assignmentList">
-								<div class="col-md-2 badge">
-									<h4>{{class}}</h4>
-									<p>{{subject}}</p>
-								</div>
-								<div class="col-md-10">
-									<h4><a href="{{pathFor 'singleAssignment'}}/{{_id}}">{{title}}</a> [{{answerCount}} Answer(s)]
-									{{#if validity}}
-										<i class="label label-danger">Expired</i>
-									{{/if}}
-									</h4>
-									<span><strong>Start: </strong>{{dateFormat startDate}}</span>
-									<span><strong>Due date: </strong>{{dateFormat endDate}}</span>
-									<span><strong>Max score: </strong>{{totalScore}}</span>
-								</div>
+						<div class="col-md-2 badge">
+							<h4>{{class}}</h4>
+							<p>{{subject}}</p>
+						</div>
+						<div class="col-md-10">
+							<h4><a href="{{pathFor 'singleAssignment'}}/{{_id}}">{{title}}</a> [{{answerCount}} Answer(s)]
+							{{#if validity}}
+								<i class="label label-danger">Expired</i>
+							{{/if}}
+							</h4>
+							<span><strong>Start: </strong>{{dateFormat startDate}}</span>
+							<span><strong>Due date: </strong>{{dateFormat endDate}}</span>
+							<span><strong>Max score: </strong>{{totalScore}}</span>
+						</div>
 					</div><hr/>
 				{{/each}}
 			{{else}}
-				<h4>
-				{{#if assignmentFilter}}
-					<strong>No assignment found for <em>{{assignmentFilter.subject}} or {{assignmentFilter.class}}.</em></strong>
+				<h5>
+				{{#with getSession "assignmentFilter"}}
+					<strong>No assignment found for <em>{{subject}} or {{class}}.</em></strong>
 				{{else}}
 					<strong>No assignment found</strong>
-				{{/if}}
-				</h4>
+				{{/with}}
+				</h5>
 				<p></p>
 			{{/if}}
 		</div>
@@ -2501,7 +2457,7 @@
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-12" id="subjectMgmt">
 		<h4>Subject Management</h4><hr/>
-		<section class="col-md-5 subject">
+		<section class="col-md-6 subject">
 			<h4>Subjects</h4><hr/>
 			<article class="subjectList">
 				<h4>List <span class="fa fa-caret-right pull-right"></span></h4>
@@ -2510,7 +2466,7 @@
 					<li name="{{this}}">{{this}} <span class="fa fa-plus pull-right" title="Add this subject to the currently selected category."></span></li> 
 					
 				{{else}}
-					<p>No subject found</p>
+					<p>No subject found.</p>
 				{{/each}}
 				</ol>
 				<form class="addNewSubject">
@@ -2524,7 +2480,7 @@
 				{{#each getObjectKey subjects.category}}
 					<li name="{{this}}">{{this}}()</li>
 				{{else}}
-					<p>No subject category found</p>
+					<p>No subject category found.</p>
 				{{/each}}
 				</ol>
 				<form class="addNewSubjectCategory">
@@ -2533,7 +2489,7 @@
 				</form>
 			</article>
 		</section>
-		<section class="col-md-6 col-md-offset-1 modifySubjectCategory">
+		<section class="col-md-6 modifySubjectCategory">
 			<form>
 				<h4>Modify a subject category</h4>
 				<select name="subjectCategory">
@@ -2554,7 +2510,11 @@
 				{{#each category}}
 					<li name="{{this}}">{{this}} <span class="fa fa-trash pull-right" title="delete this subject from this category."></span></li>
 				{{else}}
-					<p>Subject category empty.</p>
+					{{#if getSession "subjectCategory"}}
+						<p>{{getSession "subjectCategory"}} subject category is empty.<br/> Click "<span class="fa fa-plus"></span>" on subject list to add subject to this cateogry.</p>
+					{{else}}
+						<p>No subject category is selected.</p>
+					{{/if}}
 				{{/each}}	
 			</ol>
 		</section>

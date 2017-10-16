@@ -1,4 +1,6 @@
 import './main.html';
+let XLSX = require('xlsx');
+let fileSaver = require('file-saver');
 //grab setting
 Template.staffDashboard.onCreated(function(){
 	let self = this;
@@ -433,11 +435,7 @@ Template.studentList.helpers({
 										]}).fetch();
 			}
 		return g.Students.find({currentClass: "JSS1"}).fetch();
-	},
-	studentFilter:function(){
-		let filter = Session.get('studentFilter');
-		return filter;
-	},
+	}
 });
 Template.studentList.events({
 	'submit form': function(e){
@@ -553,9 +551,9 @@ Template.updateStudent.helpers({
 //update student template
 Template.resultList.onCreated(function(){
 	let self = this;
-	self.autorun(function(){
-		self.subscribe('result.list');
-	});
+		self.autorun(function(){
+			self.subscribe('result.list');
+		});
 });
 Template.resultList.helpers({
 	results: function(){
@@ -588,10 +586,6 @@ Template.resultList.helpers({
 			});
 			return filtered;
 		}	
-	},
-	resultFilter:function(){
-		let filter = Session.get('resultFilter');
-		return filter;
 	}
 });
 Template.resultList.events({
@@ -646,6 +640,7 @@ Template.singleResult.helpers({
 					}
 			});
 			if(filtered[0])return filtered[0];
+
 		}return;
 	},
 	studentInfo: function(){
@@ -776,10 +771,6 @@ Template.paymentList.helpers({
 			});
 			return filtered;
 		}
-	},
-	paymentFilter:function(){
-		let filter = Session.get('paymentFilter');
-		return filter;	
 	}
 });
 Template.paymentList.events({
@@ -994,9 +985,6 @@ Template.assignmentList.helpers({
 			});
 		return assList;
 	},	
-	assignmentFilter:function(){
-		return Session.get("assignmentFilter");
-	}
 });
 
 Template.assignmentList.events({
@@ -1464,6 +1452,165 @@ Template.subjectMgmt.events({
 		}
 	}
 });
+Template.export.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("staff.list");
+			self.subscribe("student.list");
+			self.subscribe("result.list");
+			self.subscribe("graduate.list");
+		})
+})
+Template.export.events({
+	"change select[name=data]":function(e){
+		let data = e.currentTarget.value;
+		if(data=="results" || data=="students"){
+			$("select[name=graduatedYear]").hide("fast");
+			$("select[name=class]").show("fast");
+			return;
+		}else if(data=="graduated"){
+			$("select[name=class]").hide("fast");
+			$("select[name=graduatedYear]").show("fast");
+			return;
+		}else{
+			$("select[name=class]").hide("fast");
+			$("select[name=graduatedYear]").hide("fast");
+		}
+	},
+	"submit form":function(e){
+		e.preventDefault();
+		let data = e.currentTarget.data.value,
+			targetClass = e.currentTarget.class.value,
+			graduatedYear = Number(e.currentTarget.graduatedYear.value),
+			download;
+		// if(data){
+			switch(data){
+				case "staffs":
+					download = g.Staffs.find({},{fields:{firstName:1,
+								lastName:1,otherName:1,staffId:1,
+								email:1,gender:1,subjectTaught:1}}).fetch();
+					break;
+				case "students":
+					download = g.Students.find({"currentClass":targetClass},{fields:{firstName:1,
+								lastName:1,otherName:1,studentId:1,
+								email:1,gender:1,currentClass:1}}).fetch();
+					break;
+				case "graduated":
+					download = g.Graduates.find({"graduatedYear":graduatedYear},{fields:{firstName:1,
+								lastName:1,otherName:1,studentId:1,
+								email:1,gender:1,currentClass:1,graduatedYear:1}}).fetch();
+					break;
+				case "results":
+					download = g.Results.find({result:{$exists:true},"currentClass":targetClass},
+								{fields:{meteorIdInStudent:0,
+								email:0,currentClass:0,graduated:0,"result.addedBy":0}}).fetch();
+					break;
+				default:
+					g.notice("Request not understand.",5000,"alert-danger");
+					return;
+			}//end switch
+			if(download.length<1){g.notice("Empty result. Make sure all fields are selected.",5000,"alert-info")};
+			let json = JSON.stringify(download,function(key,value){if(key==="_id"){return undefined};return value},4);
+			//save in sessionStorage
+				sessionStorage.setItem("exportAsJSON",json);
+					$("section.preview pre").text(json);
+					$("section.preview").show();
+					return;
+	},
+	"click button.exportAsJSON":function(){
+		let json = sessionStorage.getItem("exportAsJSON");
+		let blob = new Blob([json],{type:"application/json"});
+		fileSaver.saveAs(blob,"sms_export.json");
+		sessionStorage.removeItem("exportAsJSON");
+		sessionStorage.clear();
+	},
+	"click button.exportAsXLSX":function(){
+		let json = sessionStorage.getItem("exportAsJSON");
+		let toXlsx = XLSX.utils;
+		console.log(toXlsx);return;
+
+		let blob = new Blob([json],{type:"application/json"});
+		fileSaver.saveAs(blob,"sms_export.json");
+	}
+});
+Template.import.events({
+	"change select[name=data]":function(e){
+		let data = e.currentTarget.value;
+		if(data=="students"){
+			$("select[name=subject]").hide("fast");
+			$("select[name=class]").show("fast");
+			return;
+		}else if(data=="results"){
+			$("select[name=class]").show("fast");
+			$("select[name=subject]").show("fast");
+		}else{
+			$("select[name=class]").hide("fast");
+			$("select[name=subject]").hide("fast");
+		}
+	},
+	"change input#file":function(e){
+		e.preventDefault();
+		let allowedFormat = ["xlsx","ods","json"],
+			file = e.target.files[0];
+		if(!file)return;
+		let	type = file.name.split(".").pop();
+		if(allowedFormat.indexOf(type)<0){
+			g.notice("Invalid file selected!",5000,"alert-danger");
+			sessionStorage.removeItem("importJSON");
+			return;
+		}
+
+		let reader = new FileReader();
+			reader.onload = function(e){
+				let result = e.target.result,json;
+				if(type=="json"){json=result;}//if json
+				else{//spreadsheet
+					let sheet = XLSX.read(result,{type:'binary'});
+					let	sheetName = sheet.SheetNames[0] || sheet.Workbook.Sheets[0].name;
+					let	jsObject = XLSX.utils.sheet_to_json(sheet.Sheets[sheetName]);
+					let filter = ["firstName","lastName","otherName","gender","staffId","phone","studentId","currentClass","parentOrGuardian.phone","parentOrGuardian.name"];
+					json = JSON.stringify(jsObject,filter,4);
+				}
+				sessionStorage.setItem("importJSON",json);
+				//preview the data
+				$("section.preview pre").text(json);
+				$("section.preview").show();
+
+			}
+			reader.readAsBinaryString(file);
+	},
+	"submit form":function(e){
+		e.preventDefault();
+		let data = e.currentTarget.data.value,
+			targetClass = e.currentTarget.class.value,
+			subject = e.currentTarget.subject.value,
+			option = {}, confirm;
+		let importJSON = sessionStorage.getItem("importJSON");
+		if(!importJSON){g.notice("Select a valid file to import.",5000,"alert-danger");return;}
+		switch(data){
+			case "staffs":
+				option.target = data;
+				break;
+			case "students":
+				if(g.classArray.indexOf(targetClass)<0){g.notice("Select a valid class.",5000,"alert-danger");return;}
+				option.target = data; option.class = targetClass;
+				break;
+			case "results":
+				if(g.classArray.indexOf(targetClass)<0 || g.subjectArray.indexOf(subject)<0){g.notice("Select a valid class and subject.",5000,"alert-danger");return;}
+				option.target=data;option.class=targetClass;option.subject=subject;
+				break;
+			default:
+				g.notice("Select a data to import.",5000,"alert-danger");
+				return;
+		}
+		option.doc=JSON.parse(importJSON);
+		g.meteorCall("importData",{doc:option,successMsg:"Import operation completed"});
+		$("section.preview pre").text("");
+		sessionStorage.removeItem("importJSON");
+		sessionStorage.clear();
+
+	}
+});
 //Autoform hooks and addHooks
 AutoForm.hooks({
 	//Staff profile self update
@@ -1507,7 +1654,7 @@ AutoForm.hooks({
 					if(!$.isEmptyObject(data) && get){
 						Meteor.call('updateResult',get, data, function(error){
 							if(error && (error.error == 301 || error.error == 302 || error.error == 502 || error.error == 500)){
-								g.notice((error.reason + ", " + error.details), 8000);
+								g.notice((error.reason + ", " + error.details), 8000,"alert-danger");
 								g.enableBtn("#updateResult");
 								return;
 							}
@@ -1517,8 +1664,9 @@ AutoForm.hooks({
 							}
 						});
 					}else{
-						g.notice('error occurred! Invalid data.', 5000);
-						return false;
+						g.notice('Error occurred! Invalid data.', 5000,"alert-danger");
+						g.enableBtn("#updateResult");
+						return;
 					}
 		}
 	},
@@ -1660,3 +1808,70 @@ AutoForm.hooks({
 });
 
 AutoForm.debug();
+/*'change input#file':function(e){
+		e.preventDefault();
+		let allowedFormat = ["sheet","spreadsheet"];
+		let file = e.target.files[0];
+		if(!file)return;
+		let reader = new FileReader();
+		let type = file.type.split(".");
+		if(allowedFormat.indexOf(type[type.length-1])<0){
+			g.notice("Unsupported file selected", 6000);
+			return;
+		}
+		reader.onload = function(e){
+			let data = e.target.result;
+			let exam = XLSX.read(data,{type:'binary'});
+			let sheet = exam.Sheets.Sheet1;
+			let examPreview = excelToJSON(sheet);
+				excelToTable(examPreview);
+				Session.set("examToUpload",{questions:examPreview});
+		};
+		reader.readAsBinaryString(file);
+	},*/
+
+function excelToJSON(sheet){
+	let rows = Number(sheet["!ref"].split("G")[1]);
+	let array = [];
+
+	for(let i = 2; i <= rows; i++){
+		let obj = {};
+		obj.id = sheet["A"+i]['v'];
+		obj.question = sheet["B"+i]['v'];
+		obj.a = sheet["C"+i]['v'];
+		obj.b = sheet["D"+i]['v'];
+		obj.c = sheet["E"+i]?sheet["E"+i]['v']:"";
+		obj.d = sheet["F"+i]?sheet["F"+i]['v']:"";
+		obj.answer = sheet["G"+i]['v'];
+		array.push(obj);
+	}
+	return array;
+}
+
+function excelToTable(array){
+	let fragment = document.createDocumentFragment();
+	let head = document.createElement("tr"),
+		th = "<th>Id</th><th>Question</th><th>Option A</th><th>Option B</th><th>Option C</th><th>Option D</th><th>Answer</th>";
+		head.innerHTML=th;
+		fragment.appendChild(head);
+	for(let i = 0; i < array.length; i++){
+		let ct = array[i];
+		let id = "<td>"+ct.id+"</td>",
+			question = "<td>"+ct.question+"</td>",
+			a = "<td>"+ct.a+"</td>",
+			b = "<td>"+ct.b+"</td>",
+			c = "<td>"+ct.c+"</td>",
+			d = "<td>"+ct.d+"</td>",
+			answer = "<td>"+ct.answer+"</td>";
+		let tr = document.createElement('tr');
+			tr.innerHTML = id+question+a+b+c+d+answer;
+		fragment.appendChild(tr);
+	}
+	let table = document.createElement("table");
+		table.appendChild(fragment);
+	let	preview = document.getElementByimpoId("examPreview");
+		preview.innerHTML="";
+		preview.appendChild(table);
+	return table;
+}
+

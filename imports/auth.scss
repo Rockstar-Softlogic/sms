@@ -1,356 +1,8 @@
-//navigation for Logged in users
-$auth-nav: #4e4442;
-$auth-nav-icon: #283c59;
-$topnav-bg: #df421e;
-//print rules
-
-@media print {
-    button, .stNav{
-        width:0;
-        height:0;
-        display:none !important;
-
-    }
-    table.serial td:first-child{
-        width:5px !important;
-    }
-    #singlePayment:before,
-    #singleResult:before{
-      content: "School Management Systems";/* url("/logo.jpg"); */
-    }
-    .logo img{
-      width:50px;
-    }
-    #stDashboard{
-      padding:0 5px !important;
-    }
-}
-
-
-//staff dashboard
-#dashboard {
-    padding-left: 0; 
-    margin-top: 50px;   
-}
-#mainContent {
-    width: 100%;        
-    padding-top: 50px;
-    background-color: #f5f5f5;
-}
-@media(min-width:768px) {
-    #dashboard {
-        padding-left: 225px;
-    }
-    #mainContent {
-        padding: 22px 10px;
-    }
-}
-.navbar-fixed-top{
-    background-color: $topnav-bg;
-}
-/* Top Navigation */
-.top-nav {
-    padding: 0 15px;
-}
-.top-nav>li {
-    display: inline-block;
-    float: left;
-}
-.top-nav>li>a {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    line-height: 20px;
-    color: #fff;
-}
-.top-nav>li>a:hover,
-.top-nav>li>a:focus,
-.top-nav>.open>a,
-.top-nav>.open>a:hover,
-.top-nav>.open>a:focus {
-    color: #fff;
-    background-color: #1a242f;
-}
-.top-nav>.open>.dropdown.stNav {
-    float: left;
-    position: absolute;
-    margin-top: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    background-color: #fff;
-    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    box-shadow: 0 6px 12px rgba(0,0,0,.175);
-}
-.top-nav>.open>.dropdown.stNav>li>a {
-    white-space: normal;
-}
-/* Side Navigation */
-@media(min-width:768px) {
-    .side-nav {
-        position: fixed;
-        top: 60px;
-        left: 225px;
-        width: 225px;
-        margin-left: -225px;
-        border: none;
-        border-radius: 0;
-        border-top: 1px rgba(0,0,0,.5) solid;
-        overflow-y: auto;
-        background-color: #222;
-        /*background-color: #5A6B7D;*/
-        bottom: 0;
-        overflow-x: hidden;
-        padding-bottom: 40px;
-    }
-    .side-nav>li>a {
-        width: 225px;
-        border-bottom: 1px rgba(0,0,0,.3) solid;
-    }
-    .side-nav li a:hover,
-    .side-nav li a:focus {
-        outline: none;
-        background-color: $topnav-bg !important;
-    }
-}
-.side-nav>li>ul {
-    padding: 0;
-    border-bottom: 1px rgba(0,0,0,.3) solid;
-}
-.side-nav>li>ul>li>a {
-    display: block;
-    padding: 10px 15px 10px 38px;
-    text-decoration: none;
-    color: #fff;    
-}
-.navbar .nav > li > a > .label {
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  position: absolute;
-  top: 14px;
-  right: 6px;
-  font-size: 10px;
-  font-weight: normal;
-  min-width: 15px;
-  min-height: 15px;
-  line-height: 1.0em;
-  text-align: center;
-  padding: 2px;
-}
-.navbar .nav > li > a:hover > .label {
-  top: 10px;
-}
-.navbar-brand {
-    padding: 5px 15px;
-}
-//student dashboard
-#stDashboard{
-    margin: 0;
-    font-family: "Open Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
-    padding-left: 240px;
-    section {
-        position: relative;
-        height: 100vh;
-    }
-    // section header logo&school name
-    section .stHeader{
-        background-color: $auth-nav-icon;
-        padding:1em;
-        .logo{
-            float:right;
-            padding-right:1em;
-            img{
-                max-width:50px;
-                border-radius:2px;    
-            } 
-        }
-        .brandName{
-            float:left;
-            padding-left:1em;
-            color:#fff;
-        }
-    }
-    //section main content
-    section .stContent {
-        background-color: #fff;
-        border-radius: 2px;
-        margin-top:15px !important;
-        @media(min-width:768px) {
-           padding: 1.2em 10em 1.5em 5em;
-        }    
-    }
-}
-//stSidebar template styles
-.stNav {
-  background: $topnav-bg;
-  height: 100vh;
-  width: 240px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 5;
-  outline: none;
-  color:#fff;
-  // overflow-y: scroll;
-}
-.stNav .avatar {
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2em 0.5em;
-  text-align: center;
-}
-.stNav .avatar img {
-  width: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 1px solid #ffea92;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
-}
-.stNav .avatar h2 {
-  font-weight: normal;
-  margin-bottom: 0;
-  font-size:1.5em;
-}
-.stNav ul {
-  list-style: none;
-  padding: 0.5em 0;
-  margin: 0;
-}
-.stNav ul li {
-  padding: 0.5em 1em 0.5em 3em;
-  font-size: 0.95em;
-  font-weight: regular;
-  background-repeat: no-repeat;
-  background-position: left 15px center;
-  background-size: auto 20px;
-  transition: all 0.15s linear;
-  cursor: pointer;
-}
-.stNav ul li:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-.stNav ul li:focus {
-  outline: none;
-}
-.stNav ul li a{
-    color:#fff;
-    text-decoration:none;
-    font-size:1.1em;
-}
-@media screen and (max-width: 900px) and (min-width: 400px) {
-  #stDashboard {
-    padding-left: 90px;
-  }
-  .stNav {
-    width: 90px;
-    // overflow-y: scroll;
-  }
-  .stNav .avatar {
-    padding: 0.5em;
-    position: relative;
-  }
-  .stNav .avatar img {
-    width: 60px;
-  }
-  .stNav .avatar h2 {
-    opacity: 0;
-    position: absolute;
-    top: 50%;
-    left: 100px;
-    margin: 0;
-    min-width: 200px;
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.4);
-    transform: translate3d(-20px, -50%, 0);
-    transition: all 0.15s ease-in-out;
-  }
-  .stNav .avatar:hover h2 {
-    opacity: 1;
-    transform: translate3d(0px, -50%, 0);
-  }
-  .stNav ul li {
-    height: 60px;
-    background-position: center center;
-    background-size: 30px auto;
-    position: relative;
-  }
-  .stNav ul li i{
-    font-size:2em;
-  }
-  .stNav ul li span {
-    opacity: 0;
-    position: absolute;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.2em 0.5em;
-    border-radius: 4px;
-    top: 50%;
-    left: 80px;
-    font-size: 1.1em;
-    transform: translate3d(-15px, -50%, 0);
-    transition: all 0.15s ease-in-out;
-  }
-  .stNav ul li span:before {
-    content: '';
-    width: 0;
-    height: 0;
-    position: absolute;
-    top: 50%;
-    left: -5px;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-right: 5px solid rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%);
-  }
-  .stNav ul li:hover span{
-    opacity: 1;
-    transform: translate3d(0px, -50%, 0);
-  }
-}
-@media screen and (max-width: 400px) {
-  #stDashboard {
-    padding-left: 0;
-  }
-  .stNav {
-    width: 230px;
-    box-shadow: 0 0 0 100em rgba(0, 0, 0, 0);
-    transform: translate3d(-230px, 0, 0);
-    transition: all 0.3s ease-in-out;
-  }
-  .stNav .smartphone-menu-trigger {
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    left: 100%;
-    cursor: pointer;
-    background: $topnav-bg;
-  }
-  .stNav .smartphone-menu-trigger:before,
-  .stNav .smartphone-menu-trigger:after {
-    content: '';
-    width: 50%;
-    height: 2px;
-    background: #fff;
-    border-radius: 10px;
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-  }
-  .stNav .smartphone-menu-trigger:after {
-    top: 55%;
-    transform: translate3d(-50%, -50%, 0);
-  }
-  .stNav ul li {
-    padding: 1em 1em 1em 3em;
-    font-size: 1.2em;
-  }
-  .stNav:focus {
-    transform: translate3d(0, 0, 0);
-    box-shadow: 0 0 0 100em rgba(0, 0, 0, 0.6);
-  }
-  .stNav:focus .smartphone-menu-trigger {
-    pointer-events: none;
-  }
-}
-//student dashboard end
+@import './ui/bootstrap.min.scss';
+@import './ui/perfect-scrollbar.scss';
+@import './admin/client/main.scss'; // admin css code
+@import './student/client/main.scss'; // student css code
+@import './ui/main.scss';
 .crudNotice{
     position: fixed;
     padding: 5px;
@@ -361,7 +13,7 @@ $topnav-bg: #df421e;
     opacity: 1;
     left: 45%;
     top:65px;
-    z-index:100;
+    // z-index:100;
     display: none;
     button{
       padding:0 0 0 10px !important;
@@ -369,8 +21,22 @@ $topnav-bg: #df421e;
     *{
       display:inline-block;
     }
-    // bottom: 10px;
-    // color: white;
-    // background-color: #000;
-    // right:20%;
+}
+//callbackOnClient css
+#callbackOnClient{
+    position: absolute;
+    padding: 5px;
+    z-index: 97;
+    border-radius-left: 2px; 
+    opacity: 0.8;
+    left: 25%;
+    top:72px;
+    z-index:100;
+    // display: none;
+    button{
+      padding:0 0 0 10px !important;
+    }
+    *{
+      display:inline-block;
+    }
 }

@@ -9,16 +9,20 @@ g.remarkArray = ['Excellent', 'Credit', 'Pass', 'Fail', 'Not Offered'];
 g.bloodGroupArray = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 g.genotypeArray = ["AA","AS","SS","AC","SC","CC"];
 g.medicalConditionArray = ["Typhoid","Measles","Sickle cell","Tuberculosis","Asthma","HIV"];
-
+g.subjectArray = ["English Language","Mathematics","Physics","Chemistry","Biology","Economics","Geography"];
 //subjects Array
-g.subjectArray = function(){
-	if(Meteor.isClient){
-		let subject = Meteor.subscribe('subject.list');
-		if(subject.ready()){
-			return g.Subjects.findOne({"_id":"default"}).subjects;
-		}
-	}
-}
+// g.subjectArray = g.Subjects.findOne({"_id":"default"});
+// console.log(g.subjectArray);
+// g.subjectArray = function(){
+// 	if(Meteor.isClient){
+// 		let config = Meteor.subscribe('subjects');
+// 		if(config.ready()){
+// 			let subj = g.Subjects.findOne({"_id":"default"});
+// 			console.log(subj);
+// 		}
+// 	}
+// }
+
 //app setting
 g.setting = function(){
 	if(Meteor.isClient){
@@ -28,6 +32,7 @@ g.setting = function(){
 		}
 	}
 }
+
 //Session Array
 g.sessionArray = function(start=2017){
 		start = Number(start),
@@ -63,14 +68,14 @@ g.meteorCall = function(method,options){
 			return;
 		}else{
 			$("div.processRequest").hide("fast");
-			g.notice(successMsg,4000,"alert-info");
+			if(successMsg)g.notice(successMsg,4000,"alert-success");
 			if(submitBtnId)g.enableBtn(submitBtnId);
 			if(redirect){
 				//result would normally be 9 in length when returning an insert
 				//else not an insert
 				result?result.length>2?FlowRouter.go(redirect,{id:result}):FlowRouter.go(redirect):false;
 			};
-		}
+		}//end if
 	});
 }
 //exam result calculator
@@ -224,7 +229,7 @@ g.CountDown = function(minute){
 
 //logout function
 g.logout = function(){
- 	let confirmLogout = bootbox.confirm("You are about to logout, continue?", function(result){
+ 	let confirmLogout = bootbox.confirm("<h4>You are about to logout, continue?</h4>", function(result){
             if(result){
             	Meteor.call("log","logged out!");
             	Meteor.logout(function(error){
@@ -287,4 +292,23 @@ g.getObjectKey = function(object){
 		keyArray.push(prop);
 	}
 	return keyArray;
+}
+g.objectToArray = function(object){
+    let arr = [];
+    for(let key in object){
+     if(typeof object[key] === "object"){
+	     arr.push({name:key,value:object[key]});
+     }
+    }
+    return arr;
+}
+
+g.callbackOnClient = function(arrayOfOutput){
+	if(Meteor.isClient){
+		$("#callbackOnClient div").html("");
+		arrayOfOutput.forEach(function(output){
+			let former = $("#callbackOnClient div").html();
+			$("#callbackOnClient div").html(former+"<p><b>"+output+"</b></p>");
+		});
+	}
 }

@@ -1,17 +1,7 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
-import { Tracker } from 'meteor/tracker';
-import './index.html'; // main body 
+import './main.html'; // main body 
 import '../imports/auth.js'; //Authenticated users client code
-
-// //import flag-icon-css
+//flag-icon-css
 // import 'flag-icon-css/css/flag-icon.min.css';
-// //import popper for bootstrap
-// import './popper';
-// //import css from js. 
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap';
-import 'bootstrap-sass';
 
 //Template helpers and event
 Template.login.events({

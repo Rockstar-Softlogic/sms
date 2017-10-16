@@ -83,6 +83,9 @@ registerGlobalHelpers({
     getSession:function(sessionName){
         let get = Session.get(sessionName);
         if(get)return get;return;
+    },
+    resultObjectToArray:function(object){
+       return g.objectToArray(object);
     }
 });
 //end global template helpers

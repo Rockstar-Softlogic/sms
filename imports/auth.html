@@ -52,6 +52,10 @@
                     <li><a href="{{pathFor 'subjectMgmt'}}"><i class="fa fa-book"></i> Manage Subjects </a></li>
                     <li><a href="#"><i class="fa fa-info"></i> Notifications/News </a></li>
                     <li><a href="{{pathFor 'generalSearch'}}"><i class="fa fa-search"></i> Search </a></li>
+
+                     <li><a href="{{pathFor 'import'}}"><i class="fa fa-upload"></i> Import </a></li>
+	                
+	                <li><a href="{{pathFor 'export'}}"><i class="fa fa-download"></i> Export </a></li>
                 </ul>
             </li>
             {{#if isInRole 'admin, editor'}}
@@ -60,10 +64,8 @@
 	            <ul id="submenu-4" class="collapse">
 	                <li><a href="{{pathFor 'newStaff'}}"><i class="fa fa-user-plus"></i> Create new </a></li>
 	                <li><a href="{{pathFor 'staffList'}}"><i class="fa fa-list"></i> Staff list </a></li>
-	                {{#if isInRole 'admin'}}
-	                 <li><a href="{{pathFor 'editorList'}}"><i class="fa fa-user-secret"></i> Editor list </a>
+	                <li><a href="{{pathFor 'editorList'}}"><i class="fa fa-user-secret"></i> Editor list </a>
 	                 </li>
-	                {{/if}}
 	                <li><a href="#"><i class="fa fa-key"></i> Permission </a></li>
 	            </ul>
             </li>
@@ -111,7 +113,132 @@
 <template name="dashboard">
 	{{#if currentUser}}
 		{{#if isInRole "staff,editor,admin"}}
-			<div id="dashboard" class="container-fluid">
+		<!-- top navbar -->
+        <nav id="top-nav">
+            <div class="brand">
+                 <img src="/robust-80x80.png" alt="school logo" style="max-width:56px;">
+            </div>
+            <div class="item clearfix">
+                <ul class="nav float-left">
+                    <li class="nav-item"><span class="fa fa-bars nav-toggler" title="Toggle navigation"></span></li> 
+                </ul>
+                <ul class="nav float-right">
+                    <li class="nav-item dropdown-notification">
+                        <span class="fa fa-bell-o"></span>
+                        <span class="badge badge-pill badge-danger"><small>5</small></span>
+                        <article class="notification dropdown-notice" style="display:none;">
+                            <h6>NOTIFICATIONS <span class="badge badge-danger float-right">5 NEW</span></h6>
+                            <ul>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                            </ul>
+                        </article>
+                    </li>
+                    <li class="nav-item dropdown-inbox">
+                         <span class="fa fa-envelope-o"></span>
+                        <span class="badge badge-info"><small>9</small></span>  
+                        <article class="inbox dropdown-notice" style="display:none;">
+                            <h6>INBOX <span class="badge badge-info float-right">9 NEW</span></h6>
+                            <ul>
+                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
+                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
+                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
+                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
+                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
+                                
+                            </ul>
+                        </article>
+                    </li>   
+                    <li class="nav-item dropdown-user">
+                        <img src="/thumbs-up.jpg" alt="user">
+                        <span style="margin:0;padding:0;font-size:10px;" class="fa fa-chevron-down"></span>
+                        <ul style="display:none;">
+                            <li><a href="#"><span class="fa fa-user"></span>Profile</a></li>
+                            <li><a href="#"><span class="fa fa-envelope-o"></span>My Inbox</a></li>
+                            <li><a href="#"><span class="fa fa-key"></span>Change Password</a></li>
+                            <li><a href="#"><span class="fa fa-angle-double-up"></span>Update Email</a></li>
+                            <li class="dropdown-divider"></li>
+                            <li><a href="#"><span class="fa fa-power-off"></span>Logout</a></li>
+                        </ul>
+                    </li>      
+                </ul>
+            </div>
+        </nav>
+
+        <!-- side nav bar -->
+        <aside id="sidebar">
+            <ul>
+                <li class="menu-item"><a href="#"><i class="fa fa-home"></i><span>Dasboard</span><span class="fa fa-chevron-right pull-right"></span></a>
+                   <ul class="submenu">
+                        <li><a href="#">Summary</a></li>
+                        <li><a href="#">Manage subjects</a></li>
+                        <li><a href="#">Import</a></li>
+                        <li><a href="#">Export</a></li>
+                        <li><a href="#">Settings</a></li>
+                   </ul>
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-user-md"></i><span>Staff</span><span class="fa fa-chevron-right pull-right"></span></a>
+                    <ul class="submenu">
+                        <li><a href="#">Staff</a></li>
+                        <li><a href="#">New staff</a></li>
+                        <li><a href="#">Permission</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-users"></i><span>Students</span><span class="fa fa-chevron-right pull-right"></span></a>
+                    <ul class="submenu">
+                        <li><a href="#">Student</a></li>
+                        <li><a href="#">New student</a></li>
+                        <li><a href="#">Permission</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-graduation-cap"></i><span>Courses</span></a>
+
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-check"></i><span>Results</span></a>
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-money"></i><span>Payments</span></a>
+                </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-users"></i><span>Assignment</span><span class="fa fa-chevron-right pull-right"></span></a>
+                    <ul class="submenu">
+                        <li><a href="#">New Assignment</a></li>
+                        <li><a href="#">Assignment list</a></li>
+                        <li><a href="#">Permission</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+        <!-- main content section -->
+        <section id="main-content">
+            <div class="mobile-menu"><ul></ul></div>
+                <!-- network status -->
+                {{>networkStatus}}
+                 <div class="row" id="main" >
+                    <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
+                        <div style="width:20px;height:20px;border-radius:50% !important;background-color:{{networkIndicator}};"></div>
+                        {{> Template.dynamic template=content}}
+                    </div>
+                </div>
+                <div class="crudNotice alert">
+                    <div></div>
+                    <button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
+                        <span arial-hidden='true'>&times;</span>
+                    </button>
+                </div>
+                <div class="processRequest" style="display:none">{{>smsLoading}}</div>
+        </section>
+        <footer>
+            <p>Copyright &copy; <span>2017 </span><b>The school,</b> All rights reserved.</p>
+        </footer>
+		{{/if}}
+	{{/if}}
+</template>
+
+<template name="inactive">
+	<div id="dashboard" class="container-fluid">
 				{{>header}}
 				<!-- network status -->
 				{{>networkStatus}}
@@ -137,10 +264,27 @@
 					</button>
 			    </div>
 				<div class="processRequest" style="display:none">{{>smsLoading}}</div>
+				<div id="callbackOnClient" class="alert alert-info">
+					<div>This is callback one</div>
+					<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
+						<span arial-hidden='true'>&times;</span>
+					</button>
+				</div>
 			</div>
-		{{/if}}
-	{{/if}}
+
 </template>
+
+
+
+
+
+
+
+
+
+
+
+
 <!--Template for all student Users -->
 <template name="stSidebar">
 	<nav class="stNav">

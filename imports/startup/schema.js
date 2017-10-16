@@ -113,7 +113,8 @@ g.Schemas.Profile = new SimpleSchema({
 			datePickerOptions:{
 				autoclose:true
 			}
-		}
+		},
+		optional:true,
 	},
 	state:{
 			type: String,
@@ -386,6 +387,7 @@ g.Schemas.Staff = new SimpleSchema({
 			maxCount: 10,
 			minCount: 1,
 			label: "Subject(s) Taught",
+			optional:true,
 		},
 			"subjectTaught.$":{
 				type: String,
@@ -497,196 +499,14 @@ g.Schemas.Result = new SimpleSchema({
 });
 g.Results.attachSchema(g.Schemas.Result);
 // Dealing with results schema
-g.Schemas.ResultArray = new SimpleSchema({
-		mathematics: {
-			type: Object,
-		},
-			'mathematics.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'mathematics.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				optional: true,
-				defaultValue: 0,
-			},
-		english: {
-			type: Object,
-		},
-			'english.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'english.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				optional: true,
-				defaultValue: 0,
-			},
-		physics: {
-			type: Object,
-			optional: true,
-		},
-			'physics.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'physics.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		chemistry: {
-			type: Object,
-			optional: true,
-		},
-			'chemistry.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'chemistry.exam':{
-				type: Number,
-				min: 0,
-				max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		biology: {
-			type: Object,
-			optional: true,
-		},
-			'biology.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'biology.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		geography: {
-			type: Object,
-			optional: true,
-		},
-			'geography.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'geography.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		economics: {
-			type: Object,
-			optional: true,
-		},
-			'economics.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'economics.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		account: {
-			type: Object,
-			optional: true,
-		},
-			'account.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'account.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		commerce: {
-			type: Object,
-			optional: true,
-		},
-			'commerce.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'commerce.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-		government: {
-			type: Object,
-			optional: true,
-		},
-			'government.ca':{
-				type: Number,
-				min: 0,
-				// max: 40,
-				label: "Continous Assessment",
-				defaultValue: 0,
-			},
-			'government.exam':{
-				type: Number,
-				min: 0,
-				// max: 60,
-				label: "Examination score",
-				defaultValue: 0,
-				optional: true,
-			},
-}, {tracker: Tracker});
+//create schema dynamically;
+let resultSchema = {};
+g.subjectArray.forEach(function(subject){
+	resultSchema[`${subject}`] = {type:Object};
+	resultSchema[`${subject}.ca`] = {type:Number,min:0,label:"CA",defaultValue:0};
+	resultSchema[`${subject}.exam`] = {type:Number,min:0,label:"Exam",defaultValue:0,optional:true};
+});
+g.Schemas.ResultArray = new SimpleSchema(resultSchema,{tracker: Tracker});
 //end dealing with results schema
 //payment schema
 g.Schemas.PaymentArray = new SimpleSchema({

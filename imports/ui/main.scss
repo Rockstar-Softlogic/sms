@@ -1,0 +1,357 @@
+html,body{
+	padding:0;
+	margin:0;
+	background-color:#f2f2f2;
+	/*font-size: 62.5%;*/
+	font-family: Arial, sans-serif;
+}
+body,nav,aside,div,
+section,span,a,i,img{
+	transition:all .5s ease; 
+    -o-transition:all .5s ease; 
+    -moz-transition:all .5s ease; 
+    -webkit-transition:all .5s ease;
+}
+
+/*general rules*/
+/*top nav*/
+#top-nav{
+	position: fixed;
+	display: block;
+	width: 100%;
+	height: 56px;
+	/*font-size: 1.6rem;*/
+	top:0;
+	left: 0;
+	margin: 0;
+	overflow: hidden;
+	box-shadow:0 1px 4px rgb(14,33,56)/*#ddd*/; 
+	z-index: 15;
+	background-color: #fff;
+}
+#top-nav .brand{
+	width: 25%;
+	background-color:rgb(14,33,56);
+	float: left;
+	text-align: center;
+}
+
+#top-nav .item{
+	position: absolute;
+	display: block;
+	width: calc(100% - 25%);
+	padding: 8px 15px;
+	right:0;
+	top:0;
+}
+
+#top-nav>.item>.nav>.nav-item{
+	padding:5px 8px;
+}
+.dropdown-notification,.dropdown-inbox,
+.dropdown-user,.fa-bars.nav-toggler{
+	cursor: pointer;
+}
+.dropdown-notification>.fa,
+.dropdown-inbox>.fa, 
+.dropdown-user>.fa,.fa-bars.nav-toggler{
+	-webkit-text-stroke:1px #fff;
+	-moz-text-stroke:1px #fff;
+	-o-text-stroke:1px #fff;
+	font-size: 25px;
+}
+.dropdown-user>img{
+	max-width: 40px;
+	border-radius: 50%;
+	border: 1px solid #777;
+}
+/*top-right corner dropdown*/
+.notification.dropdown-notice{
+	right:140px;
+}
+.inbox.dropdown-notice{
+	right:90px;
+}
+article.dropdown-notice,
+.dropdown-user>ul{
+	display: block;
+	position: fixed;
+	border:1px solid #ccc;
+	width: 280px;
+	border-radius: 3px;
+	background-color:#fff;
+	font-size: 14px;
+	z-index: 20;
+	top:56px; 
+}
+article.dropdown-notice>h6{
+	border-bottom:1px solid #ccc;
+	padding:10px;
+	margin:0;
+	font-weight:400;
+}
+article.dropdown-notice>ul{
+	padding: 0;
+}
+article.dropdown-notice>ul>li{
+	list-style-type: none;
+	border-top:1px solid #ccc;
+}
+article.dropdown-notice>ul>li>a{
+	display: block;
+	width:inherit;
+	text-decoration: none;
+	padding:5px 10px;
+}
+.dropdown-user>ul{
+	width: 180px;
+	padding:0;
+	right:20px;
+	padding:5px 0;
+}
+.dropdown-user>ul>li{
+	list-style-type: none;
+}
+.dropdown-user>ul>li>a{
+	display: block;
+	width:inherit;
+	text-decoration: none;
+	padding:5px 10px;
+	color:#000;
+}
+.dropdown-user>ul>li>a:hover{
+	background-color: #eee;
+}
+.dropdown-user>ul>li>a>span.fa{
+	padding-right:10px;
+}
+
+/*end top nav*/
+/*sidebar rules*/
+#sidebar{
+	position: fixed;
+	display: block;
+	min-height: 100vh;
+	width: 25%;
+	top:56px;
+	background-color:rgb(14,33,56);
+	left: 0;
+	z-index: 10;
+	overflow: hidden;
+	padding-bottom:80px;
+}
+#sidebar>ul{
+	position: absolute;
+	width: 100%;
+	padding: 20px 0 120px 0;
+	-webkit-overflow-scrolling:touch;
+}
+
+#sidebar>ul>li{
+	list-style-type:none;
+	width:inherit;
+	/*height:3em;*/
+	font-size:14px;
+	line-height: 1.8;
+}
+#sidebar>ul>li>a{
+	display:block;
+	text-decoration:none;
+	color:#ffe;
+	width:inherit;
+	height: inherit;
+	padding:10px 20px;
+}
+#sidebar>ul>li>a:hover{
+	background-color:rgba(14,33,56,0.8);
+}
+#sidebar>ul>li>a>i.fa{
+	margin-right:12px;
+	padding:3px;
+}
+/*chevron dropdown*/
+#sidebar>ul>li>a>span.fa{
+	padding:5px 0;
+}
+#sidebar>ul>li>a>span{
+	padding-left:5px;
+}
+#sidebar>ul>li>ul.submenu{
+	display: none;
+	/*padding-left:50px;*/
+	background-color:rgba(0,0,0,0.2);
+	padding-left: 0;
+
+}
+#sidebar>ul>li>ul.submenu>li{
+	list-style-type: none;
+	width: 100%;
+}
+#sidebar>ul>li>ul.submenu>li>a{
+	display: block;
+	width: inherit;
+	text-decoration:none;
+	color:#ffe;
+	padding: 5px 10px 5px 60px;
+}
+#sidebar>ul>li>ul.submenu>li>a:hover{
+	background-color:rgb(14,33,56);
+	background-color:rgba(14,33,56,0.6);
+}
+
+/*main content*/
+#main-content{
+	z-index: 1;
+	margin-left: 25%;
+	margin-top:60px;
+	min-height: 100vh;
+}
+#main-content .mobile-menu{
+	display: none;
+}
+#main-content .mobile-menu li{
+	display: inline-block;
+	list-style-type: none;
+	color:#fff;
+	background-color: #37BC9B;
+	border: .5 solid #37BC9B;
+	border-radius: 1px;
+	padding: 5px;
+	margin:2px 3px;
+	font-size: 14px; 
+}
+#main-content .mobile-menu li a{
+	color: #fff;
+	text-decoration: none;
+	width: inherit;
+}
+
+footer{
+	position: relative;
+	// bottom:0;
+	width:40%;
+	margin:20px auto 0;
+	// right:15%;
+	background-color: #fff;
+	padding:5px;
+	text-align: center;
+}
+/*end general rules*/
+
+/*small screen devices*/
+@media (max-width: 474px){
+	#top-nav .item{
+	padding:8px;
+	}
+	#top-nav>.item>.nav>.nav-item{
+		padding:5px;
+	}
+	.dropdown-notification>.fa,
+	.dropdown-inbox>.fa, .dropdown-user>.fa{
+		font-size: 18px;
+		}
+	.dropdown-user>img{
+		max-width: 30px;
+	}
+	.notification.dropdown-notice,
+	.inbox.dropdown-notice,
+	.dropdown-user>ul{
+		right:20px !important;
+	}
+
+	#sidebar{
+		width:0;
+		background-color:rgba(14,33,56,0.8);
+	}
+	#sidebar>ul>li.menu-item{
+		padding:12px 0;
+	}
+	#sidebar>ul>li.menu-item>a{
+		padding: 8px 2em;
+	}
+	#sidebar>ul>li.menu-item>a>i.fa{
+		font-size: 1.6em;
+	}
+	#sidebar>ul>li.menu-item>a>span{
+		display:none;
+	}
+	#main-content{
+		width: 100%;
+		margin-left: 0;
+	}
+	#main-content .mobile-menu{
+		display: block;
+	}
+}
+
+@media (min-width: 475px) and (max-width: 768px){
+	#top-nav .brand{
+		width: 5em;
+	}
+	#top-nav .item{
+		width: calc(100% - 5em);
+	}
+	#sidebar{
+		width:5em;
+	}
+	#sidebar>ul>li.menu-item{
+		padding:12px 0;
+	}
+	#sidebar>ul>li.menu-item>a{
+		padding: 8px 2em;
+	}
+	#sidebar>ul>li.menu-item>a>i.fa{
+		font-size: 1.5em;
+	}
+	#sidebar>ul>li.menu-item>a>span{
+		display:none;
+	}
+	#main-content{
+		width: calc(100% - 5em);
+		margin-left:5em;
+	}
+	#main-content .mobile-menu{
+		display: block;
+	}
+	
+}
+/*laptop screen*/
+@media (min-width: 769px) and (max-width: 1360px){
+	
+}
+/*controller classes*/
+/*different width classes*/
+.no-sidebar{
+	width: 0 !important;
+}
+.full-width-content{
+	margin-left:0 !important;
+}
+/*icon only sidebar*/
+.icon-sidebar{
+	width: 5em !important;
+}
+.icon-sidebar>ul>li.menu-item{
+	padding:12px 0;
+}
+.icon-sidebar>ul>li.menu-item>a{
+	padding: 8px 2em;
+}
+.icon-sidebar>ul>li.menu-item>a>i.fa{
+	font-size: 1.5em;
+}
+.icon-sidebar>ul>li.menu-item>a>span{
+	display:none;
+}
+/*others width classes*/
+.md-width-content{
+	width: calc(100% - 5em) !important;
+	margin-left:5em !important;
+}
+/*deafult views*/
+.default-sidebar{
+	width: 25% !important;
+}
+.default-width-content{
+	width: 100% !important;
+}

@@ -3,6 +3,9 @@ import '../imports/admin/server/main.js';
 import '../imports/student/server/main.js';
 Meteor.startup(() => {
   // code to run on server at startup
+  	initAdmin();
+	fakeAdmin();
+	initSubject();
 });
 function initAdmin(){
 	let lookUp = Meteor.users.findOne({username:"wisdomabioye", "emails.0.address":"hakym2009@gmail.com", roles:'admin'});
@@ -16,7 +19,7 @@ function initAdmin(){
 		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);
 	}
 }
-initAdmin();
+
 function fakeAdmin(){
 	let lookUp = Meteor.users.findOne({username:"admin", "emails.0.address":"admin@rssl.com", roles:'admin'});
 	if(!lookUp){
@@ -29,7 +32,6 @@ function fakeAdmin(){
 		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);
 	}
 }
-fakeAdmin();
 function initSubject(){
 	let findSubject = g.Subjects.findOne({"_id":"default"});
 	if(!findSubject){
@@ -38,6 +40,5 @@ function initSubject(){
 		return
 	}console.log("Subject collection is existing");
 }
-initSubject();
 
 

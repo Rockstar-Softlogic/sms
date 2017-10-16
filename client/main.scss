@@ -1,20 +1,5 @@
 /* CSS declarations go here */
-// @import '{}/node_modules/bootstrap/dist/css/bootstrap.min.css';//bootstrap (not working currently)
-@import '{}/node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 @import '../imports/auth.scss'; // authenticated css code
-@import '../imports/admin/client/main.scss'; // admin css code
-@import '../imports/student/client/main.scss'; // student css code
-//reset to flat design
-div,section,input,button,
-a,img,span,form,p,select,
-h1,h2,h3,h4,h5,h6{
-    border-radius:0 !important;
-}
-h1,h2,h3,h4,h5,h6{
-    font-weight: 500 !important;
-    line-height: 1.1;
-}
-
 #login{
     background:rgba(0,0,0,0.3);
     min-height:100vh;
@@ -66,16 +51,3 @@ h1,h2,h3,h4,h5,h6{
         padding:4em;
     }
 }
-footer{
-    background-color:#abcdef;
-    margin-bottom:1em;
-    a{
-        text-decoration: none;
-        color:#fff;
-        font-weight: bold;
-    }
-    a:hover{
-        text-decoration: none;
-    }
-}
-
