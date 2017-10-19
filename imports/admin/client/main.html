@@ -118,7 +118,7 @@
 									<tr>
 										<th>Class</th>
 										<th>No of Student</th>
-										<th>School Fees</th>
+										<th>School Fees (#)</th>
 									</tr>
 								</thead>
 
@@ -199,19 +199,20 @@
 </template>
 <template name="generalSearch">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-sm-10 " id="generalSearch">
-			<h3>Search</h3><hr/>
+	<div class="row">
+		<div class="col-sm-12">
+			<h5><span class="fa fa-search"></span> Search</h5><hr/>
 		<!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist">
-			    <li role="presentation" class="active">
-			    	<a href="#findStudent" aria-controls="findStudent" role="tab" data-toggle="tab">Student</a>
+			    <li class="nav-item">
+			    	<a href="#findStudent" aria-controls="findStudent" role="tab" data-toggle="tab" class="nav-link active">Student</a>
 			    </li>
-			    <li role="presentation">
-			    	<a href="#findPayment" aria-controls="findPayment" role="tab" data-toggle="tab">Payment</a>
+			    <li class="nav-item">
+			    	<a href="#findPayment" aria-controls="findPayment" role="tab" data-toggle="tab" class="nav-link">Payment</a>
 			    </li>
 			  </ul>
 			 <div class="tab-content" style="margin:15px;">
-			    <div role="tabpanel" class="tab-pane fade in active" id="findStudent">
+			    <div role="tabpanel" class="tab-pane show fade active" id="findStudent">
 			    	<form>
 			    	<div class="form-group">
 			    		<label>Student Id or Name</label><br/>
@@ -257,8 +258,9 @@
 			    		</div>
 			    	{{/with}}
 			    </div>
-			 </div>
-		 </div>
+			</div>
+		</div>
+	 </div>
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
@@ -423,54 +425,56 @@
 </template>
 							
 <template name="ctrlpanel">
-		{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-10" id="ctrlpanel">
-			<h3>Application Settings</h3><hr/>
-				<div class="col-sm-6">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-							Session and Term
-							</h3>	
-						</div>
-						<article class="panel-body">
-							<h4><strong>Current session: {{setting.session}}</strong></h4>
-							<button type="button" class="btn btn-primary" id="newSessionBtn" title="Start a new session">New session</button>
-						</article>
-						<article class="panel-body">
-							<h4><strong>Current term: {{termSuffix setting.term}}</strong></h4>
-							<button type="button" class="btn btn-primary" id="newTermBtn" title="Start a new term">New term</button>
-						</article>
+	{{#if Template.subscriptionsReady}}
+	<h4><span class="fa fa-cog"></span> Application Settings</h4><hr/>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h5 class="text-center">Session and Term</h5>
 					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								Promote Students
-							</h3>
-						</div>
-						<article class="panel-body">
-							<b>Please Note:</b>
-							<p>
-								When you promote students, JSS1 students would be promoted to JSS2, JSS2 to JSS3 and so on.<br/>SSS3 would be moved to the graduated list.
-							</p>
-							<button class="btn btn-danger" id="promoteStudents" title="Click to promote all students in the school to the next level.">Promote Students</button>
-						</article>
+					<div class="card-text">
+						<h6>Current session: {{setting.session}}
+							<button type="button" class="btn btn-primary btn-sm" id="newSessionBtn" title="Start a new session">New session</button>
+						</h6>
+							
+						<h6>Current term: {{termSuffix setting.term}}
+							<button type="button" class="btn btn-primary btn-sm" id="newTermBtn" title="Start a new term">New term</button>
+						</h6>
+							
 					</div>
-					
 				</div>
-
-				<div class="col-sm-6">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								Current Term School Fees
-							</h3>
-						</div>
-						<div class="panel-body">
-							{{#if termSchoolFees}}
+			</div>
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h4 class="text-center">Promote Students</h4>
+					</div>
+					<div class="card-text alert alert-warning">
+						<b>Please Note:</b>
+						<p>
+							When you promote students, JSS1 students would be promoted to JSS2, JSS2 to JSS3 and so on.<br/>SSS3 would be moved to the graduated list.
+						</p>
+						<button class="btn btn-danger" id="promoteStudents" title="Click to promote all students in the school to the next level.">Promote Students</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end session and term card -->
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h5 class="text-center">
+							Current Term School Fees
+						</h5>
+					</div>
+					<div class="card-text">
+						{{#if termSchoolFees}}
 							{{#with termSchoolFees}}
 							<article class="schoolFees">
-								<h4>Term: {{termSuffix setting.term}}</h4>
+								<h6>Term: {{termSuffix setting.term}}</h6>
 								<ul style="list-style-type:square;">
 									<li>JSS1: {{schoolFees.JSS1}}</li>
 									<li>JSS2: {{schoolFees.JSS2}}</li>
@@ -489,14 +493,17 @@
 							<p>Term school fees not yet set</p>
 						{{/if}}
 						<br/>
-					 <button class="btn btn-danger" title="Feature will be enabled soon!" disabled>New payment category</button>
-					</div>
+						 <button class="btn btn-danger" title="Feature will be enabled soon!" disabled>New payment category</button>
 					</div>
 				</div>
+			</div>
+			<!-- end current term and school fees card -->
 		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+	</div><br/>
+	<!-- end first row	 -->
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>
 
 <template name="newSessionModal">
@@ -513,13 +520,6 @@
 						</h3>
 					</div>
 					<div class="modal-body">
-						<h4>Creating a new session</h4>
-						{{#with setting}}
-							<ul style="list-style-type: square;">
-								<li><b>Current session: {{session}}</b></li>
-								<li><b>Current Term : {{termSuffix term}}</b></li>
-							</ul>
-						{{/with}}
 						{{>quickForm schema="g.Schemas.SchoolFees" id="newSession" type="normal" validation='blur' afFieldInput-placeholder="schemaLabel"}}
 					</div>
 					<div class="modal-footer">
@@ -543,13 +543,6 @@
 						</h3>
 					</div>
 					<div class="modal-body">
-						<h4>Creating a new term</h4>
-						{{#with setting}}
-							<ul style="list-style-type:square;">
-								<li><b>Current session: {{session}}</b></li>
-								<li><b>Current term : {{termSuffix term}}</b></li>
-							</ul>
-						{{/with}}
 						{{> quickForm schema="g.Schemas.SchoolFees" id="setTermAndSchoolFees" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
 					</div>
 					<div class="modal-footer">
@@ -1263,66 +1256,70 @@
 	
 </template>
 <template name="import">
-	<div class="col-sm-10 ">
-		<h3>Import Data</h3><hr/>
-		<form>
-			<select name="data">
-				<option disabled selected>Data to import</option>
-				<option value="staffs">Staffs</option>
-				<option value="students">Students</option>
-				<option value="results">Results</option>
-			</select>
-			<select name="class" style="display:none;">
-				<option disabled selected>Select class</option>
-			{{#each classes}}
-				<option value="{{this}}">{{this}}</option>
-			{{/each}}
-			</select>
-			<select name="subject" style="display:none;">
-				<option disabled selected>Select subject</option>
-			{{#each subjects}}
-				<option value="{{this}}">{{this}}</option>
-			{{/each}}
-			</select>
-			<input type="file" name="file" id="file">
-			<button type="submit" class="btn btn-primary">Import</button>
-		</form><hr/>
-		<section class="preview" style="display:none;">
-			<h4>Preview as JSON</h4>
-			<pre style="max-height:30em;overflow:auto;"></pre>
-		</section><br/>
+	<h5>Import Data</h5><hr/>
+	<div class="row">
+		<div class="col-sm-12">
+			<form>
+				<select name="data">
+					<option disabled selected>Data to import</option>
+					<option value="staffs">Staffs</option>
+					<option value="students">Students</option>
+					<option value="results">Results</option>
+				</select>
+				<select name="class" style="display:none;">
+					<option disabled selected>Select class</option>
+				{{#each classes}}
+					<option value="{{this}}">{{this}}</option>
+				{{/each}}
+				</select>
+				<select name="subject" style="display:none;">
+					<option disabled selected>Select subject</option>
+				{{#each subjects}}
+					<option value="{{this}}">{{this}}</option>
+				{{/each}}
+				</select>
+				<input type="file" name="file" id="file">
+				<button type="submit" class="btn btn-primary">Import</button>
+			</form><hr/>
+			<section class="preview" style="display:none;">
+				<h5>Preview as JSON</h5>
+				<pre class="bg-light" style="max-height:30em;overflow:auto;"></pre>
+			</section><br/>
+		</div>
 	</div>
 </template>
 <template name="export">
-	<div class="col-sm-10 ">
-		<h3>Export Data</h3><hr/>
-		<form>
-			<select name="data">
-				<option disabled selected>Data to export</option>
-				<option value="staffs">Staffs</option>
-				<option value="students">Students</option>
-				<option value="graduated">Graduated Student</option>
-				<option value="results">Results</option>
-			</select>
-			<select name="class" style="display:none;">
-				<option disabled selected>Select class</option>
-			{{#each classes}}
-				<option value="{{this}}">{{this}}</option>
-			{{/each}}
-			</select>
-			<select name="graduatedYear" style="display:none;">
-				{{#each yearArray}}
+	<h5>Export Data</h5><hr/>
+	<div class="row">
+		<div class="col-sm-12">
+			<form>
+				<select name="data">
+					<option disabled selected>Data to export</option>
+					<option value="staffs">Staffs</option>
+					<option value="students">Students</option>
+					<option value="graduated">Graduated Student</option>
+					<option value="results">Results</option>
+				</select>
+				<select name="class" style="display:none;">
+					<option disabled selected>Select class</option>
+				{{#each classes}}
 					<option value="{{this}}">{{this}}</option>
 				{{/each}}
-			</select>
-			<button type="submit" class="btn btn-primary btn-sm">Export</button>
-		</form><hr/>
-		<section class="preview" style="display:none;">
-			<h4>Preview</h4>
-			<pre style="max-height:30em;overflow:auto;"></pre>
-			<button class="btn btn-primary exportAsJSON" title="JavaScript Object Notation">Export as JSON</button>
-			<button class="btn btn-primary exportAsXLSX" title="xlsx, xls, ods">Export as Spreadsheet</button>	
-		</section><br/>
+				</select>
+				<select name="graduatedYear" style="display:none;">
+					{{#each yearArray}}
+						<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+				<button type="submit" class="btn btn-primary btn-sm">Export</button>
+			</form><hr/>
+			<section class="preview" style="display:none;">
+				<h5>Preview</h5>
+				<pre class="bg-light" style="max-height:30em;overflow:auto;"></pre>
+					<button class="btn btn-primary exportAsJSON" title="JavaScript Object Notation">Export as JSON</button>
+					<button class="btn btn-primary exportAsXLSX" title="xlsx, xls, ods">Export as Spreadsheet</button>	
+			</section><br/>
+		</div>
 	</div>
 </template>
 <!-- Student templates end -->
@@ -1793,7 +1790,7 @@
 						{{#with getSession "requestedPayment"}}
 							<h5 class="text-info text-center">Payment not yet made for {{class}} term {{term}}</h5>
 						{{else}}
-							<h5 class="text-info text-center">No payment found for {{setting.term}}</h5>
+							<h5 class="text-info text-center">No payment found for term {{setting.term}}</h5>
 						{{/with}}
 					{{/with}}
 				</div>
@@ -2671,12 +2668,12 @@
 
 <template name="subjectMgmt">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-sm-12" id="subjectMgmt">
-		<h4>Subject Management</h4><hr/>
-		<section class="col-sm-6 subject">
-			<h4>Subjects</h4><hr/>
+	<h4>Subject Management</h4><hr/>
+	<div class="row">
+		<div class="col-sm-6 subject">
+			<h5>Subjects</h5><hr/>
 			<article class="subjectList">
-				<h4>List <span class="fa fa-caret-right pull-right"></span></h4>
+				<h5>List <span class="fa fa-caret-right pull-right"></span></h5>
 				<ol>
 				{{#each subjects.subjects}}
 					<li name="{{this}}">{{this}} <span class="fa fa-plus pull-right" title="Add this subject to the currently selected category."></span></li> 
@@ -2704,8 +2701,8 @@
 					<button type="submit" class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> Create</button>
 				</form>
 			</article>
-		</section>
-		<section class="col-sm-6 modifySubjectCategory">
+		</div>
+		<div class="col-sm-6 modifySubjectCategory">
 			<form>
 				<h4>Modify a subject category</h4>
 				<select name="subjectCategory">
@@ -2733,6 +2730,17 @@
 					{{/if}}
 				{{/each}}	
 			</ol>
+		</div>
+	</div>
+	<div class="col-sm-12" id="subjectMgmt">
+		
+		<section class="col-sm-6 ">
+			
+			
+			
+		</section>
+		<section class="col-sm-6 ">
+			
 		</section>
 	</div>
 	{{else}}

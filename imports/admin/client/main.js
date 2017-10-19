@@ -156,7 +156,7 @@ Template.ctrlpanel.helpers({
 	},
 });
 Template.ctrlpanel.events({
-	'click #ctrlpanel button#promoteStudents': function(){
+	'click button#promoteStudents': function(){
 		let warning = '<h4>You\'re about to promote all students in the school. This cannot be undone! <br/> Are you sure?</h4>';
 			bootbox.confirm(warning,function(verify){
 				if(verify){
@@ -164,10 +164,8 @@ Template.ctrlpanel.events({
 						successMsg:"All students were promoted with success."
 					});
 				}
-			});
-			
+			});		
 	},
-
 	'click #newSessionBtn': function(){
 		Modal.show('newSessionModal', function(){return;}, {backdrop: 'static', keyboard: false});
 	},
