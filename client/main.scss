@@ -1,24 +1,17 @@
 /* CSS declarations go here */
 @import '../imports/auth.scss'; // authenticated css code
 #login{
-    background:rgba(0,0,0,0.3);
+    background:rgb(14,33,56);
     min-height:100vh;
-    h2{
-        color:#fff;
-        margin:30px 5px;
+    h4{
+        margin: 10px;
     }
-    div.formContainer{
-        @media(min-width:768px){
-            max-width:400px;
-        }
-        margin:auto;
+    div.form-container{
+        margin: 10px 40px;
         padding:30px;
         background-color:#f5f5f5;
-        box-shadow:3px 3px 5px 3px grey, -3px -3px 5px 3px grey;
+        box-shadow:2px 2px 4px 1px #abc, -2px -2px 4px 1px #abc;
         form.login-form{
-            div,h3,h4{
-                margin:1em 0;
-            }
             input,label,button{
                 font-weight:200;
                 font-size:1.3em;

@@ -40,3 +40,15 @@
       display:inline-block;
     }
 }
+
+
+@media print{
+    #top-nav,#sidebar,button.btn-danger{
+        display: none !important;
+    }
+    #main-content{
+        margin: 10px !important;
+        padding: 10px !important;
+        min-width: 100%;
+    }
+}

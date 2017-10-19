@@ -8,6 +8,7 @@ Template.staffDashboard.onCreated(function(){
 			self.subscribe("student.list");
 			self.subscribe("result.list");
 			self.subscribe("payment.list");
+			self.subscribe("assignment.list");
 			self.subscribe("staff.name");
 			self.subscribe("log.list");
 		});
@@ -19,6 +20,13 @@ Template.staffDashboard.helpers({
 	},
 	allStudent:function(){
 		return g.Students.find().count();
+	},
+	allStaff:function(){
+		return g.Staffs.find().count();
+	},
+	allAssignment:function(){
+		let s = g.setting();if(!s)return;//review
+		return g.Assignments.find({"term":s.term,"session":s.session}).count();
 	},
 	graduates:function(){
 		return g.Graduates.find().count()
@@ -55,7 +63,7 @@ Template.staffDashboard.helpers({
 		return filtered[0]
 	},
 	log:function(){
-		let logs = g.Logs.find({},{limit:5}).fetch();
+		let logs = g.Logs.find({},{limit:10}).fetch();
 			logs.forEach(function(log){
 				let name;
 				if(Meteor.userId() === log.by){
@@ -451,17 +459,17 @@ Template.studentList.events({
 	'change .checkAllBoxes':function(e){
 		$("td input[type='checkbox']").not(this).prop("checked",$("input[type='checkbox']").prop("checked"));
 		if($("td input[type='checkbox']:checked").length > 0){
-			$(".demoteStudent").show("slow");
+			$(".demoteStudent").prop("disabled",false);
 		}else{
-			$(".demoteStudent").hide("fast");
+			$(".demoteStudent").prop("disabled",true);
 		}	
 	},
 	'click td input[type="checkbox"]':function(e){
 		$("input.checkAllBoxes").prop("checked",false);
 		if($("td input[type='checkbox']:checked").length > 0){
-			$(".demoteStudent").show("slow");
+			$(".demoteStudent").prop("disabled",false);
 		}else{
-			$(".demoteStudent").hide("fast");
+			$(".demoteStudent").prop("disabled",true);
 		}	
 	},
 	'click .demoteStudent':function(){
@@ -477,7 +485,7 @@ Template.studentList.events({
 						doc:checkedBoxes,
 						successMsg:"Operation was successful"
 					});
-					$(".demoteStudent").hide("fast");
+					$(".demoteStudent").prop("disabled",true);
 				}	
 			});	
 		}else{

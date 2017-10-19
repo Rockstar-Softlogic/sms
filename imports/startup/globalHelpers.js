@@ -57,23 +57,6 @@ registerGlobalHelpers({
     dayMonthYear:function(date){
          return date.toString().substr(0,16);
     },
-    networkIndicator:function(){
-        if(Meteor.isClient){
-          Meteor.autorun(function(){
-            var stat;
-            if (Meteor.status().status === "connected") {
-                stat = 'lime'
-            }else if (Meteor.status().status === "connecting") {
-                stat = 'yellow'
-            }else {
-                stat = 'red';
-            }
-            Session.set('networkStatus',stat);
-          });
-
-        }//end isClient
-        return Session.get('networkStatus');
-    },
     getObjectKey:function(object){
         return g.getObjectKey(object);
     },

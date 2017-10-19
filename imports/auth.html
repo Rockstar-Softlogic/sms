@@ -1,110 +1,3 @@
-<template name="header">
-	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-			<div class="navbar-header">
-	           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-	                <span class="sr-only">Toggle navigation</span>
-	                <span class="icon-bar"></span>
-	                <span class="icon-bar"></span>
-	                <span class="icon-bar"></span>
-	            </button>
-	            <a class="navbar-brand" href="{{pathFor 'login'}}">
-	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
-	            </a>
-	        </div>
-	         <h4 style="color:#fff;display:inline-block;margin:4px;">
-	            	School Management System <small style="color:#fff;"><strong>(v1.0)</strong></small>
-	          </h4>
-	         <!-- Top Menu Items -->
-	        <ul class="nav navbar-right top-nav">
-	            <li><a href="#" data-placement="bottom" data-toggle="tooltip" title="Messages"><i class="fa fa-envelope"></i></a>
-	            </li>          
-	            <li class="dropdown">
-	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
-	                <ul class="dropdown-menu">
-	                    <li><a href="{{pathFor 'profile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
-	                    <li><a href="#"><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
-	                    <li class="divider"></li>
-	                    <li><a href="{{pathFor 'logs'}}" title="Activity logs"><i class="fa fa-fw fa-info"></i> logs</a></li>
-	                    <li class="divider"></li>
-	                    <li><a href="#" id="header-logout" title="Sign out"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
-	                </ul>
-	            </li>
-	        </ul>
-	        <div class="collapse navbar-collapse navbar-ex1-collapse">
-		            {{> sideBar}}
-		     </div>
-		</nav>
-</template>
-
-<template name="sideBar">
-	<ul class="nav navbar-nav side-nav">
-            <li>
-                <a href="#" data-toggle="collapse" data-target="#submenu-1"><i class="fa fa-fw fa-dashboard"></i> DASHBOARD <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-                <ul id="submenu-1" class="collapse">
-                    <li><a href="{{pathFor 'staffDashboard'}}"><i class="fa fa-circle-o"></i> Summary </a></li>
-                    {{#if isInRole 'admin,editor'}}
-                    <li><a href="{{pathFor 'ctrlpanel'}}"><i class="fa fa-cog"></i> Settings </a></li>
-                    {{/if}}
-                    <li><a href="{{pathFor 'subjectMgmt'}}"><i class="fa fa-book"></i> Manage Subjects </a></li>
-                    <li><a href="#"><i class="fa fa-info"></i> Notifications/News </a></li>
-                    <li><a href="{{pathFor 'generalSearch'}}"><i class="fa fa-search"></i> Search </a></li>
-
-                     <li><a href="{{pathFor 'import'}}"><i class="fa fa-upload"></i> Import </a></li>
-	                
-	                <li><a href="{{pathFor 'export'}}"><i class="fa fa-download"></i> Export </a></li>
-                </ul>
-            </li>
-            {{#if isInRole 'admin, editor'}}
-			<li>
-	            <a href="#" data-toggle="collapse" data-target="#submenu-4"><i class="fa fa-fw fa-group"></i> STAFF <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-	            <ul id="submenu-4" class="collapse">
-	                <li><a href="{{pathFor 'newStaff'}}"><i class="fa fa-user-plus"></i> Create new </a></li>
-	                <li><a href="{{pathFor 'staffList'}}"><i class="fa fa-list"></i> Staff list </a></li>
-	                <li><a href="{{pathFor 'editorList'}}"><i class="fa fa-user-secret"></i> Editor list </a>
-	                 </li>
-	                <li><a href="#"><i class="fa fa-key"></i> Permission </a></li>
-	            </ul>
-            </li>
-            <li>
-	            <a href="#" data-toggle="collapse" data-target="#submenu-5"><i class="fa fa-fw fa-envelope-o"></i> BULK SMS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-	            <ul id="submenu-5" class="collapse">
-	                <li><a href="{{pathFor 'sms'}}"><i class="fa fa-plus"></i>  Summary </a></li>
-	                <li><a href="{{pathFor 'newSms'}}"><i class="fa fa-list"></i> Compose New </a></li>
-	            </ul>
-            </li>
-
-			{{/if}}
-			
-			 <li>
-	            <a href="#" data-toggle="collapse" data-target="#submenu-6"><i class="fa fa-fw fa-users"></i> STUDENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-	            <ul id="submenu-6" class="collapse">
-	                <li><a href="{{pathFor 'newStudent'}}"><i class="fa fa-user-plus"></i> Create new </a></li>
-	                <li><a href="{{pathFor 'studentList'}}"><i class="fa fa-list"></i> Student list </a></li>
-	                <li><a href="{{pathFor 'graduatedStudents'}}"><i class="fa fa-list"></i> Graduated Students </a></li>
-	                <li><a href="#"><i class="fa fa-key"></i> Permission </a></li>
-	            </ul>
-            </li>
-             <li>
-	            <a href="{{pathFor 'resultList'}}"><i class="fa fa-fw fa-check-square"></i> RESULTS </a>
-            </li>
-            <li>
-	            <a href="{{pathFor 'paymentList'}}"><i class="fa fa-fw fa-money"></i> PAYMENTS</a>
-	         </li>
-            <li>
-	            <a href="#" data-toggle="collapse" data-target="#submenu-9"><i class="fa fa-fw fa-book"></i> ASSIGNMENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-	            <ul id="submenu-9" class="collapse">
-	                <li><a href="#" onclick="Modal.show('newAssignment')"><i class="fa fa-plus"></i> Create new </a></li>
-	                <li><a href="{{pathFor 'assignmentList'}}"><i class="fa fa-list"></i> Assignment list </a></li>
-	            </ul>
-            </li>
-            <li>
-	            <a href="{{pathFor 'message'}}"><i class="fa fa-fw fa-envelope"></i> MESSAGES </a>
-            </li>
-             <li>
-	            <a href="{{pathFor 'feedback'}}"><i class="fa fa-comment"></i> FEEDBACK</a>
-            </li>
-        </ul>
-</template>
 
 <template name="dashboard">
 	{{#if currentUser}}
@@ -117,6 +10,7 @@
             <div class="item clearfix">
                 <ul class="nav float-left">
                     <li class="nav-item"><span class="fa fa-bars nav-toggler" title="Toggle navigation"></span></li> 
+                    <li class="nav-item">{{currentUser.username}}</li>
                 </ul>
                 <ul class="nav float-right">
                     <li class="nav-item dropdown-notification">
@@ -150,15 +44,16 @@
                         </article>
                     </li>   
                     <li class="nav-item dropdown-user">
-                        <img src="/thumbs-up.jpg" alt="user">
+                        <img src="/thumbs-up.jpg" alt="user" class="rounded-circle">
                         <span style="margin:0;padding:0;font-size:10px;" class="fa fa-chevron-down"></span>
                         <ul style="display:none;">
-                            <li><a href="#"><span class="fa fa-user"></span>Profile</a></li>
-                            <li><a href="#"><span class="fa fa-envelope-o"></span>My Inbox</a></li>
+                            <li><a href="{{pathFor 'profile'}}"><span class="fa fa-user"></span>Profile</a></li>
+                            <li><a href="{{pathFor 'message'}}"><span class="fa fa-envelope-o"></span>My Inbox</a></li>
                             <li><a href="#"><span class="fa fa-key"></span>Change Password</a></li>
                             <li><a href="#"><span class="fa fa-angle-double-up"></span>Update Email</a></li>
+                            <li><a href="{{pathFor 'logs'}}"><span class="fa fa-angle-double-up"></span>Log</a></li>
                             <li class="dropdown-divider"></li>
-                            <li><a href="#"><span class="fa fa-power-off"></span>Logout</a></li>
+                            <li><a href="#" id="header-logout" title="Sign out"><span class="fa fa-power-off"></span>Logout</a></li>
                         </ul>
                     </li>      
                 </ul>
@@ -170,41 +65,52 @@
             <ul>
                 <li class="menu-item"><a href="#"><i class="fa fa-home"></i><span>Dasboard</span><span class="fa fa-chevron-right pull-right"></span></a>
                    <ul class="submenu">
-                        <li><a href="#">Summary</a></li>
-                        <li><a href="#">Manage subjects</a></li>
-                        <li><a href="#">Import</a></li>
-                        <li><a href="#">Export</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="{{pathFor 'staffDashboard'}}">Summary</a></li>
+                         {{#if isInRole 'admin,editor'}}
+                        <li><a href="{{pathFor 'ctrlpanel'}}">Settings</a></li>
+                         {{/if}}
+                        <li><a href="{{pathFor 'subjectMgmt'}}">Manage subjects</a></li>
+                        <li><a href="{{pathFor 'generalSearch'}}">Search</a></li>
+                        <li><a href="{{pathFor 'import'}}">Import</a></li>
+                        <li><a href="{{pathFor 'export'}}">Export</a></li>
                    </ul>
                 </li>
+                {{#if isInRole 'admin, editor'}}
                 <li class="menu-item"><a href="#"><i class="fa fa-user-md"></i><span>Staff</span><span class="fa fa-chevron-right pull-right"></span></a>
                     <ul class="submenu">
-                        <li><a href="#">Staff</a></li>
-                        <li><a href="#">New staff</a></li>
+                        <li><a href="{{pathFor 'newStaff'}}">New staff</a></li>
+                        <li><a href="{{pathFor 'staffList'}}">Staff list</a></li>
+                        <li><a href="#">Editor list</a></li>
                         <li><a href="#">Permission</a></li>
                     </ul>
                 </li>
+                <li class="menu-item"><a href="#"><i class="fa fa-envelope-o"></i><span>SMS</span><span class="fa fa-chevron-right pull-right"></span></a>
+                    <ul class="submenu">
+                        <li><a href="{{pathFor 'sms'}}">Summary</a></li>
+                        <li><a href="{{pathFor 'newSms'}}">Compose new</a></li>
+                    </ul>
+                </li>
+                {{/if}}
                 <li class="menu-item"><a href="#"><i class="fa fa-users"></i><span>Students</span><span class="fa fa-chevron-right pull-right"></span></a>
                     <ul class="submenu">
-                        <li><a href="#">Student</a></li>
-                        <li><a href="#">New student</a></li>
-                        <li><a href="#">Permission</a></li>
+                        <li><a href="{{pathFor 'newStudent'}}">New student</a></li>
+                        <li><a href="{{pathFor 'studentList'}}">Student list</a></li>
+                        <li><a href="{{pathFor 'graduatedStudents'}}">Graduated students</a></li>
                     </ul>
                 </li>
-                <li class="menu-item"><a href="#"><i class="fa fa-graduation-cap"></i><span>Courses</span></a>
-
-                </li>
-                <li class="menu-item"><a href="#"><i class="fa fa-check"></i><span>Results</span></a>
-                </li>
-                <li class="menu-item"><a href="#"><i class="fa fa-money"></i><span>Payments</span></a>
-                </li>
-                <li class="menu-item"><a href="#"><i class="fa fa-users"></i><span>Assignment</span><span class="fa fa-chevron-right pull-right"></span></a>
+                <li class="no-submenu"><a href="{{pathFor 'resultList'}}"><i class="fa fa-check-square"></i><span>Results</span></a></li>
+                <li class="no-submenu"><a href="{{pathFor 'paymentList'}}"><i class="fa fa-money"></i><span>Payments</span></a></li>
+                <li class="menu-item"><a href="#"><i class="fa fa-book"></i><span>Assignment</span><span class="fa fa-chevron-right pull-right"></span></a>
                     <ul class="submenu">
-                        <li><a href="#">New Assignment</a></li>
-                        <li><a href="#">Assignment list</a></li>
-                        <li><a href="#">Permission</a></li>
+                        <li><a href="#" onclick="Modal.show('newAssignment')">Create new</a></li>
+                        <li><a href="{{pathFor 'assignmentList'}}">Assignment list</a></li>
                     </ul>
                 </li>
+                <li class="no-submenu"><a href="{{pathFor 'message'}}"><i class="fa fa-envelope"></i><span>Messages</span></a></li>
+
+                <li class="no-submenu"><a href="#"><i class="fa fa-bar-chart-o"></i><span>Performance Analysis</span></a></li>
+                
+                <li class="no-submenu"><a href="{{pathFor 'feedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a></li>
             </ul>
         </aside>
         <!-- main content section -->
@@ -212,74 +118,24 @@
             <div class="mobile-menu"><ul></ul></div>
                 <!-- network status -->
                 {{>networkStatus}}
-                 <div class="row" id="main" >
-                    <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
-                        <div style="width:20px;height:20px;border-radius:50% !important;background-color:{{networkIndicator}};"></div>
-                        {{> Template.dynamic template=content}}
-                    </div>
+                <div id="content">
+                {{> Template.dynamic template=content}}
                 </div>
+                
                 <div class="crudNotice alert">
                     <div></div>
-                    <button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
+                    <button type="button" class="close" onclick="$(this).parent().slideUp('fast')" arial-label='Close'>
                         <span arial-hidden='true'>&times;</span>
                     </button>
                 </div>
                 <div class="processRequest" style="display:none">{{>smsLoading}}</div>
         </section>
         <footer>
-            <p>Copyright &copy; <span>2017 </span><b>The school,</b> All rights reserved.</p>
+            <p>Copyright &copy; <span>2017 </span><b>Your school,</b> All rights reserved.</p>
         </footer>
 		{{/if}}
 	{{/if}}
 </template>
-
-<template name="inactive">
-	<div id="dashboard" class="container-fluid">
-				{{>header}}
-				<!-- network status -->
-				{{>networkStatus}}
-				 <div id="mainContent">
-			        <div class="container-fluid">
-			            <!-- Page Heading -->
-			            <div class="row" id="main" >
-			                <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
-			                	<div style="width:20px;height:20px;border-radius:50% !important;background-color:{{networkIndicator}};"></div>
-								{{> Template.dynamic template=content}}
-			                </div>
-			            </div>
-			            <div class="col-sm-12 col-md-12">
-								{{> footer}}
-						</div>
-			            <!-- /.row -->
-			        </div>
-			    </div>
-			    <div class="crudNotice alert">
-			    	<div></div>
-			    	<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
-						<span arial-hidden='true'>&times;</span>
-					</button>
-			    </div>
-				<div class="processRequest" style="display:none">{{>smsLoading}}</div>
-				<div id="callbackOnClient" class="alert alert-info">
-					<div>This is callback one</div>
-					<button type="button" class="close" onclick="$(this).parent().slideUp('slow')" arial-label='Close'>
-						<span arial-hidden='true'>&times;</span>
-					</button>
-				</div>
-			</div>
-
-</template>
-
-
-
-
-
-
-
-
-
-
-
 
 <!--Template for all student Users -->
 <template name="stSidebar">
