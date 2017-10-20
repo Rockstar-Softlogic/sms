@@ -54,8 +54,8 @@ Template.dashboard.events({
 	},
 	"click #main-content":function(){
 		var width = window.innerWidth;
-		// $("#sidebar>ul>li.menu-item").children("a").children("span.fa").removeClass("fa-chevron-down").addClass("fa-chevron-right");
-		// $("#sidebar>ul>li.menu-item>ul.submenu").slideUp("slow");
+		$("#sidebar>ul>li.menu-item").children("a").children("span.fa").removeClass("fa-chevron-down").addClass("fa-chevron-right");
+		$("#sidebar>ul>li.menu-item>ul.submenu").slideUp("slow");
 		if(width<475 && $("#sidebar").hasClass("default-sidebar")){
 			$("#sidebar").removeClass("default-sidebar");
 		}

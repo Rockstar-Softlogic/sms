@@ -719,7 +719,7 @@
 			</table>
 		</div>
 		<div class="col-sm-4">
-			<p><img src="{{staffId}}.png" alt="Staff Passport Photograph"></p>
+			<p><img src="/staff5.png" alt="Staff Passport Photograph"></p>
 			<p><a href="#">View Assignments</a></p>
 			<p><a href="#">Send a Message</a></p>
 			{{#if isInRole "admin,editor"}}
@@ -737,140 +737,163 @@
 
 
 <template name="newStaff">
-	<div class=" col-sm-10">
-		<h3>New staff</h3><hr/>
-		{{#autoForm collection="g.Staffs" id="newStaff" type="normal" validation='blur'}}
-				<p><b>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</b></p>
-				<section class="col-sm-4">
-					<fieldset>
-						<legend>Employment Data <span class="fa fa-asterisk text-danger"></span></legend>
-						{{>afQuickField name="firstName"}}
-						{{>afQuickField name="lastName"}}
-						{{>afQuickField name="otherName"}}
-						{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
-						{{>afQuickField name="dob"}}
-						{{>afQuickField name="staffId"}}
-						{{>afQuickField name="subjectTaught"}}
-					</fieldset>
-				</section>
-				<section class=" col-sm-4">
-					<fieldset>
-						<legend>Medical History </legend>
-						{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
-						{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
-						{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
-					</fieldset>
-					<fieldset>
-						<legend>Next of Kin</legend>
-						{{>afQuickField name="nok.name"}}
-						{{>afQuickField name="nok.address"}}
-						{{>afQuickField name="nok.phone"}}
-						{{>afQuickField name="nok.relationship"}}
-					</fieldset>
-				</section><br style="clear:both;"/>
-				<!-- other information -->
+	<h5>New staff</h5><hr/>
+	<p>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</p>
+	{{#autoForm collection="g.Staffs" id="newStaff" type="normal" validation='blur'}}
+		<div class="row">
+			<section class="col-sm-6">
 				<fieldset>
-					<legend>Other Information</legend>
-					<fieldset class="col-sm-4">
-						{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
-						{{>afQuickField name="town"}}
-						{{>afQuickField name="homeAddress"}}
-						{{>afQuickField name="presentAddress"}}
-						{{>afQuickField name="email"}}
-						{{>afQuickField name="club" options="allowed"}}
-					</fieldset>
-					<fieldset class="col-sm-4 ">
-						{{>afQuickField name="phone"}}
-						{{>afQuickField name="hobby"}}
-					</fieldset>
-				</fieldset><br style="clear:both;"/>
-				<!-- miscellaneous fields -->
+					<legend>Employment Data <span class="fa fa-asterisk text-danger"></span></legend>
+					{{>afQuickField name="firstName"}}
+					{{>afQuickField name="lastName"}}
+					{{>afQuickField name="otherName"}}
+					{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
+					{{>afQuickField name="dob"}}
+					{{>afQuickField name="staffId"}}
+					{{>afQuickField name="subjectTaught"}}
+				</fieldset>
+			</section>
+			<section class="col-sm-6">
+				<fieldset>
+					<legend>Medical History </legend>
+					{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+					{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+					{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+				</fieldset>
+				<fieldset>
+					<legend>Next of Kin</legend>
+					{{>afQuickField name="nok.name"}}
+					{{>afQuickField name="nok.address"}}
+					{{>afQuickField name="nok.phone"}}
+					{{>afQuickField name="nok.relationship"}}
+				</fieldset>
+			</section>
+			<!-- other information -->
+			<div class="col-sm-6">
+				<legend>Other Information</legend>
+				<fieldset>
+					{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
+					{{>afQuickField name="town"}}
+					{{>afQuickField name="homeAddress"}}
+					{{>afQuickField name="presentAddress"}}
+					{{>afQuickField name="email"}}
+					{{>afQuickField name="club" options="allowed"}}
+				</fieldset>	
+			</div>
+			<div class="col-sm-6">
+				<fieldset>
+					{{>afQuickField name="phone"}}
+					{{>afQuickField name="hobby"}}
+				</fieldset>
+			<!-- miscellaneous fields -->
 				{{>afQuickField name="createdAt"}}
 				{{>afQuickField name="addedBy"}}
-				<br style="clear:both;">
+			</div>
+			<div class="col-sm-12">
 				<div class="form-group">										<button type="reset" class="btn btn-danger">Reset</button>
 					&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary btn-lg">Submit</button>
-
 				</div>
-
-				
-			{{/autoForm}}
-	</div>
+			</div>
+		</div>
+	{{/autoForm}}
 </template>
 
 <template name="editStaff">
 	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-10">
-		<h3>Edit Staff details</h3><hr/>
-		{{#with editStaffInfo}}
-			<table style="margin: 5px auto;">
-				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="staff5.png" alt="{{firstName}} passport"></td></tr>
-				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
-				<tr><td><strong>Staff Id</strong></td><td>{{staffId}}</td></tr>
-			</table>
-		{{/with}}
-			{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
-			<fieldset>
-				<legend>Employment Data</legend>
-				<fieldset class="col-sm-4">
+		<div class="row">
+			<div class="col-sm-6">
+				<h5>Edit Staff details</h5><hr/>
+				{{#with editStaffInfo}}
+					<table class="table table-sm table-bordered">
+						<tbody>
+							<tr>
+								<th>{{lastName}}, {{firstName}} {{otherName}}</th>
+								<td rowspan="3"><img src="/staff5.png" alt="{{firstName}} passport" class="rounded-circle" style="max-width:80px;"></td>
+							</tr> 
+						</tbody>
+					</table>
+				{{/with}}
+			</div>
+		</div>
+		{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
+		<div class="row">
+			<div class="col-sm-12">
+				<h4>Employment Data</h4>
+			</div>
+			<div class="col-sm-6">
+				<fieldset>
 					{{> afQuickField name="firstName"}}
 					{{> afQuickField name="lastName"}}
 					{{> afQuickField name="otherName"}}
-					{{> afQuickField name="gender" options="allowed"}}
+					{{> afQuickField name="gender" options="allowed" type="select-radio-inline"}}
 				</fieldset>
-				<fieldset class="col-sm-4 ">
+			</div>
+			<div class="col-sm-6">
+				<fieldset>
 					{{> afQuickField name="subjectTaught"}}
 				</fieldset>
-			</fieldset>
-			<br style="clear:both;"/>
+			</div>
+			<div class="col-sm-12">
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Update</button>
 				</div>
-			{{/autoForm}}
+			</div>
 		</div>
+		{{/autoForm}}
+
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
-	
 </template>
 
 <template name="updateStaff">
 	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-11">
+	<div class="row">
+		<div class="col-sm-6">
+			<h5>Update Staff Information</h5><hr/>
 			{{#with updateStaffInfo}}
-			<table style="margin: 5px auto;">
-				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="http://localhost:3000/staff5.png" alt="{{firstName}} passport"></td></tr>
-				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
-				<tr><td><strong>Staff Id</strong></td><td>{{staffId}}</td></tr>
-			</table>
+				<table class="table table-sm table-bordered">
+					<tbody>
+						<tr>
+							<th>{{lastName}}, {{firstName}} {{otherName}}</th>
+							<td rowspan="2"><img src="/staff5.png" alt="{{firstName}} passport" class="rounded-circle" style="max-width:80px;"></td>
+						</tr>
+					</tbody>
+				</table>
 			{{/with}}
-			{{#autoForm schema="g.Schemas.UpdateStaff" id="updateStaff" type="normal" doc=updateStaffInfo validation='blur'}} 
-				<fieldset>
-						<legend>Profile Information</legend>
-						<fieldset class="col-sm-4">
-							{{>afQuickField name="state" options="allowed"}}
-							{{>afQuickField name="town"}}
-							{{>afQuickField name="homeAddress"}}
-							{{>afQuickField name="presentAddress"}}
-							{{>afQuickField name="nok"}}
-						</fieldset>
-						
-						<fieldset class="col-sm-4 ">
-							{{>afQuickField name="dob"}}
-							{{>afQuickField name="phone"}}
-							{{>afQuickField name="hobby"}}
-							{{>afQuickField name="club" options="allowed"}}
-							<!-- {{>afQuickField name="medicalHistory"}} -->
-							{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
-							{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
-							{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
-						</fieldset>
-					</fieldset>	<br style="clear:both;"/>	
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Update</button>
-				</div>
-			{{/autoForm}}
 		</div>
+	</div>
+	{{#autoForm schema="g.Schemas.UpdateStaff" id="updateStaff" type="normal" doc=updateStaffInfo validation='blur'}} 
+	<div class="row">
+		<div class="col-sm-12">
+			<h5>Profile Information</h5><hr/>
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				{{>afQuickField name="state" options="allowed"}}
+				{{>afQuickField name="town"}}
+				{{>afQuickField name="homeAddress"}}
+				{{>afQuickField name="presentAddress"}}
+				{{>afQuickField name="nok"}}
+			</fieldset>
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				{{>afQuickField name="dob"}}
+				{{>afQuickField name="phone"}}
+				{{>afQuickField name="hobby"}}
+				{{>afQuickField name="club" options="allowed"}}
+				<!-- {{>afQuickField name="medicalHistory"}} -->
+				{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+				{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+				{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+			</fieldset>
+		</div><br/>
+		<div class="col-sm-12 form-group">
+			<button type="submit" class="btn btn-primary">Update</button>
+		</div>
+	</div>
+	{{/autoForm}}
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
@@ -1101,7 +1124,7 @@
 				</table>
 		</div>
 		<div class="col-sm-4">
-			<p><img src="{{studentId}}.png" alt="Student Passport Photograph"></p>
+			<p><img src="/student10.png" alt="{{studentId}} Passport Photograph"></p>
 			<p><a href="{{pathFor 'singleResult'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-check-circle"></span> View Results</a></p>
 			<p><a href="{{pathFor 'singlePayment'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-money"></span> View Payments</a></p>
 			<p><a href="{{pathFor 'performance'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-bar-chart-o"></span> View Performance</a></p>
@@ -1114,98 +1137,104 @@
 	{{/if}}
 </template>
 <template name="newStudent">	
-	<div class="col-sm-11">
-		<h3>New student</h3><hr/>
-			{{#autoForm collection="g.Students" id="newStudent" type="normal" validation='blur'}}
-				<p><b>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</b></p>
-				<section class="col-sm-4 col-sm-5">
-					<fieldset>
-						<legend>Personal Information <span class="fa fa-asterisk text-danger"></span></legend>
-						{{>afQuickField name="firstName"}}
-						{{>afQuickField name="lastName"}}
-						{{>afQuickField name="otherName"}}
-						{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
-						{{>afQuickField name="dob"}}
-					</fieldset>
-					<fieldset>
-						<legend>Admission Data <span class="fa fa-asterisk text-danger"></span></legend>
-						{{>afQuickField name="currentClass" options="allowed" firstOption="Select class"}}
-						{{>afQuickField name="studentId"}}
-					</fieldset>
-					<fieldset>
-						<legend>Other Information</legend>
-						{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
-						{{>afQuickField name="town"}}
-						{{>afQuickField name="homeAddress"}}
-						{{>afQuickField name="presentAddress"}}
-						{{>afQuickField name="phone"}}
-						{{>afQuickField name="email"}}
-						{{>afQuickField name="hobby"}}
-						{{>afQuickField name="club" options="allowed"}}
-					</fieldset>
-				</section>
-				<section class=" col-sm-4">
-					<fieldset>
-						<legend>Parent or Guardian <span class="fa fa-asterisk text-danger"></span></legend>
-						{{>afQuickField name="parentOrGuardian"}}
-					</fieldset>
-					<fieldset>
-						<legend>Medical History </legend>
-						{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
-						{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
-						{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
-					</fieldset>
-					<fieldset>
-						<legend>Next of Kin</legend>
-						{{>afQuickField name="nok"}}
-					</fieldset>
-				</section>
-				<!-- miscellaneous fields -->
+	<h5>New student</h5>
+	<p>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</p>
+	<hr/>
+	{{#autoForm collection="g.Students" id="newStudent" type="normal" validation='blur'}}
+	<div class="row">
+		<div class="col-sm-6">
+			<fieldset>
+				<legend>Personal Information <span class="fa fa-asterisk text-danger"></span></legend>
+				{{>afQuickField name="firstName"}}
+				{{>afQuickField name="lastName"}}
+				{{>afQuickField name="otherName"}}
+				{{>afQuickField name="gender" options="allowed" firstOption="Select gender" type="select-radio-inline"}}
+				{{>afQuickField name="dob"}}
+			</fieldset>
+			<fieldset>
+				<legend>Other Information</legend>
+				{{>afQuickField name="state" options="allowed" firstOption="Select class"}}
+				{{>afQuickField name="town"}}
+				{{>afQuickField name="homeAddress"}}
+				{{>afQuickField name="presentAddress"}}
+				{{>afQuickField name="phone"}}
+				{{>afQuickField name="email"}}
+				{{>afQuickField name="hobby"}}
+				{{>afQuickField name="club" options="allowed"}}
+			</fieldset>
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				<legend>Admission Data <span class="fa fa-asterisk text-danger"></span></legend>
+				{{>afQuickField name="currentClass" options="allowed" firstOption="Select class"}}
+				{{>afQuickField name="studentId"}}
+				{{>afQuickField name="parentOrGuardian"}}
+			</fieldset>
+			<fieldset>
+				<legend>Medical History </legend>
+				{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+				{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+				{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+			</fieldset>
+			<fieldset>
+				{{>afQuickField name="nok"}}
+			</fieldset>
 				{{>afQuickField name="createdAt"}}
 				{{>afQuickField name="addedBy"}}
-				<br style="clear:both;">
-				<div class="form-group">										<button type="reset" class="btn btn-danger">Reset</button>
-					&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary btn-lg">Submit</button>
-
-				</div>
-
-				
-			{{/autoForm}}
+		</div>
+		<div class="col-sm-12">
+			<div class="form-group">										
+				<button type="reset" class="btn btn-danger">Reset</button>
+						&nbsp;&nbsp;&nbsp;
+				<button type="submit" class="btn btn-primary btn-lg">Submit</button>
+			</div>
+		</div>
 	</div>
+	{{/autoForm}}
 </template>
 
 
 <template name="editStudent">
 	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-10">
-			<h3>Edit student details</h3><hr/>
+	<div class="row">
+		<div class="col-sm-6">
+			<h5>Edit student details</h5><hr/>
 			{{#with editStudentInfo}}
-				<table style="margin: 5px auto;">
-					<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="/student10.png" alt="{{firstName}} passport"></td></tr>
-					<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
-					<tr><td><strong>Student Id</strong></td><td>{{studentId}}</td></tr>
+				<table class="table table-sm table-bordered">
+					<tbody>
+						<tr>
+							<th>{{lastName}}, {{firstName}} {{otherName}}</th>
+							<td rowspan="2"><img src="/student10.png" alt="{{studentId}} passport" class="rounded-circle" style="max-width:80px;"></td>
+						</tr>
+					</tbody>
 				</table>
 			{{/with}}
-			{{#autoForm schema="g.Schemas.EditStudent" id="editStudent" type="normal" doc=editStudentInfo validation='blur'}}
+		</div>
+	</div>
+	{{#autoForm schema="g.Schemas.EditStudent" id="editStudent" type="normal" doc=editStudentInfo validation='blur'}}
+	<div class="row">
+		<div class="col-sm-12">
+			<legend>Admission Data</legend><hr/>
+		</div>
+		<div class="col-sm-6">
 			<fieldset>
-				<legend>Admission Data</legend>
-				<fieldset class="col-sm-4">
-					{{> afQuickField name="firstName"}}
-					{{> afQuickField name="lastName"}}
-					{{> afQuickField name="otherName"}}
-					{{> afQuickField name="currentClass" options="allowed" firstOption="Current class"}}
-					{{> afQuickField name="gender" options="allowed"}}
-				</fieldset>
-				<fieldset class="col-sm-4 ">
-					{{> afQuickField name="parentOrGuardian"}}
-				</fieldset>
+				{{> afQuickField name="firstName"}}
+				{{> afQuickField name="lastName"}}
+				{{> afQuickField name="otherName"}}
+				{{> afQuickField name="currentClass" options="allowed" firstOption="Current class"}}
+				{{> afQuickField name="gender" options="allowed" type="select-radio-inline"}}
 			</fieldset>
-			<br style="clear:both;"/>
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Update</button>
-				</div>
-			{{/autoForm}}
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				{{> afQuickField name="parentOrGuardian"}}
+			</fieldset>
+		</div><br/>
+		<div class="form-group col-sm-12">
+			<button type="submit" class="btn btn-primary">Update</button>
 		</div>	
+	</div>
+	{{/autoForm}}
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
@@ -1213,43 +1242,53 @@
 
 <template name="updateStudent">
 	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-11">
-		<h3>Update student details</h3><hr/>
-		{{#with updateStudentInfo}}
-			<table style="margin: 5px auto;">
-				<tr><td><strong>Name</strong></td><td>{{lastName}}, {{firstName}} {{otherName}}</td><td rowspan="3"><img src="/student10.png" alt="{{firstName}} passport"></td></tr>
-				<tr><td><strong>Email</strong></td><td>{{email}}</td></tr>
-				<tr><td><strong>Student Id</strong></td><td>{{studentId}}</td></tr>
-			</table>
-		{{/with}}
-			{{#autoForm schema="g.Schemas.UpdateStudent" id="updateStudent" type="normal" doc=updateStudentInfo validation='blur'}}
-					<fieldset>
-						<legend>Profile Information</legend>
-						<fieldset class="col-sm-4">
-							{{>afQuickField name="state" options="allowed"}}
-							{{>afQuickField name="town"}}
-							{{>afQuickField name="homeAddress"}}
-							{{>afQuickField name="presentAddress"}}
-							{{>afQuickField name="nok"}}
-						</fieldset>
-						
-						<fieldset class="col-sm-4">
-							{{>afQuickField name="dob"}}
-							{{>afQuickField name="phone"}}
-							{{>afQuickField name="hobby"}}
-							{{>afQuickField name="club" options="allowed"}}
-							<!-- {{>afQuickField name="medicalHistory"}} -->
-							{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
-							{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
-							{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
-						</fieldset>
-					</fieldset>					
-				<br style="clear:both;"/>
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Update</button>	
-				</div>
-			{{/autoForm}}
+	<div class="row">
+		<div class="col-sm-6">
+			<h3>Update student details</h3><hr/>
+			{{#with updateStudentInfo}}
+				<table class="table table-sm table-bordered">
+					<tbody>
+						<tr>
+							<th>{{lastName}}, {{firstName}} {{otherName}}</th>
+							<td rowspan="2"><img src="/student10.png" alt="{{studentId}} passport" class="rounded-circle" style="max-width:80px;"></td>
+						</tr>
+					</tbody>
+				</table>
+			{{/with}}
 		</div>
+	</div>
+	{{#autoForm schema="g.Schemas.UpdateStudent" id="updateStudent" type="normal" doc=updateStudentInfo validation='blur'}}
+	<div class="row">
+		<div class="col-sm-12">
+			<legend>Profile Information</legend><hr/>
+		</div>	
+		<div class="col-md-6">
+			<fieldset>
+				{{>afQuickField name="state" options="allowed"}}
+				{{>afQuickField name="town"}}
+				{{>afQuickField name="homeAddress"}}
+				{{>afQuickField name="presentAddress"}}
+				{{>afQuickField name="nok"}}
+			</fieldset>
+			
+		</div>	
+		<div class="col-sm-6">
+			<fieldset>
+				{{>afQuickField name="dob"}}
+				{{>afQuickField name="phone"}}
+				{{>afQuickField name="hobby"}}
+				{{>afQuickField name="club" options="allowed"}}
+				<!-- {{>afQuickField name="medicalHistory"}} -->
+				{{>afQuickField name="medicalHistory.bloodGroup" options="allowed"}}
+				{{>afQuickField name="medicalHistory.genotype" options="allowed"}}
+				{{>afQuickField name="medicalHistory.medicalCondition" options="allowed" type="select-checkbox-inline"}}
+			</fieldset>
+		</div><br/>				
+		<div class="form-group col-sm-12">
+			<button type="submit" class="btn btn-primary">Update</button>	
+		</div>
+	</div>
+		{{/autoForm}}
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}

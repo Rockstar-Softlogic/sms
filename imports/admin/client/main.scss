@@ -79,6 +79,17 @@ table.serial {
 	}
 }
 
+//autoform error class
+form {
+	.help-block{
+		color:#dc3545 !important;
+		font-size: 14px;
+	}
+	input[type="text"]:focus{
+		background-color:#eeefff;
+	}
+}
+
 
 // button#uploadBtn{
 // 	display: none;

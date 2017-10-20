@@ -34,6 +34,7 @@ section,span,a,i,img{
 	background-color:rgb(14,33,56);
 	float: left;
 	text-align: center;
+	height:inherit;
 }
 
 #top-nav .item{
@@ -60,7 +61,7 @@ section,span,a,i,img{
 	-o-text-stroke:1px #fff;
 	font-size: 25px;
 }
-.dropdown-user>img{
+.dropdown-user>img,.dropdown-user>i.fa{
 	max-width: 40px;
 	border-radius: 50%;
 	border: 1px solid #777;
@@ -225,14 +226,18 @@ article.dropdown-notice>ul>li>a{
 }
 
 footer{
-	position: relative;
-	// bottom:0;
-	width:40%;
-	margin:20px auto 0;
-	// right:15%;
-	background-color: #fff;
+	position: absolute;
+	// bottom:20px;
+	// width:50%;
+	// margin:10px auto ;
+	right:25%;
+	left:25%;
+	// background-color: #fff;
 	padding:5px;
 	text-align: center;
+}
+footer>p{
+	background-color: #fff;
 }
 /*end general rules*/
 

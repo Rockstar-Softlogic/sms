@@ -63,7 +63,7 @@ Template.staffDashboard.helpers({
 		return filtered[0]
 	},
 	log:function(){
-		let logs = g.Logs.find({},{limit:10}).fetch();
+		let logs = g.Logs.find({},{limit:8}).fetch();
 			logs.forEach(function(log){
 				let name;
 				if(Meteor.userId() === log.by){
