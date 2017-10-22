@@ -1,204 +1,199 @@
 <template name="staffDashboard">
-		{{#if Template.subscriptionsReady}}
-		<div class="row">
-			<div class="col-sm-8">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-info">
-							NOTIFICATION
-						</h4>
-						<div class="card-text notification">
-							<article>
-								<p>{{{setting.notification}}}</p>
-								{{#if isInRole 'admin,editor'}}
-								<button class="btn btn-danger pull-right pushNew" title="New notification">Push New</button>
-								{{else}}
-								<button class="btn btn-danger pull-right" title="You don not have enough rights to push notification." disabled>Push New</button>
-								{{/if}}
-							</article>
-							<!-- notification form -->
-							<form class="form-group" style="display:none;">
-								<textarea class="form-control" rows="4" placeholder="Notifications to push to staff and student" name="notification" required></textarea><br/>
-								<button type="reset" class="btn btn-danger btn-sm cancelPush">Cancel</button>
-								<button type="submit" class="btn btn-primary btn-sm pull-right">Push Notification</button>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-sm-4">
-				<div class="card">
-					<div class="card-body">
-						<div class="card-title">
-							<h3 class="text-center text-secondary">Current</h3>
-						</div>
-						<div class="card-text">
-							<h4 class="text-info">
-								Session: {{setting.session}}
-							</h4>
-							<h4 class="text-info">
-								Term: {{termSuffix setting.term}}
-							</h4>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><br/>
-		<!-- end first row -->
-		<div class="row">
-			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-danger">
-							{{allStudent}}73
-							<span class="fa fa-users fa-2x float-right"></span>
-						</h4>
-						<p class="card-text">
-							Students
-						</p>
-					</div>
-				</div>
-			</div>
-			<!-- card break -->
-			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-info">
-							{{allStaff}}8
-							<span class="fa fa-user-secret fa-2x float-right"></span>
-						</h4>
-						<p class="card-text">
-							Staffs
-						</p>
-					</div>
-				</div>
-			</div>
-			<!-- card break -->
-			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-danger">
-							{{allPayment}}8
-							<span class="fa fa-money fa-2x float-right"></span>
-						</h4>
-						<p class="card-text">
-							Payments
-						</p>
-					</div>
-				</div>
-			</div>
-			<!-- card break -->
-			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-info">
-							{{allAssignment}}8
-							<span class="fa fa-check fa-2x float-right"></span>
-						</h4>
-						<p class="card-text">
-							Assignments
-						</p>
-					</div>
-				</div>
-			</div>
-		</div><br/>
-		<!-- end second row -->
-		<div class="row">
-			<div class="col-sm-7">
-				<div class="card">
-					<div class="card-body">
-						<h4 class="card-title text-info">
-							Students &amp; Fees
-						</h4>
-						<div class="card-text">
-						{{#with termSchoolFees}}
-							<table class="table table-responsive table-striped">
-								<thead>
-									<tr>
-										<th>Class</th>
-										<th>No of Student</th>
-										<th>School Fees (#)</th>
-									</tr>
-								</thead>
-
-								<tbody>
-									<tr>
-										<td>JSS1</td>
-										<td>{{studentCount "JSS1"}}</td>
-										<td>{{schoolFees.JSS1}}</td>
-									</tr>
-									<tr>
-										<td>JSS2</td>
-										<td>{{studentCount "JSS2"}}</td>
-										<td>{{schoolFees.JSS2}}</td>
-									</tr>
-									<tr>
-										<td>JSS3</td>
-										<td>{{studentCount "JSS3"}}</td>
-										<td>{{schoolFees.JSS3}}</td>
-									</tr>
-									<tr>
-										<td>SSS1</td>
-										<td>{{studentCount "SSS1"}}</td>
-										<td>{{schoolFees.SSS1}}</td>
-									</tr>
-									<tr>
-										<td>SSS2</td>
-										<td>{{studentCount "SSS2"}}</td>
-										<td>{{schoolFees.SSS2}}</td>
-									</tr>
-									<tr>
-										<td>SSS3</td>
-										<td>{{studentCount "SSS3"}}</td>
-										<td>{{schoolFees.SSS3}}</td>
-									</tr>
-								</tbody>
-							</table>
-						{{/with}}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-5">
-				<div class="card">
-					<div class="card-body">
-						<div class="card-title">
-							<h4 class="text-center text-danger">Recent Activities</h4>
-						</div>
-						<div class="card-text">
-							{{#each log}}
-								<strong>*</strong> <span>{{name}} {{action}}</span> <span class="badge badge-secondary">@{{dateFormat time}}</span><br/>
-							{{/each}}
-							<a href="{{pathFor 'logs'}}">See more...</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><br/>
-		<!-- end third row -->
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="card text-white bg-info">
-					<div class="card-body">
-						<div class="card-title">
-							<h3 class="text-center">
-								Performance Analysis
-							</h3>
-						</div>
-						<div title="coming soon" class="card-text text-center">
-							<span class="fa fa-bar-chart-o fa-5x"></span>
-						</div>
+	<div class="row">
+		<div class="col-sm-8">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						NOTIFICATION
+					</h4>
+					<div class="card-text notification">
+						<article>
+							<p>{{{setting.notification}}}</p>
+							{{#if isInRole 'admin,editor'}}
+							<button class="btn btn-danger pull-right pushNew" title="New notification">Push New</button>
+							{{else}}
+							<button class="btn btn-danger pull-right" title="You don not have enough rights to push notification." disabled>Push New</button>
+							{{/if}}
+						</article>
+						<!-- notification form -->
+						<form class="form-group" style="display:none;">
+							<textarea class="form-control" rows="4" placeholder="Notifications to push to staff and student" name="notification" required></textarea><br/>
+							<button type="reset" class="btn btn-danger btn-sm cancelPush">Cancel</button>
+							<button type="submit" class="btn btn-primary btn-sm pull-right">Push Notification</button>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+
+		<div class="col-sm-4">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h3 class="text-center text-secondary">Current</h3>
+					</div>
+					<div class="card-text">
+						<h4 class="text-info">
+							Session: {{setting.session}}
+						</h4>
+						<h4 class="text-info">
+							Term: {{termSuffix setting.term}}
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><br/>
+	<!-- end first row -->
+	<div class="row">
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-danger">
+						{{allStudent}}73
+						<span class="fa fa-users fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Students
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- card break -->
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						{{allStaff}}8
+						<span class="fa fa-user-secret fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Staffs
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- card break -->
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-danger">
+						{{allPayment}}8
+						<span class="fa fa-money fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Payments
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- card break -->
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						{{allAssignment}}8
+						<span class="fa fa-check fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Assignments
+					</p>
+				</div>
+			</div>
+		</div>
+	</div><br/>
+	<!-- end second row -->
+	<div class="row">
+		<div class="col-sm-7">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						Students &amp; Fees
+					</h4>
+					<div class="card-text">
+					{{#with termSchoolFees}}
+						<table class="table table-responsive table-striped">
+							<thead>
+								<tr>
+									<th>Class</th>
+									<th>No of Student</th>
+									<th>School Fees (#)</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td>JSS1</td>
+									<td>{{studentCount "JSS1"}}</td>
+									<td>{{schoolFees.JSS1}}</td>
+								</tr>
+								<tr>
+									<td>JSS2</td>
+									<td>{{studentCount "JSS2"}}</td>
+									<td>{{schoolFees.JSS2}}</td>
+								</tr>
+								<tr>
+									<td>JSS3</td>
+									<td>{{studentCount "JSS3"}}</td>
+									<td>{{schoolFees.JSS3}}</td>
+								</tr>
+								<tr>
+									<td>SSS1</td>
+									<td>{{studentCount "SSS1"}}</td>
+									<td>{{schoolFees.SSS1}}</td>
+								</tr>
+								<tr>
+									<td>SSS2</td>
+									<td>{{studentCount "SSS2"}}</td>
+									<td>{{schoolFees.SSS2}}</td>
+								</tr>
+								<tr>
+									<td>SSS3</td>
+									<td>{{studentCount "SSS3"}}</td>
+									<td>{{schoolFees.SSS3}}</td>
+								</tr>
+							</tbody>
+						</table>
+					{{/with}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-5">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h4 class="text-center text-danger">Recent Activities</h4>
+					</div>
+					<div class="card-text">
+						{{#each log}}
+							<strong>*</strong> <span>{{name}} {{action}}</span> <span class="badge badge-secondary">@{{dateFormat time}}</span><br/>
+						{{/each}}
+						<a href="{{pathFor 'logs'}}">See more...</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><br/>
+	<!-- end third row -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card text-white bg-info">
+				<div class="card-body">
+					<div class="card-title">
+						<h3 class="text-center">
+							Performance Analysis
+						</h3>
+					</div>
+					<div title="coming soon" class="card-text text-center">
+						<span class="fa fa-bar-chart-o fa-5x"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 <template name="generalSearch">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">
 			<h5><span class="fa fa-search"></span> Search</h5><hr/>
@@ -261,131 +256,122 @@
 			</div>
 		</div>
 	 </div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 <template name="profile">
-	{{#if Template.subscriptionsReady}}
-		<div class="row">
-			{{#with currentStaff}}
-				<div class="col-sm-8">
-					<table class="table table-responsive table-striped">	
-						<thead>
-							<tr>
-								<th colspan="2" class="table-info">Employment Data</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th>Last Name</th><td>{{lastName}}</td>
-							</tr>
-							<tr>
-								<th>First Name</th><td>{{firstName}}</td>
-							</tr>
-							<tr>
-								<th>Other Name</th><td>{{otherName}}</td>
-							</tr>
-							<tr>	
-								<th>Gender</th> <td>{{gender}}</td>
-							</tr>
-							<tr>
-								<th>Date of Birth</th> <td>{{dayMonthYear dob}}</td>
-							</tr>
-							<tr>
-								<th>Staff ID</th> <td>{{staffId}}</td>
-							</tr>
-							<tr>
-								<th>Email</th> <td>{{email}}</td>
-							</tr>
-							<tr>
-								<th>Subject Taught</th> <td>{{subjectTaught}}</td>
-							</tr>
-						</tbody>
-						<tfoot>
-							<span><a href="{{pathFor 'editStaff'}}/{{staffId}}" class="btn btn-primary btn-sm"><span class="fa fa-edit"></span> edit</a></span>
-						</tfoot>
-					</table>
-				<!-- Other Information --><br/>
-				<table class="table table-responsive table-striped">
+	<div class="row">
+		{{#with currentStaff}}
+			<div class="col-sm-8">
+				<table class="table table-responsive table-striped">	
 					<thead>
 						<tr>
-							<th colspan="2" class="table-info">Other Information</th>
+							<th colspan="2" class="table-info">Employment Data</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<th>Origin</th> <td>{{town}}, {{state}} State</td>
+							<th>Last Name</th><td>{{lastName}}</td>
 						</tr>
 						<tr>
-							<th>Present Address</th> <td>{{presentAddress}}</td>
+							<th>First Name</th><td>{{firstName}}</td>
 						</tr>
 						<tr>
-							<th>Home Address</th> <td>{{homeAddress}}</td>
+							<th>Other Name</th><td>{{otherName}}</td>
+						</tr>
+						<tr>	
+							<th>Gender</th> <td>{{gender}}</td>
 						</tr>
 						<tr>
-							<th>Contact Number</th> <td>{{phone}}</td>
+							<th>Date of Birth</th> <td>{{dayMonthYear dob}}</td>
 						</tr>
 						<tr>
-							<th>Hobbies</th> <td>{{hobby}}</td>
+							<th>Staff ID</th> <td>{{staffId}}</td>
 						</tr>
 						<tr>
-							<th>Club and Society</th> <td>{{club}}</td>
+							<th>Email</th> <td>{{email}}</td>
 						</tr>
 						<tr>
-							<th colspan="2" class="table-info">Medical Record</th>
-						</tr>
-						<tr>
-							<th>Blood Group</th><td>{{medicalHistory.bloodGroup}}</td>
-						</tr>
-						<tr>
-							<th>Genotype</th><td>{{medicalHistory.genotype}}</td>
-						</tr>
-						<tr>
-							<th>Condition</th><td>{{medicalHistory.medicalCondition}}</td>
-						</tr>
-						<tr>
-							<th colspan="2" class="table-info">Next of Kin</th>
-						</tr>
-						<tr>
-							<th>Name</th> <td>{{nok.name}}</td>
-						</tr>
-						<tr>
-							<th>Address</th> <td>{{nok.address}}</td>
-						</tr>
-						<tr>
-							<th>Contact</th> <td>{{nok.phone}}</td>
-						</tr>
-						<tr>
-							<th>Relationship</th> <td>{{nok.relationship}}</td>
+							<th>Subject Taught</th> <td>{{subjectTaught}}</td>
 						</tr>
 					</tbody>
 					<tfoot>
-						<span><a href="{{pathFor 'updateStaff'}}/{{staffId}}" class="btn btn-primary btn-sm"><span class="fa fa-edit"></span> edit profile</a></span>
+						<span><a href="{{pathFor 'editStaff'}}/{{staffId}}" class="btn btn-primary btn-sm"><span class="fa fa-edit"></span> edit</a></span>
 					</tfoot>
 				</table>
+			<!-- Other Information --><br/>
+			<table class="table table-responsive table-striped">
+				<thead>
+					<tr>
+						<th colspan="2" class="table-info">Other Information</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>Origin</th> <td>{{town}}, {{state}} State</td>
+					</tr>
+					<tr>
+						<th>Present Address</th> <td>{{presentAddress}}</td>
+					</tr>
+					<tr>
+						<th>Home Address</th> <td>{{homeAddress}}</td>
+					</tr>
+					<tr>
+						<th>Contact Number</th> <td>{{phone}}</td>
+					</tr>
+					<tr>
+						<th>Hobbies</th> <td>{{hobby}}</td>
+					</tr>
+					<tr>
+						<th>Club and Society</th> <td>{{club}}</td>
+					</tr>
+					<tr>
+						<th colspan="2" class="table-info">Medical Record</th>
+					</tr>
+					<tr>
+						<th>Blood Group</th><td>{{medicalHistory.bloodGroup}}</td>
+					</tr>
+					<tr>
+						<th>Genotype</th><td>{{medicalHistory.genotype}}</td>
+					</tr>
+					<tr>
+						<th>Condition</th><td>{{medicalHistory.medicalCondition}}</td>
+					</tr>
+					<tr>
+						<th colspan="2" class="table-info">Next of Kin</th>
+					</tr>
+					<tr>
+						<th>Name</th> <td>{{nok.name}}</td>
+					</tr>
+					<tr>
+						<th>Address</th> <td>{{nok.address}}</td>
+					</tr>
+					<tr>
+						<th>Contact</th> <td>{{nok.phone}}</td>
+					</tr>
+					<tr>
+						<th>Relationship</th> <td>{{nok.relationship}}</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<span><a href="{{pathFor 'updateStaff'}}/{{staffId}}" class="btn btn-primary btn-sm"><span class="fa fa-edit"></span> edit profile</a></span>
+				</tfoot>
+			</table>
+			</div>
+			<div class="col-sm-4">
+				<div class="passport" style="text-align:center;">
+					<img src="/staff5.png" alt="{{lastName}} {{firstName}} passport">
+					<p><strong>{{staffId}}</strong></p>
 				</div>
-				<div class="col-sm-4">
-					<div class="passport" style="text-align:center;">
-						<img src="/staff5.png" alt="{{lastName}} {{firstName}} passport">
-						<p><strong>{{staffId}}</strong></p>
-					</div>
-					<div>
-						<p><a href="#">Assignments</a></p><hr/>
-						<p><a href="#">Subjects</a></p><hr/>
-						<p><a href="#">Messages</a></p><hr/>
-						<p><a href="#">Send feedback</a></p><hr/>
-					</div>
+				<div>
+					<p><a href="#">Assignments</a></p><hr/>
+					<p><a href="#">Subjects</a></p><hr/>
+					<p><a href="#">Messages</a></p><hr/>
+					<p><a href="#">Send feedback</a></p><hr/>
 				</div>
-			{{/with}}
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+			</div>
+		{{/with}}
+	</div>
 </template>
-
 <template name="editProfile">
-	{{#if Template.subscriptionsReady}}
 	<div class="col-sm-10">
 		{{#with currentStaff}}
 		<table style="margin: 5px auto;">
@@ -419,13 +405,8 @@
 			</div>
 		{{/autoForm}}
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
-							
 <template name="ctrlpanel">
-	{{#if Template.subscriptionsReady}}
 	<h4><span class="fa fa-cog"></span> Application Settings</h4><hr/>
 	<div class="row">
 		<div class="col-sm-6">
@@ -501,13 +482,9 @@
 		</div>
 	</div><br/>
 	<!-- end first row	 -->
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="newSessionModal">
-		<!-- Moddal start -->
 	<div class="modal fade">
 			<div class="modal-dialog" role='document'>
 				<div class="modal-content">
@@ -530,7 +507,6 @@
 	</div>
 </template>
 <template name="setTermAndSchoolFees">
-		<!-- Moddal start -->
 	<div class="modal fade">
 			<div class="modal-dialog" role='document'>
 				<div class="modal-content">
@@ -555,18 +531,11 @@
 </template>
 <template name="editorList">
 	{{#if isInRole 'admin'}}
-		{{#if Template.subscriptionsReady}}
-
-		{{else}}
-			{{> smsLoading}}
-		{{/if}}
-
 	{{/if}}
 </template>
 <!-- Staff Template begin -->
 <template name="staffList">
-		<h5>Staff list &nbsp;&nbsp;&nbsp;<a href="{{pathFor 'newStaff'}}" class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> New staff</a></h5><hr/>
-	{{#if Template.subscriptionsReady}}
+	<h5>Staff list &nbsp;&nbsp;&nbsp;<a href="{{pathFor 'newStaff'}}" class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> New staff</a></h5><hr/>
 	<div class="row">
 		<div class="col-sm-12">
 			<form class="filter">
@@ -605,13 +574,8 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
-
 <template name="singleStaff">
-	{{#if Template.subscriptionsReady}}
 	{{#with staff}}	
 	<h5>{{lastName}}, {{firstName}} {{otherName}} Profile 
 		{{#if isInRole 'admin'}}
@@ -728,14 +692,7 @@
 		</div>		
 	</div>
 	{{/with}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
-	
 </template>
-
-
-
 <template name="newStaff">
 	<h5>New staff</h5><hr/>
 	<p>Section suffixed with <span class="fa fa-asterisk text-danger"></span> must be filled.</p>
@@ -799,55 +756,49 @@
 </template>
 
 <template name="editStaff">
-	{{#if Template.subscriptionsReady}}
-		<div class="row">
-			<div class="col-sm-6">
-				<h5>Edit Staff details</h5><hr/>
-				{{#with editStaffInfo}}
-					<table class="table table-sm table-bordered">
-						<tbody>
-							<tr>
-								<th>{{lastName}}, {{firstName}} {{otherName}}</th>
-								<td rowspan="3"><img src="/staff5.png" alt="{{firstName}} passport" class="rounded-circle" style="max-width:80px;"></td>
-							</tr> 
-						</tbody>
-					</table>
-				{{/with}}
+	<div class="row">
+		<div class="col-sm-6">
+			<h5>Edit Staff details</h5><hr/>
+			{{#with editStaffInfo}}
+				<table class="table table-sm table-bordered">
+					<tbody>
+						<tr>
+							<th>{{lastName}}, {{firstName}} {{otherName}}</th>
+							<td rowspan="3"><img src="/staff5.png" alt="{{firstName}} passport" class="rounded-circle" style="max-width:80px;"></td>
+						</tr> 
+					</tbody>
+				</table>
+			{{/with}}
+		</div>
+	</div>
+	{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
+	<div class="row">
+		<div class="col-sm-12">
+			<h4>Employment Data</h4>
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				{{> afQuickField name="firstName"}}
+				{{> afQuickField name="lastName"}}
+				{{> afQuickField name="otherName"}}
+				{{> afQuickField name="gender" options="allowed" type="select-radio-inline"}}
+			</fieldset>
+		</div>
+		<div class="col-sm-6">
+			<fieldset>
+				{{> afQuickField name="subjectTaught"}}
+			</fieldset>
+		</div>
+		<div class="col-sm-12">
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Update</button>
 			</div>
 		</div>
-		{{#autoForm schema="g.Schemas.EditStaff" id="editStaff" type="normal" doc=editStaffInfo validation='blur'}}
-		<div class="row">
-			<div class="col-sm-12">
-				<h4>Employment Data</h4>
-			</div>
-			<div class="col-sm-6">
-				<fieldset>
-					{{> afQuickField name="firstName"}}
-					{{> afQuickField name="lastName"}}
-					{{> afQuickField name="otherName"}}
-					{{> afQuickField name="gender" options="allowed" type="select-radio-inline"}}
-				</fieldset>
-			</div>
-			<div class="col-sm-6">
-				<fieldset>
-					{{> afQuickField name="subjectTaught"}}
-				</fieldset>
-			</div>
-			<div class="col-sm-12">
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Update</button>
-				</div>
-			</div>
-		</div>
-		{{/autoForm}}
-
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+	</div>
+	{{/autoForm}}
 </template>
 
 <template name="updateStaff">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-6">
 			<h5>Update Staff Information</h5><hr/>
@@ -894,9 +845,6 @@
 		</div>
 	</div>
 	{{/autoForm}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <!-- Staff Template end -->
@@ -937,7 +885,6 @@
 
 <template name="studentList">
 	<h5>Student list &nbsp; <a href="{{pathFor 'newStudent'}}" class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> New Student</a></h5><hr/>
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class=" col-sm-12">	
 		<h5 class="text-info">
@@ -997,17 +944,12 @@
 		{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 <template name="singleStudent">
-	{{#if Template.subscriptionsReady}}
-		<!-- Admission Information -->
 	{{#with student}}
 	<h5>{{lastName}}, {{firstName}} {{otherName}} Profile</h5><hr/>	
 	<div class="row">
-			<div class="col-sm-8">	
+		<div class="col-sm-8">	
 				<table class="table table-responsive table-striped">
 					<thead>
 						<tr>
@@ -1132,9 +1074,6 @@
 		</div>		
 	</div>
 	{{/with}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 <template name="newStudent">	
 	<h5>New student</h5>
@@ -1195,7 +1134,6 @@
 
 
 <template name="editStudent">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-6">
 			<h5>Edit student details</h5><hr/>
@@ -1235,13 +1173,9 @@
 		</div>	
 	</div>
 	{{/autoForm}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="updateStudent">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-6">
 			<h3>Update student details</h3><hr/>
@@ -1289,10 +1223,6 @@
 		</div>
 	</div>
 		{{/autoForm}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
-	
 </template>
 <template name="import">
 	<h5>Import Data</h5><hr/>
@@ -1366,7 +1296,6 @@
 <!-- Result templates begin -->
 <template name="resultList">
 	<h5>Result List <a href="{{pathFor 'uploadResult'}}" class="btn btn-primary btn-sm"><span class="fa fa-upload"></span> Upload Result</a></h5><hr/>
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">
 			<h6 class="text-info">
@@ -1440,14 +1369,10 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="singleResult">
-	{{#if Template.subscriptionsReady}}
-		<div class="row">
+	<div class="row">
 			<div class="col-sm-12">	
 			{{#with studentInfo}}
 				<h5>{{firstName}}, {{lastName}} {{otherName}} Result</h5>
@@ -1551,88 +1476,83 @@
 						</h5>
 					{{/with}}
 				{{/with}}
-		</div>	
+			</div>	
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
-
 <template name="updateResult">
-	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-10">
 		{{#if resultFor}}
+	<div class="row">
+		<div class="col-sm-6">
 			{{#with resultFor}}
-				<h3>Add Result</h3><hr/>
+			<h5>Add Result</h5><hr/>
+			<table class="table table-sm table-bordered table-responsive">
+				<tbody>
+					<tr>
+						<td>{{name}}</td>
+						<td rowspan="2"><img src="/student10.png" alt="{{studentId}} passport" class="rounded-circle" style="max-width:50px;"></td>
+					</tr>
+					<tr>
+						<td>{{currentClass}} {{termSuffix term}} term</td>
+					</tr>
+				</tbody>
+			</table>
+			{{/with}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+			{{#autoForm schema="g.Schemas.ResultArray" id="updateResult" type="normal" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+				{{#each subjects}}
+					{{>afQuickField name=this}}
+				{{/each}}
+			{{/autoForm}}
+		</div>
+	</div>
+		{{else}}
+			<p>No student is selected for this result. Select a student first.</p>
+		{{/if}}
+</template>
+
+<template name="editResult">
+	<div class=" col-sm-8">
+		<h3>Edit Result</h3><hr/>
+		<h3>Student details</h3><hr/>
+			{{#with studentInfo}}
 				<table style="margin: 5px auto;">
 					<tr>
-						<td><strong>Name:</strong></td> <td><strong>{{name}}</strong></td>
+						<td><strong>Name:</strong></td> <td><strong>{{lastName}}, {{firstName}} {{otherName}}</strong></td>
 						<td><strong>Student ID:</strong></td> <td><strong>{{studentId}}</strong></td>
 						<td rowspan="2"><img src="student10.png" alt="{{studentId}} passport"></td>
 					</tr>
 					<tr>
 						<td><strong>Class:</strong></td> <td><strong>{{currentClass}}</strong></td>
-						<td><strong>Term:</strong></td> <td><strong>{{termSuffix term}}</strong></td>
+						<td><strong>Term:</strong></td>
+						<td><strong>{{termSuffix setting.term}}</strong></td>
 					</tr>
 				</table>
-
 			{{/with}}
-			{{> quickForm schema="g.Schemas.ResultArray" id="updateResult" type="normal" template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
-
-		{{else}}
-			<p>No student is selected for this result. Select a student first.</p>
-		{{/if}}
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
-</template>
-
-<template name="editResult">
-		{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Edit Result</h3><hr/>
-			<h3>Student details</h3><hr/>
-				{{#with studentInfo}}
-					<table style="margin: 5px auto;">
-						<tr>
-							<td><strong>Name:</strong></td> <td><strong>{{lastName}}, {{firstName}} {{otherName}}</strong></td>
-							<td><strong>Student ID:</strong></td> <td><strong>{{studentId}}</strong></td>
-							<td rowspan="2"><img src="student10.png" alt="{{studentId}} passport"></td>
-						</tr>
-						<tr>
-							<td><strong>Class:</strong></td> <td><strong>{{currentClass}}</strong></td>
-							<td><strong>Term:</strong></td>
-							<td><strong>{{termSuffix setting.term}}</strong></td>
-						</tr>
-					</table>
-				{{/with}}
-				{{#with resultToEdit}}
-					<h3>Update result for</h3>
-					<table>
-						<tr>
-						<td><strong>Class</strong></td>
-						<td>{{class}}</td>
-						<td><strong>Term</strong></td>
-						<td>{{termSuffix term}}</td>
-						</tr>
-					</table>
-					{{> quickForm type="normal" id="editResult" schema="g.Schemas.ResultArray" collection="g.Results" doc=resultToEdit template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
-				{{else}}
-				<h3>No result to edit</h3>
-				{{/with}}
-		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+			{{#with resultToEdit}}
+				<h3>Update result for</h3>
+				<table>
+					<tr>
+					<td><strong>Class</strong></td>
+					<td>{{class}}</td>
+					<td><strong>Term</strong></td>
+					<td>{{termSuffix term}}</td>
+					</tr>
+				</table>
+				{{> quickForm type="normal" id="editResult" schema="g.Schemas.ResultArray" collection="g.Results" doc=resultToEdit template="bootstrap3-inline" label-class="sr-only" afFieldInput-placeholder="schemaLabel" validation='blur'}}
+			{{else}}
+			<h3>No result to edit</h3>
+			{{/with}}
+	</div>
 </template>
 
 <!-- Result Ended -->
 <!-- Payments templates begin -->
 <template name="paymentList">
 	<h5>Payment List <button class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> New Payment</button></h5><hr/>
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">
 			<h6 class="text-info">
@@ -1704,250 +1624,241 @@
 		{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
-
 <template name="singlePayment">
-		{{#if Template.subscriptionsReady}}
-			<div class="row">
-			{{#with studentInfo}}
-				<div class="col-sm-12">
-					<h5>{{firstName}}, {{lastName}} {{otherName}} Payments</h5>
-					<hr style="border-bottom: 3px dashed #abcdef;"/>
-					<form class='searchPayment'>
-						<select name="class">
-						{{#if availableClass}}
-							{{#each availableClass}}	
-								<option value="{{this}}">{{this}}</option>
-							{{/each}}
-						{{/if}}
-						</select>
-						<select name="term">
-						{{#each termArray}}
-							<option value="{{this}}">{{termSuffix this}}</option>
+	<div class="row">
+		{{#with studentInfo}}
+			<div class="col-sm-12">
+				<h5>{{firstName}}, {{lastName}} {{otherName}} Payments</h5>
+				<hr style="border-bottom: 3px dashed #abcdef;"/>
+				<form class='searchPayment'>
+					<select name="class">
+					{{#if availableClass}}
+						{{#each availableClass}}	
+							<option value="{{this}}">{{this}}</option>
 						{{/each}}
-						</select>
-						<button type="submit" class="btn btn-primary btn-sm">Show payment</button>
-					</form>
-					<table class="table table-responsive table-bordered">
+					{{/if}}
+					</select>
+					<select name="term">
+					{{#each termArray}}
+						<option value="{{this}}">{{termSuffix this}}</option>
+					{{/each}}
+					</select>
+					<button type="submit" class="btn btn-primary btn-sm">Show payment</button>
+				</form>
+				<table class="table table-responsive table-bordered">
+					<tbody>
+						<tr>
+							<th>First Name</th>
+							<td>{{firstName}}</td>
+							<th>Other Name</th>
+							<td>{{lastName}} {{otherName}}</td>
+							<td rowspan="3">
+								<img src="student10.png" alt="{{studentId}} passport">
+							</td>
+						</tr>
+						<tr>
+							<th>Student ID</th>
+							<td>{{studentId}}</td>
+							<th>Email</th>
+							<td>{{email}}</td>
+						</tr>
+						<tr>
+							<th>Current Class</th>
+							<td>{{currentClass}}</td>
+							<th>Current Term</th>
+							<td>{{termSuffix setting.term}}</td>
+						</tr>
+					</tbody>
+				</table>
+				{{#with singlePay}}
+					<table class="table table-responsive table-striped table-bordered">
+						<thead>
+							<tr>
+								<th colspan="2" class="table-info">Payment details</th>
+							</tr>
+						</thead>
 						<tbody>
 							<tr>
-								<th>First Name</th>
-								<td>{{firstName}}</td>
-								<th>Other Name</th>
-								<td>{{lastName}} {{otherName}}</td>
-								<td rowspan="3">
-									<img src="student10.png" alt="{{studentId}} passport">
-								</td>
+								<td>Class</td>
+								<td>{{class}}</td>
 							</tr>
 							<tr>
-								<th>Student ID</th>
-								<td>{{studentId}}</td>
-								<th>Email</th>
-								<td>{{email}}</td>
+								<td>Term</td>
+								<td>{{termSuffix term}}</td>
 							</tr>
 							<tr>
-								<th>Current Class</th>
-								<td>{{currentClass}}</td>
-								<th>Current Term</th>
-								<td>{{termSuffix setting.term}}</td>
+								<td>Session</td>
+								<td>{{session}}</td>
 							</tr>
-						</tbody>
+							<tr>
+								<td>Payment Category</td>
+								<td>{{category}}</td>
+							</tr>
+							<tr>
+								<td>Amount</td>
+								<td>{{amount}}</td>
+							</tr>
+							<!-- online payment -->
+							{{#if paymentMethod paymentType}}
+							<tr>
+								<td>Amount Approved</td>
+								<td>{{approvedAmount}}</td>
+							</tr>
+							<tr>
+								<td>Gateway Description</td>
+								<td>{{paymentDescription}}</td>
+							</tr>
+							<tr>
+								<td>Payment Reference</td>
+								<td>{{payRef}}</td>
+							</tr>
+							{{/if}}
+							<!-- end online payment fields -->
+							<tr>
+								<td>Payment Method</td>
+								<td>{{paymentType}}</td>
+							</tr>
+							<tr>
+								<td>Payment Status</td>
+								<td>{{paymentStatus}}</td>
+							</tr>
+							<tr>
+								<td>Payment Date</td>
+								<td>{{dateFormat date}}</td>
+							</tr>
+							<tr>
+								<td>Transaction ID</td>
+								<td>{{transactionId}}</td>
+							</tr>
+							<tr>
+								<td>Receiver's Name</td>
+								<td>{{staffName}}</td>
+							</tr>
+							</tbody>
 					</table>
-					{{#with singlePay}}
-						<table class="table table-responsive table-striped table-bordered">
-							<thead>
-								<tr>
-									<th colspan="2" class="table-info">Payment details</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Class</td>
-									<td>{{class}}</td>
-								</tr>
-								<tr>
-									<td>Term</td>
-									<td>{{termSuffix term}}</td>
-								</tr>
-								<tr>
-									<td>Session</td>
-									<td>{{session}}</td>
-								</tr>
-								<tr>
-									<td>Payment Category</td>
-									<td>{{category}}</td>
-								</tr>
-								<tr>
-									<td>Amount</td>
-									<td>{{amount}}</td>
-								</tr>
-								<!-- online payment -->
-								{{#if paymentMethod paymentType}}
-								<tr>
-									<td>Amount Approved</td>
-									<td>{{approvedAmount}}</td>
-								</tr>
-								<tr>
-									<td>Gateway Description</td>
-									<td>{{paymentDescription}}</td>
-								</tr>
-								<tr>
-									<td>Payment Reference</td>
-									<td>{{payRef}}</td>
-								</tr>
-								{{/if}}
-								<!-- end online payment fields -->
-								<tr>
-									<td>Payment Method</td>
-									<td>{{paymentType}}</td>
-								</tr>
-								<tr>
-									<td>Payment Status</td>
-									<td>{{paymentStatus}}</td>
-								</tr>
-								<tr>
-									<td>Payment Date</td>
-									<td>{{dateFormat date}}</td>
-								</tr>
-								<tr>
-									<td>Transaction ID</td>
-									<td>{{transactionId}}</td>
-								</tr>
-								<tr>
-									<td>Receiver's Name</td>
-									<td>{{staffName}}</td>
-								</tr>
-								</tbody>
-						</table>
-						<br/>
-						<button class="btn btn-danger" onclick="window.print()">Print</button>
+					<br/>
+					<button class="btn btn-danger" onclick="window.print()">Print</button>
+				{{else}}
+					{{#with getSession "requestedPayment"}}
+						<h5 class="text-info text-center">Payment not yet made for {{class}} term {{term}}</h5>
 					{{else}}
-						{{#with getSession "requestedPayment"}}
-							<h5 class="text-info text-center">Payment not yet made for {{class}} term {{term}}</h5>
-						{{else}}
-							<h5 class="text-info text-center">No payment found for term {{setting.term}}</h5>
-						{{/with}}
+						<h5 class="text-info text-center">No payment found for term {{setting.term}}</h5>
 					{{/with}}
-				</div>
 				{{/with}}
-		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+			</div>
+			{{/with}}
+	</div>
 </template>
 
 <template name="updatePayment">
-		{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Payment details</h3><hr/>
-			{{#if paymentFor}}
-				<form id="createPaymentReceipt">
-					<select name="paymentCat">
-						{{#each paymentFor.category}}
-							<option value="{{this}}">{{this}}</option>
-						{{/each}}
-					</select>
-					<select name="paymentMethod">
-						<option value="Cash">Cash</option>
-						<option value="Online">Online</option>
-					</select>
-					<button type="submit" class="btn btn-primary btn-sm">Create receipt</button>
-				</form>
-				<p class="text-info"><strong>Select a payment category and payment method above and proceed to pay.</strong></p>
-				{{#with paymentFor.stInfo}}
-					<img src="/student10.png" style="float:right;max-width:100px;margin:10px;">
-					<table style="margin:5px;font-size:1.1em;">
-						<tr>
-							<td>Name</td>
-							<td>{{name}}</td>	
-						</tr>
-						<tr>
-							<td>Student Id</td>
-							<td>{{studentId}}</td>
-						</tr>
-						<tr>
-							<td>Current class</td>
-							<td>{{currentClass}}</td>
-						</tr>
-						<tr>
-							<td>Current term</td>
-							<td>{{termSuffix term}}</td>
-						</tr>
-						<tr>
-							<td>Payment category</td>
-							<td>{{paymentCategory}}</td>
-						</tr>
-						<tr>
-							<td>Amount</td>
-							<td>{{amount}}</td>
-						</tr>
-						<tr>
-							<td>Payment method</td>
-							<td>{{method}}</td>
-						</tr>
-					</table>
-					<br style="clear:both;">
-					<p class="text-info"><strong>
-						Please note:<br/>
-						<span>Cash payment means that you've collected this payment by hand.</span><br/>
-						<span>Online payment would be processed by interswitch payment gateway.</span>
-					</strong></p>
-					{{#if failedPaymentReason}}
-						<p class="text-danger"><strong>Payment failed due to {{failedPaymentReason}}. Try again!</strong></p>
-					{{/if}}
-					{{#if paymentMethod method}}
-						<div id="onlinePayment">
-							<a data-isw-payment-button data-isw-ref='kGM0Ul8XP'>
-							  <script type='text/javascript' 
-							    src='https://qa.interswitchng.com/paymentgateway/public/js/webpay.js' 
-							    data-isw-customer-ref='{{transactionId}}' 
-							    data-isw-customer-callback='cardPaymentCallback'
-							    data-isw-trans-amount='{{amount}}00'> 
-							  </script>
-							</a>
-							<script>
-							  function cardPaymentCallback(response){
-							  		if(!response){
-								  		return;
-								  	}
-								  	let paymentInfo = Session.get('st.info'); 
-									if(response.resp==="00" && response.desc=="Approved by Financial Institution" && response.payRef!==response.txnref){
-										paymentInfo.response = response;
-										g.meteorCall("updatePaymentByCard",{doc:paymentInfo,
-											successMsg:"Payment was successful",
-											redirect:FlowRouter.path("singlePayment",{id:paymentInfo.studentId})
-										});
-									}else{
-										paymentInfo.failedPaymentReason = response.desc;
-										Session.set("st.info",paymentInfo);
-									}
-							  }
-							</script>
-						</div>
-					{{else}}
-						<button class="btn btn-primary" id="proceedPayment" title="Click to confirm payment details above">Proceed</button>
-					{{/if}}
-				{{/with}}
-			{{else}}
-				<p>No student is selected for this payment. Select a student first.</p>
-			{{/if}}
-			
-		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+	<div class="row">
+		<h5>Payment details</h5><hr/>
 	
+		{{#if paymentFor}}
+		<div class="col-sm-12">	
+			<form id="createPaymentReceipt">
+				<select name="paymentCat">
+					{{#each paymentFor.category}}
+						<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+				<select name="paymentMethod">
+					<option value="Cash">Cash</option>
+					<option value="Online">Online</option>
+				</select>
+				<button type="submit" class="btn btn-primary btn-sm">Create receipt</button>
+			</form>
+			<p class="text-info">Select a payment category and payment method above and proceed to pay.</p>
+		</div>
+			{{#with paymentFor.stInfo}}
+		<div class="col-sm-6">
+			<img src="/student10.png" style="max-width:100px;margin:10px;">
+			<table class="table table-responsive table-striped table-bordered table-sm">
+				<tbody>
+					<tr>
+						<td>Name</td>
+						<td>{{name}}</td>	
+					</tr>
+					<tr>
+						<td>Student Id</td>
+						<td>{{studentId}}</td>
+					</tr>
+					<tr>
+						<td>Current class</td>
+						<td>{{currentClass}}</td>
+					</tr>
+					<tr>
+						<td>Current term</td>
+						<td>{{termSuffix term}}</td>
+					</tr>
+					<tr>
+						<td>Payment category</td>
+						<td>{{paymentCategory}}</td>
+					</tr>
+					<tr>
+						<td>Amount</td>
+						<td>{{amount}}</td>
+					</tr>
+					<tr>
+						<td>Payment method</td>
+						<td>{{method}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="text-danger"><strong>
+				Please note:</strong><br/>
+				<span>Cash payment means that you've collected this payment by hand.</span><br/>
+				<span>Online payment will be processed by interswitch payment gateway.</span>
+			</p>
+			{{#if failedPaymentReason}}
+				<p class="text-danger"><strong>Payment failed due to {{failedPaymentReason}}. Try again!</strong></p>
+			{{/if}}
+			{{#if paymentMethod method}}
+				<div id="onlinePayment">
+					<a data-isw-payment-button data-isw-ref='kGM0Ul8XP'>
+					  <script type='text/javascript' 
+					    src='https://qa.interswitchng.com/paymentgateway/public/js/webpay.js' 
+					    data-isw-customer-ref='{{transactionId}}' 
+					    data-isw-customer-callback='cardPaymentCallback'
+					    data-isw-trans-amount='{{amount}}00'> 
+					  </script>
+					</a>
+					<script>
+					  function cardPaymentCallback(response){
+					  		if(!response){
+						  		return;
+						  	}
+						  	let paymentInfo = Session.get('st.info'); 
+							if(response.resp==="00" && response.desc=="Approved by Financial Institution" && response.payRef!==response.txnref){
+								paymentInfo.response = response;
+								g.meteorCall("updatePaymentByCard",{doc:paymentInfo,
+									successMsg:"Payment was successful",
+									redirect:FlowRouter.path("singlePayment",{id:paymentInfo.studentId})
+								});
+							}else{
+								paymentInfo.failedPaymentReason = response.desc;
+								Session.set("st.info",paymentInfo);
+							}
+					  }
+					</script>
+				</div>
+			{{else}}
+				<button class="btn btn-primary" id="proceedPayment" title="Click to confirm payment details above">Proceed</button>
+			{{/if}}
+		</div>
+			{{/with}}
+		{{else}}
+			<p>No student is selected for this payment. Select a student first.</p>
+		{{/if}}
+	</div>
 </template>
 <!-- Payments templates end -->
 <!-- ******************************************* -->
 <!-- *************Break Break Break************* -->
 <!-- ******************************************* -->
 <template name="assignmentList">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">
 			<h5>
@@ -2022,103 +1933,94 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="singleAssignment">
-		{{#if Template.subscriptionsReady}}
-		<div class="row">
-			{{#with assignment}}
-			<div class="col-sm-5">
-				<h5>{{title}}</h5><hr/>
-				<article>
-					<h5>Question</h5>
-					<p class="text-justify">{{content}}</p>
-					<span class="badge badge-info">Class: {{class}}</span>
-					<span class="badge badge-info">Subject: {{subject}}</span>
-					<span class="badge badge-info">Mark: {{totalScore}}</span>
-					<span class="badge badge-info">Start date: {{dateFormat startDate}}</span>
-					<span class="badge badge-info">End date: {{dateFormat endDate}}</span><br/>
-					<p>
-						Posted by: 
-						{{#if isInRole 'admin, editor'}}
-							<strong>
-							<a href="{{pathFor 'singleStaff'}}/{{staffId}}" class="text-primary">{{author}}</a>
-							</strong>
-						{{else}}
-							<strong>{{author}}</strong>
-						{{/if}}
-					</p>
-					{{#if canEdit}}
-					<p class="float-right">
-						<span title="click to modify this assignment">
-							<a href="{{pathFor 'editAssignment'}}/{{_id}}" class="btn btn-warning btn-sm">Edit</a>
-						</span>
-					</p><br/>
+	<div class="row">
+		{{#with assignment}}
+		<div class="col-sm-5">
+			<h5>{{title}}</h5><hr/>
+			<article>
+				<h5>Question</h5>
+				<p class="text-justify">{{content}}</p>
+				<span class="badge badge-info">Class: {{class}}</span>
+				<span class="badge badge-info">Subject: {{subject}}</span>
+				<span class="badge badge-info">Mark: {{totalScore}}</span>
+				<span class="badge badge-info">Start date: {{dateFormat startDate}}</span>
+				<span class="badge badge-info">End date: {{dateFormat endDate}}</span><br/>
+				<p>
+					Posted by: 
+					{{#if isInRole 'admin, editor'}}
+						<strong>
+						<a href="{{pathFor 'singleStaff'}}/{{staffId}}" class="text-primary">{{author}}</a>
+						</strong>
 					{{else}}
-					<p style="float: right;">
-						<span class="btn btn-warning btn-sm" title="You cannot edit this assignment">
-							<span class="fa fa-ban"></span>	
-							Edit
-						</span>
-					</p>
+						<strong>{{author}}</strong>
 					{{/if}}
-					<p>
-						{{#if answerCount}} 
-							<strong>{{answerCount}} answer(s) submitted. </strong>
-						{{else}} 
-							<strong>No answer submitted yet.</strong>
-						{{/if}}
-					</p>
-					
-				</article>
-			</div>
-			<div class="col-sm-7">
-				{{#if answerList}}
-				<h5>Answers</h5><hr/>
-				{{#each answerList}}
-					<article>
-						<h6 class="badge badge-secondary">{{fullName}}</h6>
-						<p>{{text}}</p>
-							{{#if score}}
-								<span><strong>Score: </strong>{{score}} / {{assignment.totalScore}}</span> <i class="fa fa-check fa-2x" style="color: green;"></i>&nbsp;&nbsp;<span><strong>Comment: </strong></span><content class="text-danger">{{comment}}</content>
-							{{else}}
-								{{#if assignment.canEdit}}
-								<form class="form-group">
-									<label>Award score: </label>
-									<input type="number" max="{{assignment.totalScore}}" min="0" name="score" placeholder="score this answer" required> 
-									<input type="text" name="comment" placeholder="comment">
-									<button type="submit" class="btn btn-primary btn-sm">Submit</button>
-									<div style="display: none;">
-										<div style="display: none;">
-											<p style="display: none;">
-												<input type="hidden" name="id" value="{{assignment._id}}" style="display: none;">
-											</p>
-										</div>
-									</div>
-								</form>
-
-								{{else}}
-									<span class="text-danger">Not yet marked by the teacher</span>
-								{{/if}}
-							{{/if}}
-							<br/>
-							<span class="badge badge-info">Submitted on: {{dateFormat date}}</span>
-					</article><hr/>
-				{{/each}}
+				</p>
+				{{#if canEdit}}
+				<p class="float-right">
+					<span title="click to modify this assignment">
+						<a href="{{pathFor 'editAssignment'}}/{{_id}}" class="btn btn-warning btn-sm">Edit</a>
+					</span>
+				</p><br/>
+				{{else}}
+				<p style="float: right;">
+					<span class="btn btn-warning btn-sm" title="You cannot edit this assignment">
+						<span class="fa fa-ban"></span>	
+						Edit
+					</span>
+				</p>
 				{{/if}}
-			</div>
-			{{/with}}
+				<p>
+					{{#if answerCount}} 
+						<strong>{{answerCount}} answer(s) submitted. </strong>
+					{{else}} 
+						<strong>No answer submitted yet.</strong>
+					{{/if}}
+				</p>
+				
+			</article>
 		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
-	
+		<div class="col-sm-7">
+			{{#if answerList}}
+			<h5>Answers</h5><hr/>
+			{{#each answerList}}
+				<article>
+					<h6 class="badge badge-secondary">{{fullName}}</h6>
+					<p>{{text}}</p>
+						{{#if score}}
+							<span><strong>Score: </strong>{{score}} / {{assignment.totalScore}}</span> <i class="fa fa-check fa-2x" style="color: green;"></i>&nbsp;&nbsp;<span><strong>Comment: </strong></span><content class="text-danger">{{comment}}</content>
+						{{else}}
+							{{#if assignment.canEdit}}
+							<form class="form-group">
+								<label>Award score: </label>
+								<input type="number" max="{{assignment.totalScore}}" min="0" name="score" placeholder="score this answer" required> 
+								<input type="text" name="comment" placeholder="comment">
+								<button type="submit" class="btn btn-primary btn-sm">Submit</button>
+								<div style="display: none;">
+									<div style="display: none;">
+										<p style="display: none;">
+											<input type="hidden" name="id" value="{{assignment._id}}" style="display: none;">
+										</p>
+									</div>
+								</div>
+							</form>
+
+							{{else}}
+								<span class="text-danger">Not yet marked by the teacher</span>
+							{{/if}}
+						{{/if}}
+						<br/>
+						<span class="badge badge-info">Submitted on: {{dateFormat date}}</span>
+				</article><hr/>
+			{{/each}}
+			{{/if}}
+		</div>
+		{{/with}}
+	</div>
 </template>
 <template name="newAssignment">
-		<!-- Moddal start -->
 	<div class="modal fade">
 		<div class="modal-dialog" role='document'>
 			<div class="modal-content">
@@ -2152,7 +2054,6 @@
 	</div>
 </template>
 <template name="editAssignment">
-	{{#if Template.subscriptionsReady}}
 	<div class=" col-sm-10">
 		<h3>Edit assignment</h3><hr/> <br/>
 		{{#autoForm schema="g.Schemas.Assignment" id="editAssignment" type="normal" afFieldInput-placeholder="schemaLabel" doc=assignmentToEdit validation='blur'}}
@@ -2168,15 +2069,11 @@
 			</div>
 		{{/autoForm}}
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 <!-- ******************************************* -->
 <!-- *************Break Break Break************* -->
 <!-- ******************************************* -->
 <template name='messages'>
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">
 			<h3>Messages</h3><hr/>
@@ -2211,13 +2108,9 @@
 			 </div>
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="inboxMessage">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">	
 		<div class="col-sm-12">
 			<br/>
@@ -2266,13 +2159,9 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="sentMessage">
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm">
 			<br/>
@@ -2320,205 +2209,165 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 <template name="singleMessage">
-		{{#if Template.subscriptionsReady}}
-		<div class="row">
-			<div class="col-sm-12">
-			{{#with message}}
-				<h4>{{subject}}</h4><hr/>
-				<span><b>Sender: </b>{{senderName}}</span><br/>
-				<span><b>Receiver: </b>{{staffName}}</span><br/>
-				<span><b>Date: </b>{{dateFormat createdAt}}</span><br/>
-				<span><b>Replies: </b>{{count}}</span><br/><hr/>
-				<article style="padding:1em;line-height:2;">
-					{{content}}
-				</article>
-			{{/with}}
-			<form>
-				<div class="form-group">
-					<textarea class="form-control" placeholder="Reply to this message" minlength="5" rows="5" name="reply" required></textarea>
-				</div>
-				<button class="btn btn-primary btn-sm" type="submit">Submit reply</button>
-			</form><br/>
-			{{#if msgReply}}
-				<h5>Replies <span class="badge badge-info" title="{{count}} replies">{{count}}</span></h5><hr/>
-				{{#each msgReply}}
-				<div class="reply">
-					<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}} </strong></span>
-					<span title="Posted date"><strong> {{dateFormat replyDate}}</strong></span>
-
-					</p>
-					<p style="padding-left:2em;">{{reply}}</p>
-
-				</div>
-				<hr/>		
-				{{/each}}
-			
-			{{else}}
-				<h3>No Replies</h3>
-			{{/if}}
+	<div class="row">
+		<div class="col-sm-12">
+		{{#with message}}
+			<h4>{{subject}}</h4><hr/>
+			<span><b>Sender: </b>{{senderName}}</span><br/>
+			<span><b>Receiver: </b>{{staffName}}</span><br/>
+			<span><b>Date: </b>{{dateFormat createdAt}}</span><br/>
+			<span><b>Replies: </b>{{count}}</span><br/><hr/>
+			<article style="padding:1em;line-height:2;">
+				{{content}}
+			</article>
+		{{/with}}
+		<form>
+			<div class="form-group">
+				<textarea class="form-control" placeholder="Reply to this message" minlength="5" rows="5" name="reply" required></textarea>
 			</div>
-		</div>
+			<button class="btn btn-primary btn-sm" type="submit">Submit reply</button>
+		</form><br/>
+		{{#if msgReply}}
+			<h5>Replies <span class="badge badge-info" title="{{count}} replies">{{count}}</span></h5><hr/>
+			{{#each msgReply}}
+			<div class="reply">
+				<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}} </strong></span>
+				<span title="Posted date"><strong> {{dateFormat replyDate}}</strong></span>
+
+				</p>
+				<p style="padding-left:2em;">{{reply}}</p>
+
+			</div>
+			<hr/>		
+			{{/each}}
+		
 		{{else}}
-			{{>smsLoading}}
+			<h3>No Replies</h3>
 		{{/if}}
+		</div>
+	</div>
 </template>
 
 <template name="newMessage">
-		{{#if Template.subscriptionsReady}}
-		<div class="col-sm-10">
-			<div class="alert alert-info alert-dismissible" role='alert'>
-			<button type="button" class="close" data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
-				Please Note: 
-					<ul>
-						<li>
-						Select staff(s) to send a message, 
-						<strong>hold ctrl key to select multiple staff.</strong>
-						</li>
-						<li>
-							Select class(es) of students to send a message, 
-							<strong>select multiple boxes to send message to different classes.</strong>
-						</li>
-						<li>
-							If message is to be sent a single student, <a href="{{pathFor 'studentList'}}" class="alert-link">open student</a> details and click on <strong>send message</strong>.
-						</li>
-					</ul>
-			</div>
-			<label>Staff (<small>if sms is for staff</small>)</label><br/>
-			<input type="checkbox" class="all_staff">All Staffs
-			<form>
-				<div class="form-group">
-					<select name="staff" class="form-control msgStaff" multiple="true">
-						{{#each staff}}
-							<option value="{{meteorIdInStaff}}" name='{{lastName}} {{firstName}} {{otherName}}'>{{lastName}}, {{firstName}} {{otherName}}</option>
-						{{/each}}
-					</select>
-				</div>
-				<div id="msgClass">
-					<label>Class of students (<small>if message is for one or more classes</small>)</label> <br/>
-					{{#each classes}}
-					<label class="checkbox-inline">
-						<input type="checkbox" name="class" value="{{this}}">{{this}}
-					</label>
-					{{/each}}
-				</div><br/>
-				<div class="form-group">
-					<label for="title">Subject</label><br/>
-					<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="5">
-				</div>
-				<div class="form-group">
-					<label for="content">Message body</label><br/>
-					<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="10"></textarea>
-				</div>
-
-				<button type="submit" class="btn btn-primary">Send message</button>
-				<button type="button" class="btn btn-danger">Save to draft</button>
-			</form><br/>
+	<div class="col-sm-10">
+		<div class="alert alert-info alert-dismissible" role='alert'>
+		<button type="button" class="close" data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+			Please Note: 
+				<ul>
+					<li>
+					Select staff(s) to send a message, 
+					<strong>hold ctrl key to select multiple staff.</strong>
+					</li>
+					<li>
+						Select class(es) of students to send a message, 
+						<strong>select multiple boxes to send message to different classes.</strong>
+					</li>
+					<li>
+						If message is to be sent a single student, <a href="{{pathFor 'studentList'}}" class="alert-link">open student</a> details and click on <strong>send message</strong>.
+					</li>
+				</ul>
 		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+		<label>Staff (<small>if sms is for staff</small>)</label><br/>
+		<input type="checkbox" class="all_staff">All Staffs
+		<form>
+			<div class="form-group">
+				<select name="staff" class="form-control msgStaff" multiple="true">
+					{{#each staff}}
+						<option value="{{meteorIdInStaff}}" name='{{lastName}} {{firstName}} {{otherName}}'>{{lastName}}, {{firstName}} {{otherName}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div id="msgClass">
+				<label>Class of students (<small>if message is for one or more classes</small>)</label> <br/>
+				{{#each classes}}
+				<label class="checkbox-inline">
+					<input type="checkbox" name="class" value="{{this}}">{{this}}
+				</label>
+				{{/each}}
+			</div><br/>
+			<div class="form-group">
+				<label for="title">Subject</label><br/>
+				<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="5">
+			</div>
+			<div class="form-group">
+				<label for="content">Message body</label><br/>
+				<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="10"></textarea>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Send message</button>
+			<button type="button" class="btn btn-danger">Save to draft</button>
+		</form><br/>
+	</div>
 </template>
 
 <template name="draftMessage">
-		{{#if Template.subscriptionsReady}}
-
-			<h3>Draft Message</h3>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+	<h3>Draft Message</h3>
 </template>
 <!-- ******************************************* -->
 <!-- *************Break Break Break************* -->
 <!-- ******************************************* -->
-
 <template name="sms">
-	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Short Message Services</h3><hr/>
-			<div class="info">
-				<h4>SMS Balance: 15,711</h4><br/>
-				<h4><u>Recently sent SMS</u></h4>
-			</div>
+	<div class=" col-sm-8">
+		<h3>Short Message Services</h3><hr/>
+		<div class="info">
+			<h4>SMS Balance: 15,711</h4><br/>
+			<h4><u>Recently sent SMS</u></h4>
 		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+	</div>
 </template>
 
-
 <template name="newSms">
-	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Compose SMS</h3><hr/>
-			<label>Staff (<small>if SMS is for staff</small>)</label><br/>
-			<input type="checkbox" class="all_staff">All Staffs
-			<form>
-				<div class="form-group">
-					<label class="text-info">Showing only staffs with phone number.</label>
-					<select name="staff" class="form-control smsStaff" multiple="true">
-						{{#each staff}}
-							<option value="{{phone}}">{{lastName}} {{firstName}} ({{phone}})</option>
-						{{/each}}
-					</select>
-				</div>
-				<div class="smsClass">
-					<label>Class of students (<small>if SMS is for one or more classes</small>)</label> <br/>
-					{{#each classes}}
-					<span class="checkbox-inline">
-						<input type="checkbox" name="class" value="{{this}}">{{this}}(73)
-					</span>
+	<div class=" col-sm-8">
+		<h3>Compose SMS</h3><hr/>
+		<label>Staff (<small>if SMS is for staff</small>)</label><br/>
+		<input type="checkbox" class="all_staff">All Staffs
+		<form>
+			<div class="form-group">
+				<label class="text-info">Showing only staffs with phone number.</label>
+				<select name="staff" class="form-control smsStaff" multiple="true">
+					{{#each staff}}
+						<option value="{{phone}}">{{lastName}} {{firstName}} ({{phone}})</option>
 					{{/each}}
-				</div><br/>
-				<div class="form-group">
-					<label>Message</label><br/>
-					<textarea class="form-control" rows="6" required placeholder="Message" name="message" minlength="10"></textarea>
-				</div>
-				<p class="smsCost">
-					<b>
-					Character: <span class="characterCount">0/160</span> =>
-					Cost: <span class="smsCount">0</span> SMS
-					</b>	
-				</p>
-				<button type="submit" class="btn btn-primary">Send SMS</button>
-			</form><br/>
-			
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+				</select>
+			</div>
+			<div class="smsClass">
+				<label>Class of students (<small>if SMS is for one or more classes</small>)</label> <br/>
+				{{#each classes}}
+				<span class="checkbox-inline">
+					<input type="checkbox" name="class" value="{{this}}">{{this}}(73)
+				</span>
+				{{/each}}
+			</div><br/>
+			<div class="form-group">
+				<label>Message</label><br/>
+				<textarea class="form-control" rows="6" required placeholder="Message" name="message" minlength="10"></textarea>
+			</div>
+			<p class="smsCost">
+				<b>
+				Character: <span class="characterCount">0/160</span> =>
+				Cost: <span class="smsCount">0</span> SMS
+				</b>	
+			</p>
+			<button type="submit" class="btn btn-primary">Send SMS</button>
+		</form><br/>
+	</div>
 </template>
 
 <template name="performance">
-	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Performance Analysis</h3><hr/>
-			
-			
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+	<div class=" col-sm-8">
+		<h3>Performance Analysis</h3><hr/>
+	</div>
 </template>
 
 <template name="studentPerformance">
-	{{#if Template.subscriptionsReady}}
-		<div class=" col-sm-8">
-			<h3>Student Performance Analysis</h3><hr/>
-			
-			
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+	<div class=" col-sm-8">
+		<h3>Student Performance Analysis</h3><hr/>
+	</div>
 </template>
 <template name="graduatedStudents">
 	<h5>Graduated Students List</h5><hr/>
-	{{#if Template.subscriptionsReady}}
 	<div class="row">
 		<div class="col-sm-12">	
 			<h4 class="text-info">
@@ -2562,151 +2411,138 @@
 			{{/if}}
 		</div>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>
 
 <template name="singleGraduatedStudent">
-	{{#if Template.subscriptionsReady}}
 		<!-- Admission Information -->
-		{{#with graduate}}
-		<h5>{{lastName}}, {{firstName}} {{otherName}} ({{currentClass}} {{graduatedYear}})</h5><hr/>	
-		<div class="row">
-			<div class="col-sm-8">	
-				<table class="table table-responsive table-striped">
-				<thead>
-					<tr>
-						<th colspan="2" class="table-info">Profile</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th>Last Name</th><td>{{lastName}}</td>
-					</tr>
-					<tr>
-						<th>First Name</th><td>{{firstName}}</td>
-					</tr>
-					<tr>
-						<th>Other Name</th><td>{{otherName}}</td>
-					</tr>
-					<tr>	
-						<th>Gender</th> <td>{{gender}}</td>
-					</tr>
-					<tr>
-						<th>Class</th>	<td>{{currentClass}}</td>
-					</tr>
-					<tr>
-						<th>Student ID</th> <td>{{studentId}}</td>
-					</tr>
-					<tr>
-						<th>Email</th> <td>{{email}}</td>
-					</tr>
-					<tr>
-						<th>Date of Birth</th> <td>{{dayMonthYear dob}}</td>
-					</tr>
-					<tr>
-						<th>State</th> <td>{{state}} State</td>
-					</tr>
-					<tr>
-						<th>Town</th> <td>{{town}}</td>
-					</tr>
-					
-					<tr>
-						<th>Club and Society</th> <td>{{club}}</td>
-					</tr>
-					<tr>
-						<th>Contact Number</th> <td>{{phone}}</td>
-					</tr>
-					<tr>
-						<th>Present Address</th> <td>{{presentAddress}}</td>
-					</tr>
-					<tr>
-						<th>Home Address</th> <td>{{homeAddress}}</td>
-					</tr>
-					<tr>
-						<th>Hobbies</th> <td>{{hobby}}</td>
-					</tr>
-					<tr>
-						<th colspan="2" class="table-info">Parent/Guardian</th>
-					</tr>
-					<tr>
-						<th>Name</th>
-						<td>{{parentOrGuardian.name}}</td>
-					</tr>
-					<tr>
-						<th>Address</th>
-						<td>{{parentOrGuardian.address}}</td>
-					</tr>
-					<tr>
-						<th>Contact Number</th>
-						<td>{{parentOrGuardian.phone}}</td>
-					</tr>
-					<tr>
-						<th colspan="2" class="table-info">Next of kin</th>
-					</tr>
-					<tr>
-						<th>Next of kin name</th> <td>{{nok.name}}</td>
-					</tr>
-					<tr>
-						<th>Next of kin address</th> <td>{{nok.address}}</td>
-					
-					</tr>
-					
-					<tr>
-						<th>Next of kin contact</th> <td>{{nok.phone}}</td>
-					</tr>
-					<tr>
-						<th>Next of kin relationship</th> <td>{{nok.relationship}}</td>
-					</tr>
-				</tbody>
-				</table>
-			</div>
-			<div class="col-sm-4">
-				<p><img src="{{studentId}}.png" alt="Student Passport Photograph"></p>
-				<p><a href="{{pathFor 'singleResult'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-check-circle"></span> View Results</a></p>
-				<p><a href="{{pathFor 'singlePayment'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-money"></span> View Payments</a></p>
-				<p><a href="{{pathFor 'performance'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-bar-chart-o"></span> View Performance</a></p>
-				<p><button class="btn btn-danger" title="Demote student to SSS3" id="demoteGraduate">Demote student</button></p>
-			</div>	
+	{{#with graduate}}
+	<h5>{{lastName}}, {{firstName}} {{otherName}} ({{currentClass}} {{graduatedYear}})</h5><hr/>	
+	<div class="row">
+		<div class="col-sm-8">	
+			<table class="table table-responsive table-striped">
+			<thead>
+				<tr>
+					<th colspan="2" class="table-info">Profile</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Last Name</th><td>{{lastName}}</td>
+				</tr>
+				<tr>
+					<th>First Name</th><td>{{firstName}}</td>
+				</tr>
+				<tr>
+					<th>Other Name</th><td>{{otherName}}</td>
+				</tr>
+				<tr>	
+					<th>Gender</th> <td>{{gender}}</td>
+				</tr>
+				<tr>
+					<th>Class</th>	<td>{{currentClass}}</td>
+				</tr>
+				<tr>
+					<th>Student ID</th> <td>{{studentId}}</td>
+				</tr>
+				<tr>
+					<th>Email</th> <td>{{email}}</td>
+				</tr>
+				<tr>
+					<th>Date of Birth</th> <td>{{dayMonthYear dob}}</td>
+				</tr>
+				<tr>
+					<th>State</th> <td>{{state}} State</td>
+				</tr>
+				<tr>
+					<th>Town</th> <td>{{town}}</td>
+				</tr>
+				
+				<tr>
+					<th>Club and Society</th> <td>{{club}}</td>
+				</tr>
+				<tr>
+					<th>Contact Number</th> <td>{{phone}}</td>
+				</tr>
+				<tr>
+					<th>Present Address</th> <td>{{presentAddress}}</td>
+				</tr>
+				<tr>
+					<th>Home Address</th> <td>{{homeAddress}}</td>
+				</tr>
+				<tr>
+					<th>Hobbies</th> <td>{{hobby}}</td>
+				</tr>
+				<tr>
+					<th colspan="2" class="table-info">Parent/Guardian</th>
+				</tr>
+				<tr>
+					<th>Name</th>
+					<td>{{parentOrGuardian.name}}</td>
+				</tr>
+				<tr>
+					<th>Address</th>
+					<td>{{parentOrGuardian.address}}</td>
+				</tr>
+				<tr>
+					<th>Contact Number</th>
+					<td>{{parentOrGuardian.phone}}</td>
+				</tr>
+				<tr>
+					<th colspan="2" class="table-info">Next of kin</th>
+				</tr>
+				<tr>
+					<th>Next of kin name</th> <td>{{nok.name}}</td>
+				</tr>
+				<tr>
+					<th>Next of kin address</th> <td>{{nok.address}}</td>
+				
+				</tr>
+				
+				<tr>
+					<th>Next of kin contact</th> <td>{{nok.phone}}</td>
+				</tr>
+				<tr>
+					<th>Next of kin relationship</th> <td>{{nok.relationship}}</td>
+				</tr>
+			</tbody>
+			</table>
 		</div>
-		{{/with}}
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+		<div class="col-sm-4">
+			<p><img src="{{studentId}}.png" alt="Student Passport Photograph"></p>
+			<p><a href="{{pathFor 'singleResult'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-check-circle"></span> View Results</a></p>
+			<p><a href="{{pathFor 'singlePayment'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-money"></span> View Payments</a></p>
+			<p><a href="{{pathFor 'performance'}}/{{studentId}}" class="btn btn-primary btn-sm"><span class="fa fa-bar-chart-o"></span> View Performance</a></p>
+			<p><button class="btn btn-danger" title="Demote student to SSS3" id="demoteGraduate">Demote student</button></p>
+		</div>	
+	</div>
+	{{/with}}
 </template>
 
 <template name="logs">
-	{{#if Template.subscriptionsReady}}
-		<div class="col-sm-12">
-			<h5>Activity log</h5><hr/>
-			<table class="table table-responsive table-bordered table-striped table-sm serial">
-				<thead>
-					<tr>
-						<th>S/N</th>
-						<th>Action</th>
-						<th>Time</th>
-					</tr>	
-				</thead>
-				<tbody>
-				{{#each log}}
-					<tr>
-						<td></td>
-						<td>{{name}} {{action}}</td>
-						<td>{{dateFormat time}}</td>
-					</tr>
-				{{/each}}
-				</tbody>
-			</table>
-			
-		</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
+	<div class="col-sm-12">
+		<h5>Activity log</h5><hr/>
+		<table class="table table-responsive table-bordered table-striped table-sm serial">
+			<thead>
+				<tr>
+					<th>S/N</th>
+					<th>Action</th>
+					<th>Time</th>
+				</tr>	
+			</thead>
+			<tbody>
+			{{#each log}}
+				<tr>
+					<td></td>
+					<td>{{name}} {{action}}</td>
+					<td>{{dateFormat time}}</td>
+				</tr>
+			{{/each}}
+			</tbody>
+		</table>
+	</div>
 </template>
 
 <template name="subjectMgmt">
-	{{#if Template.subscriptionsReady}}
 	<h4>Subject Management</h4><hr/>
 	<div class="row">
 		<div class="col-sm-6 subject">
@@ -2782,7 +2618,4 @@
 			
 		</section>
 	</div>
-	{{else}}
-		{{>smsLoading}}
-	{{/if}}
 </template>

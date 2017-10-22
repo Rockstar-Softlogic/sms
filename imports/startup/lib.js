@@ -10,6 +10,7 @@ g.bloodGroupArray = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 g.genotypeArray = ["AA","AS","SS","AC","SC","CC"];
 g.medicalConditionArray = ["Typhoid","Measles","Sickle cell","Tuberculosis","Asthma","HIV"];
 g.subjectArray = ["English Language","Mathematics","Physics","Chemistry","Biology","Economics","Geography"];
+
 //subjects Array
 // g.subjectArray = g.Subjects.findOne({"_id":"default"});
 // console.log(g.subjectArray);
@@ -25,12 +26,7 @@ g.subjectArray = ["English Language","Mathematics","Physics","Chemistry","Biolog
 
 //app setting
 g.setting = function(){
-	if(Meteor.isClient){
-		let config = Meteor.subscribe('setting');
-		if(config.ready()){
-			return g.Settings.findOne({_id:"default"});
-		}
-	}
+	return g.Settings.findOne({_id:"default"});
 }
 
 //Session Array
@@ -172,61 +168,6 @@ g.notice = function(text,time=8000,type="alert-info"){
 	    }
        return term;
  },
-//countdown timer
-g.CountDown = function(minute){
-	this.now = new Date(),
-	this.totalMin = this.now.getMinutes()+minute,
-	this.seconds = this.now.getSeconds(),
-	this.endHours = Math.floor(this.totalMin/60),
-	this.endMinutes = this.totalMin - (this.endHours*60),
-	this.endTime = this.now.getHours()+this.endHours+":"+this.endMinutes,
-	this.hoursDiff = Math.floor(minute/60),
-	this.minutesDiff = minute - (this.hoursDiff*60),
-	this.timeDiff = this.hoursDiff+":"+this.minutesDiff,
-	this.countDownDiff = function(){
-			var sec = 0//this.seconds,
-				min = this.minutesDiff,
-				hr = this.hoursDiff,
-				trackSec = 0,//auto submit seconds
-				trackMin = 0,//auto submit minute
-				trackHr = 0;//auto submit hour
-		Meteor.setTimeout(function count(){
-			var loc = window.location.pathname.split("#")[0].split("/");
-			if(loc[loc.length-1].length==17&&loc[loc.length-2]=="do"){
-				if(sec < 0){
-					sec = 59;//reset seconds to 59
-					min--;
-				}
-				if(min < 0){
-					min = 59;//reset minutes to 59
-					hr--;
-				}
-				if(hr < 0){
-					hr = 23;//reset hour to 23
-				}
-				if(sec<10)sec="0"+sec; //a digit to 2 digits;
-				if(min<10)min="0"+Math.abs(min);
-				if(hr<10)hr="0"+Math.abs(hr);
-				$(".count .timeCount h3").text(hr+":"+min+":"+sec);
-				sec--;
-				if(sec==trackSec&&min==trackMin&&hr==trackHr){
-					new Audio(window.location.origin+"/times_up.mp3").play();
-					$("form#questionsList").submit();
-					$(".count .timeCount span").html("<b>Time's up!</b>");
-					Meteor.clearTimeout(count);
-					return;
-				}
-				if((min == 5 && sec == 0) || (min == 10 && sec == 0) || (min < 1 && sec < 30)){
-					new Audio(window.location.origin+"/times_up.mp3").play();
-				}
-				Meteor.setTimeout(count,1000);
-			}else{
-					Meteor.clearTimeout(count);
-			}
-		}, 1000);
-	}
-}
-
 //logout function
 g.logout = function(){
  	let confirmLogout = bootbox.confirm("<h4>You are about to logout, continue?</h4>", function(result){

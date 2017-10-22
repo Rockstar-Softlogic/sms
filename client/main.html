@@ -8,55 +8,50 @@
 	<div class="container-fluid" id="login">
 		<div class="row justify-content-center">
 			<div class="col-sm-12">
-				<h4 class="text-center text-white">School Management System (Demo)</h4>
+				<h6 class="text-center text-white">SMS Login (demo)</h6>
 			</div>
-			<div class="col-sm-8 col-md-6 col-lg-4 form-container">
+			<div class="col-sm-10 col-md-6 col-lg-4 form-container">
 				{{#if currentUser}}
-				<h3>You're logged in as {{currentUser.username}}</h3>
-					{{#if isInRole 'staff'}}
-						<a href="/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
-					{{else}}
-						{{#if isInRole 'student'}}
-							<a href="/st/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+				<div class="text-center logged-in">
+					<h5>You're logged in as {{currentUser.username}}</h5>
+						{{#if isInRole 'staff'}}
+							<a href="/dashboard" class="btn btn-primary btn-sm">Dashboard</a>
 						{{else}}
-							{{> notFound}}
+							{{#if isInRole 'student'}}
+								<a href="/st/dashboard" class="btn btn-primary btn-sm">Dashboard</a>
+							{{else}}
+								{{> notFound}}
+							{{/if}}
 						{{/if}}
-					{{/if}}
-	          		<button class="btn btn-danger btn-lg" id="logout">Logout</button>
-	          		<a href="{{pathFor 'feedback'}}" class="btn btn-danger btn-lg"><span class="fa fa-envelope"></span> Support</a> 
+		          		<button class="btn btn-danger btn-sm" id="logout">Logout</button>
+		          		<a href="{{pathFor 'feedback'}}" class="btn btn-danger btn-sm"><span class="fa fa-envelope"></span> Support</a> 
+	        	</div>
 	        	{{else}}
-	        	<form class="login-form">
-	                <h3>SMS Login <span><a href="{{pathFor 'feedback'}}" class="btn btn-info btn-sm">Send feedback</a></span></h3>
-		               
-	                <h5 id="login-error" class="text-danger text-center" style="display:none;"></h5>
+	        	<form class="login-form">   
+	                <h6 id="login-error" class="text-danger text-center" style="display:none;"></h6>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text"  class="form-control" id="username" placeholder="username or email" required>
+                        <input type="text"  class="form-control" id="username" placeholder="username" required>
                     </div>
                     <div class="form-group">
                         <label>Password</label>
                         <input type="password" class="form-control" id="password" value="" placeholder="Password" required>
                     </div>
-	                 <button type="submit" id="btn-login" class="btn btn-primary btn-lg float-right">Login</button>
-	            </form><br/>
-	            <p>
-					<b><u>Login Credentials</u></b><br/>
-					<b>Admin Username: admin &amp; password:admin123 </b><br/>
-					<b>Staffs: staff1, staff2, staff3, staff4 &amp; password:@012345# </b><br/>
-					<b>Students: student1, student2, student3, student4 &amp; password:@012345# </b>
-				</p>
-				<p class="text-center">
-					<a href="http://www.lovelampsys.com" target="_blank" class="text-info">Lovelamp Systems &amp; Consulting Firm</a>
-				</p>
+                    <a href="{{pathFor 'feedback'}}" class="btn btn-info btn-sm">Send feedback</a>
+
+	                 <button type="submit" id="btn-login" class="btn btn-danger btn-sm float-right">Login</button>
+	            </form>
 	        	 {{/if}}
 			</div>
 		</div>
+		{{>networkStatus}}
 	</div>
+
 </template>
 
 <template name="smsLoading">
 	<div id="smsLoading" title="Processing">
-		<div class="text-center">
+		<div>
 			<h2><span class="fa fa-spin fa-spinner fa-2x"></span> Processing...</h2>
 		</div>
 	</div>
@@ -65,16 +60,16 @@
 	<div class="networkStatus">
 		{{#with networkStatus}}
 			{{#if connected}}
-				<!-- <p class="alert alert-info">Network Status: <button class="btn btn-success btn-xs">Connected</button></p> -->
+				<!-- <p class="alert alert-info">Network Status: <button class="btn btn-success btn-sm" disabled>Connected</button></p> -->
 			{{else}}
 				{{#if waiting}}
-					<p class="alert alert-info" title="click to reload">Network Status: <button class="btn btn-warning btn-xs" onclick="window.location.reload()">Reconnecting...</button><br/>
+					<p class="alert alert-info" title="click to reload">Network status: <button class="btn btn-warning btn-sm">Reconnecting...</button><br/>
 					<span>Retry count: {{retryCount}}</span>
 					</p>
 				{{/if}}
 				{{#if canTryReconnect}}
 					<p class="alert alert-danger">
-						<span>You're not connected!</span> <button class="btn btn-primary btn-xs" onclick="Meteor.reconnect()">Retry connect</button>
+						<span>You're not connected!</span> <button class="btn btn-primary btn-xs">Retry connect</button>
 					</p>
 				{{/if}}
 			{{/if}}	
@@ -95,20 +90,21 @@
 				<label>Email</label>
 				<div class="form-group">
 					<input type="email" class="form-control" id="email" name="email" placeholder="Email" minlength="5" required><br/>
-					<small class="text-danger">A valid email address.</small>
+					<!-- <small class="text-danger">A valid email address.</small> -->
 				</div>
    				{{/if}}
    			 	<label>Subject</label>
 				<div class="form-group">
 					<input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" minlength="5" maxlength="100" required><br/>
-					<small class="text-danger">Minimum: 5 characters, maximum: 100 characters.</small>
+					<!-- <small class="text-danger">Minimum: 5 characters, maximum: 100 characters.</small> -->
 				</div>
 				<label>Message</label>
                 <div class="form-group">
                 	<textarea class="form-control" type="textarea" id="message" placeholder="Message" minlength="50" maxlength="15000" rows="7" name="message"></textarea><br/>
-					<small class="text-danger">Minimum: 50 characters, maximum: 15000 characters</small>
+					<!-- <small class="text-danger">Minimum: 50 characters, maximum: 15000 characters</small> -->
                 </div>
-   				<button type="submit" id="submit" name="submit" class="btn btn-primary float-right">Submit Form</button>
+                <a href="/" class="btn btn-info btn-sm">Home</a>
+   				<button type="submit" id="submit" name="submit" class="btn btn-primary btn-sm float-right">Submit Form</button>
 	   		</form>
 	   	</div>
 	</div>

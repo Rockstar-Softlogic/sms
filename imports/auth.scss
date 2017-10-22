@@ -3,6 +3,10 @@
 @import './admin/client/main.scss'; // admin css code
 @import './student/client/main.scss'; // student css code
 @import './ui/main.scss';
+#content{
+    background-color: #fff;
+    padding:20px;
+}
 .crudNotice{
     position: fixed;
     padding: 5px;

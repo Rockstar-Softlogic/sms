@@ -1,16 +1,17 @@
 
 <template name="dashboard">
+{{#if Template.subscriptionsReady}}
 	{{#if currentUser}}
 		{{#if isInRole "staff,editor,admin"}}
 		<!-- top navbar -->
         <nav id="top-nav">
             <div class="brand">
-                 <img src="/lls-no-bg.png" alt="school logo" style="max-width:56px;">
+                 <img src="/logo.jpg" alt="school logo" style="max-width:50px;padding:5px;">
             </div>
             <div class="item clearfix">
                 <ul class="nav float-left">
                     <li class="nav-item"><span class="fa fa-bars nav-toggler" title="Toggle navigation"></span></li> 
-                    <li class="nav-item">{{currentUser.username}}</li>
+                    <li class="nav-item display-username">Hi, {{currentUser.username}}</li>
                 </ul>
                 <ul class="nav float-right">
                     <li class="nav-item dropdown-notification">
@@ -135,6 +136,9 @@
         </footer>
 		{{/if}}
 	{{/if}}
+{{else}}
+    {{>smsLoading}}
+{{/if}}
 </template>
 
 <!--Template for all student Users -->

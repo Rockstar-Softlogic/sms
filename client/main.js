@@ -44,7 +44,16 @@ Template.networkStatus.helpers({
                 return status;
         }
     },
-
+});
+Template.networkStatus.events({
+    "click p button":function(){
+        console.log(Meteor.isCordova);
+        if(Meteor.isCordova){
+            return false;
+        }else{
+            window.location.reload();
+        }
+    },
 });
 
 Template.feedback.events({

@@ -1,19 +1,13 @@
 //global template helpers
 Template.registerHelper("g.Schemas", g.Schemas);
 registerGlobalHelpers({
-    currentStaff:function(){//currentUser is already in use so currentStaff;
-            let sub = Meteor.subscribe('staff.info');
-            if(sub.ready()){
-                let staff = g.Staffs.findOne();
-                return staff;  
-            }  
+    currentStaff:function(){
+        let staff = g.Staffs.findOne({"meteorIdInStaff":Meteor.userId()});
+        return staff;  
     },
      currentStudent:function(){
-            let sub = Meteor.subscribe('student.info');
-            if(sub.ready()){
-                let student = g.Students.findOne();
-                return student;  
-            }  
+        let student = g.Students.findOne({"meteorIdInStudent":Meteor.userId()});
+        return student;  
     },
     termSuffix:function(term){
         return g.termSuffix(term);
@@ -36,15 +30,12 @@ registerGlobalHelpers({
         return g.subjectArray;
     },
     setting:function(){
-    let sub = Meteor.subscribe('setting');
-        if(sub.ready()){
-            let set = g.Settings.findOne({"_id":"default"});
+        let set = g.Settings.findOne({"_id":"default"});
             if(set){
                 return set;
             }else{
                 return {session:"Session not set",term:"Term not set",notification:"No any notification"};
             }
-        }
     },
     isObject:function(arg){
         if(typeof arg == "object"){
