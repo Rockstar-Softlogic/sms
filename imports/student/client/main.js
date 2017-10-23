@@ -1,10 +1,4 @@
 import './main.html';
-Template.studentLandingPage.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("log.list");
-		});
-});
 Template.studentLandingPage.helpers({
 	log:function(){
 		let logs = g.Logs.find({},{limit:5}).fetch();
@@ -16,16 +10,9 @@ Template.studentLandingPage.helpers({
 		return logs;
 	}
 });
-Template.stResult.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("student.result");
-			self.subscribe('student.info');
-		});
-});
 Template.stResult.helpers({
 	studentRes: function(){
-		let s = g.setting();if(!s)return;//review
+		let s = g.setting();
 		let query = g.Results.findOne(),
 			currentClass = g.Students.findOne().currentClass,
 			requestedResult = Session.get('stRequestedResult');
@@ -66,17 +53,9 @@ Template.stResult.events({
 		Session.set('stRequestedResult', request);
 	},
 });
-Template.stPayment.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("student.payment");
-			self.subscribe('student.info');
-			self.subscribe('staff.name');
-		});
-});
 Template.stPayment.helpers({
 	studentPay: function(){
-		let s = g.setting();if(!s)return;//review
+		let s = g.setting();
 		let query = g.Payments.findOne(),
 			currentClass = g.Students.findOne().currentClass,
 			requestedPayment = Session.get('stRequestedPayment');
@@ -121,12 +100,6 @@ Template.stPayment.events({
 		Session.set('stRequestedPayment', request);
 	},
 });
-Template.stAssignment.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("student.assignment");
-		});
-});
 Template.stAssignment.helpers({
 	'assignmentList': function(){
 		let assFilter = Session.get('assFilter'), assignments;
@@ -155,13 +128,7 @@ Template.stAssignment.events({
 		Session.set('assFilter', subject);
 	},
 });
-Template.stSingleAssignment.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("student.assignment");
-			self.subscribe("st.staffName");
-		});
-});
+
 Template.stSingleAssignment.helpers({
 	assignment: function(){
 		let id = FlowRouter.getParam('id'),
@@ -212,13 +179,6 @@ Template.stSingleAssignment.events({
 				}
 			});
 	}
-});
-
-Template.stLogs.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("log.list");
-		});
 });
 Template.stLogs.helpers({
 	log:function(){

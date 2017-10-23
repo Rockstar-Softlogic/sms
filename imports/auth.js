@@ -5,7 +5,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import "./auth.html";
 //ui
 import "./ui/bootstrap.min.js";
-import "./ui/perfect-scrollbar.jquery.js";
 import "./ui/main.js";
 //logic
 import "./startup/route.js";
@@ -16,55 +15,7 @@ import "./admin/client/main.js";
 var inbox = "article.inbox.dropdown-notice",
 		notice = "article.notification.dropdown-notice",
 		user = "li.nav-item.dropdown-user>ul";
-function toggleTablePadding(){
-	let width = window.innerWidth;
-	window.onload = function(){
-		alert("hi");
-		if(width<=475){
-			$("table").addClass("table-sm");
-		}else{
-			$("table").removeClass("table-sm");
-		}
-	}
-	window.onresize = function(){
-		if(width<=475){
-			$("table").addClass("table-sm");
-		}else{
-			$("table").removeClass("table-sm");
-		}
-	}
-}
-Template.dashboard.onCreated(function(){
-	let self = this;
-		self.autorun(function(){
-			self.subscribe("setting");
-			self.subscribe('editor.list');
-			self.subscribe('staff.list');
-			self.subscribe("staff.name");
-			self.subscribe("staff.info");
-			self.subscribe("student.list");
-			self.subscribe('graduate.list');
-			self.subscribe("result.list");
-			self.subscribe("payment.list");
-			self.subscribe("subject.list");
-			self.subscribe('message.list');
-			self.subscribe("assignment.list");
-			self.subscribe("log.list");
-		});
-});
-
-Template.dashboard.onRendered(function(){
-	$("#sidebar").perfectScrollbar({suppressScrollX:true});
-	$(".dropdown-user>ul").perfectScrollbar({suppressScrollX:true});
-	$("article.dropdown-notice").perfectScrollbar({suppressScrollX:true});
-	$(window).resize(function(){
-		$("#sidebar").removeClass("default-sidebar no-sidebar icon-sidebar");
-		$("#sidebar li.menu-item").children("a").children("span.fa").removeClass("fa-chevron-down").addClass("fa-chevron-right");
-		$(".menu-item>ul.submenu").slideUp("slow");
-		$("#main-content").attr("class","");
-	});
-});
-Template.dashboard.events({
+var TemplateEvents = {
 	"click #sidebar>ul>li":function(e){
 		let self = $(e.currentTarget);
 		var width = window.innerWidth;
@@ -129,8 +80,59 @@ Template.dashboard.events({
         e.preventDefault();
          g.logout();
     }
+};
+var TemplateOnRendered = function(){
+	var element = document.getElementById("sidebar");
+	new slimScroll(element);
+	// $("#sidebar").perfectScrollbar({suppressScrollX:true});
+	$(window).resize(function(){
+		$("#sidebar").removeClass("default-sidebar no-sidebar icon-sidebar");
+		$("#sidebar li.menu-item").children("a").children("span.fa").removeClass("fa-chevron-down").addClass("fa-chevron-right");
+		$(".menu-item>ul.submenu").slideUp("slow");
+		$("#main-content").attr("class","");
+	});
+}
+var TemplateOnDestroyed = function(){
+	$(window).off("resize");
+}
+
+//subscriptions
+Template.dashboard.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("setting");
+			self.subscribe('editor.list');
+			self.subscribe('staff.list');
+			self.subscribe("staff.name");
+			self.subscribe("staff.info");
+			self.subscribe("student.list");
+			self.subscribe('graduate.list');
+			self.subscribe("result.list");
+			self.subscribe("payment.list");
+			self.subscribe("subject.list");
+			self.subscribe('message.list');
+			self.subscribe("assignment.list");
+			self.subscribe("log.list");
+		});
+});
+Template.stDashboard.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("log.list");
+			self.subscribe("student.result");
+			self.subscribe('student.info');
+			self.subscribe("student.payment");
+			self.subscribe('staff.name');
+			self.subscribe("student.assignment");
+			self.subscribe("st.staffName");
+		});
 });
 
-Template.dashboard.onDestroyed(function(){
-	$(window).off("resize");
-});
+//onRendered,events,onDestroyed functions
+Template.dashboard.onRendered(TemplateOnRendered);
+Template.dashboard.events(TemplateEvents);
+Template.dashboard.onDestroyed(TemplateOnDestroyed);
+
+Template.stDashboard.onRendered(TemplateOnRendered);
+Template.stDashboard.events(TemplateEvents);
+Template.stDashboard.onDestroyed(TemplateOnDestroyed);

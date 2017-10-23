@@ -1,0 +1,35 @@
+
+App.info({
+  id: 'com.rssl.sms',
+  name: 'smsapp',
+  description: 'School Management System',
+  author: 'Rockstar Softlogic',
+  email: 'wisdomabioye@gmail.com',
+  website: 'lovelampsys.com'
+});
+// Set up resources such as icons and launch screens.
+// App.icons({
+//   'iphone_2x': 'icons/icon-60@2x.png',
+//   'iphone_3x': 'icons/icon-60@3x.png',
+//   // More screen sizes and platforms...
+// });
+App.launchScreens({
+  // 'iphone_2x': 'splash/Default@2x~iphone.png',
+  // 'iphone5': 'splash/Default~iphone5.png',
+  'android_ldpi_portrait':'public/rssl.png',
+  'android_ldpi_landscape':'public/rssl.png',
+  'android_mdpi_portrait':'public/rssl.png',
+  'android_mdpi_landscape':'public/rssl.png',
+  'android_hdpi_portrait':'public/rssl.png',
+  'android_hdpi_landscape':'public/rssl.png',
+  'android_xhdpi_portrait':'public/rssl.png',
+  ' android_xhdpi_landscape':'public/rssl.png',
+
+  // More screen sizes and platforms...
+});
+// Set PhoneGap/Cordova preferences.
+App.setPreference("SplashMaintainAspectRatio", true, "android");
+// App.setPreference('BackgroundColor', '0xff0000ff');
+App.setPreference('HideKeyboardFormAccessoryBar', true);
+App.setPreference('Orientation', 'default');
+App.setPreference('Orientation', 'all', 'ios');
