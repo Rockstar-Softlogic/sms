@@ -16,14 +16,14 @@ App.info({
 App.launchScreens({
   // 'iphone_2x': 'splash/Default@2x~iphone.png',
   // 'iphone5': 'splash/Default~iphone5.png',
-  'android_ldpi_portrait':'public/rssl.png',
-  'android_ldpi_landscape':'public/rssl.png',
-  'android_mdpi_portrait':'public/rssl.png',
-  'android_mdpi_landscape':'public/rssl.png',
-  'android_hdpi_portrait':'public/rssl.png',
-  'android_hdpi_landscape':'public/rssl.png',
-  'android_xhdpi_portrait':'public/rssl.png',
-  ' android_xhdpi_landscape':'public/rssl.png',
+  'android_ldpi_portrait':'public/rssl2320-480.png',
+  'android_ldpi_landscape':'public/rssl2320-480.png',
+  'android_mdpi_portrait':'public/rssl2320-480.png',
+  'android_mdpi_landscape':'public/rssl2320-480.png',
+  'android_hdpi_portrait':'public/rssl2320-480.png',
+  'android_hdpi_landscape':'public/rssl2320-480.png',
+  'android_xhdpi_portrait':'public/rssl2320-480.png',
+  ' android_xhdpi_landscape':'public/rssl2320-480.png',
 
   // More screen sizes and platforms...
 });
