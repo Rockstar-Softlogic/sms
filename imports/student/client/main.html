@@ -1,24 +1,152 @@
 <template name="studentLandingPage">
-	<section id="studentLandingPage">
-		<div class="notification" style="overflow-y:scroll;">
-			<h4>Notification <span class="fa fa-info"></span></h4>
-			<article>
-				{{{setting.notification}}}
-			</article>
+	<div class="row">
+		<div class="col-sm-12">
+			{{#if pendingPayment}}
+				<p class="alert alert-warning">This term school fees payment is pending &nbsp;&nbsp;<a href="{{pathFor 'stNewPayment'}}" class="btn btn-success btn-sm">Pay now</a></p>
+			{{/if}}
 		</div>
-		<div class="log">
-			<h4>Recent Activities</h4>
-			{{#each log}}
-				<strong>*</strong> <span>{{name}} {{action}} @{{dateFormat time}}</span><br/>
-			{{/each}}
-			<a href="{{pathFor 'stLogs'}}">See more...</a>
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-danger">
+						{{allResults}}
+						<span class="fa fa-check fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Results
+					</p>
+				</div>
+			</div>
 		</div>
-	</section>
+		<!-- card break -->
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						{{assignment.total}}
+						<span class="fa fa-adn fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Assignments
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- card break -->
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<p class="card-text">
+						<span class="text-info">Assignments</span><br/>
+						<span class="badge badge-info">Answered: {{assignment.answered}}</span>
+						<span class="badge badge-success">Marked: {{assignment.answeredAndMarked}}</span>
+						<span class="badge badge-danger">Unanswered: {{assignment.unanswered}}</span>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-6 col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-danger">
+						{{allPayments}}
+						<span class="fa fa-money fa-2x float-right"></span>
+					</h4>
+					<p class="card-text">
+						Payments
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- card break -->
+	</div><br/>
+	<div class="row">
+		<div class="col-sm-8">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						NOTIFICATION
+					</h4>
+					<div class="card-text notification">
+						<article>
+							<p>{{{setting.notification}}}</p>
+						</article>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-4">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h3 class="text-center text-secondary">Current</h3>
+					</div>
+					<div class="card-text">
+						<h4 class="text-info">
+							Session: {{setting.session}}
+						</h4>
+						<h4 class="text-info">
+							Term: {{termSuffix setting.term}}
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><br/>
+	<!-- end second row -->
+	<div class="row">
+		<div class="col-sm-7">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title text-info">
+						My Subjects
+					</h4>
+					<div class="card-text">
+					
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-5">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<h4 class="text-center text-danger">Recent Activities</h4>
+					</div>
+					<div class="card-text">
+						{{#each log}}
+							<strong>*</strong> <span>{{name}} {{action}}</span> <span class="badge badge-secondary">@{{dateFormat time}}</span><br/>
+						{{/each}}
+						<a href="{{pathFor 'stLogs'}}">See more...</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><br/>
+	<!-- end third row -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card text-white bg-info">
+				<div class="card-body">
+					<div class="card-title">
+						<h3 class="text-center">
+							Your Performance Analysis
+						</h3>
+					</div>
+					<div title="coming soon" class="card-text text-center">
+						<span class="fa fa-bar-chart-o fa-5x"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end last row -->
 </template>
 <template name="studentProfile">
 	<div class="row">
 		{{#with currentStudent}}
-		<div class="col-sm-8">
+		<div class="col-sm-12">
 			<h5>{{lastName}} {{firstName}} Profile</h5><hr/>
 			<table class="table table-responsive table-striped">
 					<thead>
@@ -283,6 +411,11 @@
 		<h5>Student Payments</h5><hr/>
 		<div class="row">
 			<div class="col-sm-12">
+			{{#if pendingPayment}}
+				<p class="alert alert-warning">This term school fees payment is pending &nbsp;&nbsp; <a href="{{pathFor 'stNewPayment'}}" class="btn btn-success btn-sm">Pay now</a></p>
+			{{/if}}
+		</div>
+			<div class="col-sm-12">
 				<form class='searchPayment'>
 					<select name="class">
 					{{#if availableClass}}
@@ -388,8 +521,8 @@
 								<td>{{transactionId}}</td>
 							</tr>
 							<tr>
-								<td>Receiver's Name</td>
-								<td>{{staffName}}</td>
+								<td>Payer</td>
+								<td>{{payerName}}</td>
 							</tr>
 							</tbody>
 					</table>
@@ -405,7 +538,97 @@
 			</div>	
 		</div>
 </template>
-
+<template name="stNewPayment">
+	<h5>New Payment</h5><hr/>
+	<div class="row">
+		<div class="col-sm-12">	
+			<form id="createPaymentReceipt">
+				<select name="paymentCat">
+					{{#each PaymentCategory}}
+						<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+				<button type="submit" class="btn btn-primary btn-sm">Create receipt</button>
+			</form>
+			<p class="text-info">Select a payment category above before proceeding to the payment gateway.</p>
+		</div>
+		{{#with currentStudent}}
+		<div class="col-sm-6">
+			<img src="/student10.png" style="max-width:100px;margin:10px;">
+			<table class="table table-responsive table-striped table-bordered table-sm">
+				<tbody>
+					<tr>
+						<th>Name</th>
+						<td>{{lastName}} {{firstName}} {{otherName}}</td>	
+					</tr>
+					<tr>
+						<th>Student Id</th>
+						<td>{{studentId}}</td>
+					</tr>
+					<tr>
+						<th>Current class</th>
+						<td>{{currentClass}}</td>
+					</tr>
+					<tr>
+						<th>Current term</th>
+						<td>{{termSuffix setting.term}}</td>
+					</tr>
+					<tr>
+						<th>Payment category</th>
+						<td>{{paymentInfo.paymentCategory}}</td>
+					</tr>
+					<tr>
+						<th>Amount</th>
+						<td>{{paymentInfo.amount}}</td>
+					</tr>
+					<tr>
+						<th>Payment method</th>
+						<td>Online</td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="text-danger"><strong>
+				Please note:</strong><br/>
+				<span>Online payment will be processed by interswitch payment gateway.</span>
+			</p>
+			 {{#if paymentInfo.failedPaymentReason}}
+				<p class="text-danger"><strong>Payment failed due to {{paymentInfo.failedPaymentReason}}. Try again!</strong></p>
+			{{/if}}
+			<div id="onlinePayment" style="display:none;">
+				{{#with paymentInfo}}
+					<a data-isw-payment-button data-isw-ref='kGM0Ul8XP'>
+					  <script type='text/javascript' 
+					    src='https://qa.interswitchng.com/paymentgateway/public/js/webpay.js' 
+					    data-isw-customer-ref='{{transactionId}}' 
+					    data-isw-customer-callback='cardPaymentCallback'
+					    data-isw-trans-amount='{{amount}}00'> 
+					  </script>
+					</a>
+				{{/with}}
+					<script>
+					  function cardPaymentCallback(response){
+					  		if(!response){
+						  		return;
+						  	}
+						  	console.log(response);
+						  	let iswPayment = Session.get('stPaymentInfo'); 
+							if(response.resp==="00" && response.desc=="Approved by Financial Institution" && response.payRef!==response.txnref){
+								iswPayment.response = response;
+								g.meteorCall("newPaymentByStudent",{doc:iswPayment,
+									successMsg:"Payment was successful",
+									redirect:"stPayment"
+								});
+							}else{
+								iswPayment.failedPaymentReason = response.desc;
+								Session.set("stPaymentInfo",iswPayment);
+							}
+					  }
+					</script>
+			</div>
+		</div> 
+			{{/with}}
+	</div>
+</template>
 <template name="stAssignment">
 	<h5>Assignment list</h5><hr/>
 	<div class="row">
@@ -538,7 +761,201 @@
 </template>
 		
 <template name="stMessage">
-	
+	<div class="row">
+		<div class="col-sm-12">
+			<h3>Messages</h3><hr/>
+		<!-- Nav tabs -->
+			  <ul class="nav nav-tabs" role="tablist">
+			    <li class="nav-item">
+			    	<a href="#inbox" aria-controls="inbox" role="tab" data-toggle="tab" class="nav-link active" aria-expanded="true">Inbox Messages</a>
+			    </li>
+			    <li class="nav-item">
+			    	<a href="#sent" aria-controls="sent" role="tab" data-toggle="tab" class="nav-link">Sent Messages</a>
+			    </li>
+			    <li class="nav-item">
+			    	<a href="#newMessage" aria-controls="newMessage" role="tab" data-toggle="tab" class="nav-link">Compose New</a>
+			    </li>
+			  </ul>
+			 <div class="tab-content">
+			    <div role="tabpanel" class="tab-pane fade show active" id="inbox">
+			    	{{> stInboxMessage}}
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="sent">
+			    	{{> stSentMessage}}
+			    </div>
+			    <div role="tabpanel" class="tab-pane fade" id="newMessage">
+			    	{{> stNewMessage}}
+			    </div>
+			 </div>
+		</div>
+	</div>
+</template>
+<template name="stInboxMessage">
+	<div class="row">	
+		<div class="col-sm-12">
+			<br/>
+			{{#with inboxCount}}
+			<h5>
+				<button class="btn btn-sm inboxBtn" title="Inbox messages">Inbox: <span class="badge badge-info">{{count}}</span>
+				</button>
+				<button class="btn btn-sm unreadBtn" title="Unread messages">Unread: <span class="badge badge-info">{{unread}}</span></button>
+				<button class="btn btn-sm readBtn" title="Read messages"><i class="fa fa-check text-success"> </i>Read: <span class="badge badge-info">{{read}}</span></button>
+			</h5>
+			{{/with}}
+		</div>
+		<div class="col-sm-12">
+			{{#if inboxMsg}}
+				<table class="table table-responsive table-hover table-sm">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Sender</th>
+							<th>Subject</th>
+							<th>Date received</th>
+							<th>Action</th>
+						</tr>	
+					</thead>
+					<tbody>
+					{{#each inboxMsg}}
+						<tr>
+							<td>
+								<span class="{{read}}"></span>
+							</td>
+							<td>{{senderName}}</td>
+							<td>{{subject}} <span class="badge badge-success" title="Number of replies">{{count}}</span></td>
+							<td>{{dateFormat createdAt}}</td>
+							<td>
+								<a href="{{pathFor 'stMessage'}}/{{_id}}" style="text-decoration: none;">
+									<button class="btn btn-info btn-sm">Open</button>	
+								</a>
+								<button class="btn btn-danger btn-sm"><span class="fa fa-trash"></span> Delete</button>
+							</td>
+						</tr>
+					{{/each}}
+					</tbody>
+				</table>
+			{{else}}
+				<h5 class="text-info">No message</h5>
+			{{/if}}
+		</div>
+	</div>
+</template>
+
+<template name="stSentMessage">
+	<div class="row">
+		<div class="col-sm">
+			<br/>
+			<h5>
+				<button class="btn btn-sm" title="Sent messages">Sent: <span class="badge badge-info">{{sentCount}}</span></button>
+			</h5>
+			{{#if sentMsg}}
+				<table class="table table-responsive table-hover table-sm">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Recipients</th>
+							<th>Subject</th>
+							<th>Date sent</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+					{{#each sentMsg}}
+						<tr>
+							<td>
+								<input type="checkbox" name="id" value="{{_id}}">
+							</td>
+							<td>
+								{{staffName}} {{studentName}}
+							</td>
+							<td>
+								{{subject}} <span class="badge badge-success" title="Number of replies">{{count}}</span>
+							</td>
+							<td>
+								{{dateFormat createdAt}}
+							</td>
+							<td>
+								<a href="{{pathFor 'stMessage'}}/{{_id}}">
+									<button class="btn btn-info btn-sm">Open</button>	
+								</a>
+								<button class="btn btn-danger btn-sm"><span class="fa fa-trash"></span> Delete</button>
+							</td>
+						</tr>
+					{{/each}}
+					</tbody>
+				</table>
+			{{else}}
+				<h5 class="text-info">No sent messages</h5>
+			{{/if}}
+		</div>
+	</div>
+</template>
+<template name="stSingleMessage">
+	<div class="row">
+		<div class="col-sm-12">
+		{{#with message}}
+			<h4>{{subject}}</h4><hr/>
+			<span><b>Sender: </b>{{senderName}}</span><br/>
+			<span><b>Receiver (Staff): </b><small>{{staffName}}</small></span><br/>
+			<span><b>Receiver (Class): </b><small>{{toClass}}</small></span><br/>
+			<span><b>Date: </b>{{dateFormat createdAt}}</span><br/>
+			<span><b>Replies: </b>{{count}}</span><br/><hr/>
+			<article style="padding:1em;line-height:2;">
+				{{content}}
+			</article>
+		{{/with}}
+		<form>
+			<div class="form-group">
+				<textarea class="form-control" placeholder="Reply to this message" minlength="5" rows="5" name="reply" required></textarea>
+			</div>
+			<button class="btn btn-primary btn-sm" type="submit">Submit reply</button>
+		</form><br/>
+		{{#if msgReply}}
+			<h5>Replies <span class="badge badge-info" title="{{count}} replies">{{count}}</span></h5><hr/>
+			{{#each msgReply}}
+			<div class="reply">
+				<p><span style="background-color: orangered; padding:2px;color:#fff;cursor:pointer;" title="commenter name"><strong>{{name}} </strong></span>
+				<span title="Posted date"><strong> {{dateFormat replyDate}}</strong></span>
+
+				</p>
+				<p style="padding-left:2em;">{{reply}}</p>
+
+			</div>
+			<hr/>		
+			{{/each}}
+		
+		{{else}}
+			<h3>No Replies</h3>
+		{{/if}}
+		</div>
+	</div>
+</template>
+
+<template name="stNewMessage">
+	<div class="col-sm-10">
+		<br/>
+		<form>
+			<label>Staff</label><br/>
+			<div class="form-group">
+				<select name="staff" class="form-control msgStaff">
+					{{#each staff}}
+						<option value="{{meteorIdInStaff}}">{{lastName}}, {{firstName}} {{otherName}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<br/>
+			<div class="form-group">
+				<label for="title">Subject</label><br/>
+				<input type="text" name="title" class="form-control" required placeholder="Subject of the message" maxlength="75" minlength="5">
+			</div>
+			<div class="form-group">
+				<label for="content">Message body</label><br/>
+				<textarea class="form-control" rows="6" required placeholder="Content of the message" name="body" minlength="10"></textarea>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Send message</button>
+		</form><br/>
+	</div>
 </template>
 
 <template name="stLogs">

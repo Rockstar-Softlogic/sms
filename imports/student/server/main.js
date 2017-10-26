@@ -2,7 +2,17 @@ Meteor.publish({
 	'student.info': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['student'])){
-			currentStudent = g.Students.find({meteorIdInStudent: userId});	
+			let currentStudent = g.Students.find({meteorIdInStudent: userId});
+				if(currentStudent){
+					return currentStudent;
+				}
+		}
+		return this.ready();
+	},
+	'graduate.info': function(){
+		let userId = this.userId;
+		if(Roles.userIsInRole(userId, ['student'])){
+			let currentStudent = g.Graduates.find({meteorIdInStudent: userId});
 				if(currentStudent){
 					return currentStudent;
 				}
@@ -32,11 +42,27 @@ Meteor.publish({
 	'student.assignment': function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['student'])){
-			let assignmentClass = g.Students.findOne({meteorIdInStudent: userId}).currentClass;
-			let stAssignment = g.Assignments.find({class: assignmentClass});
-			if(stAssignment) return stAssignment;
+			let s = g.setting();
+			let student = g.Students.findOne({meteorIdInStudent: userId});
+			if(student){
+				let stAssignment = g.Assignments.find({class:student.currentClass,session:s.session,term:s.term});
+				if(stAssignment) return stAssignment;
+			}
 		}
 		return this.ready();
+	},
+	'stMessage.list': function(){
+			let userId = this.userId;
+				if(Roles.userIsInRole(userId, ['student'])){
+					let student = g.Students.findOne({"meteorIdInStudent":userId}) || g.Graduates.findOne({"meteorIdInStudent":userId});
+					if(student){
+					let messages = g.Messages.find({$or:[{"senderId":userId},{"toClass":student.currentClass}]});	
+						if(messages){
+							return messages;
+						}
+					}
+				}
+				return this.ready();
 	},
 	'st.staffName': function(){
 		let userId = this.userId;

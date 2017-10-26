@@ -237,7 +237,7 @@ g.getObjectKey = function(object){
 g.objectToArray = function(object){
     let arr = [];
     for(let key in object){
-     if(typeof object[key] === "object"){
+     if(typeof object[key] === "object" /*&& g.subjectArray.indexOf(key)>-1*/){
 	     arr.push({name:key,value:object[key]});
      }
     }

@@ -63,7 +63,7 @@ Template.staffDashboard.helpers({
 				if(Meteor.userId() === log.by){
 					name = "You";
 				}else{
-					let query = g.Staffs.findOne({"meteorIdInStaff":log.by}) || g.Students.findOne({"meteorIdInStudent":log.by});
+					let query = g.Staffs.findOne({"meteorIdInStaff":log.by}) || g.Students.findOne({"meteorIdInStudent":log.by}) || g.Graduates.findOne({"meteorIdInStudent":log.by});
 					query?name = query.lastName+" "+query.firstName+" ("+ (query.staffId || query.studentId)+")":name="super Admin";	
 				}
 				log.name = name;
@@ -135,7 +135,7 @@ Template.ctrlpanel.helpers({
 					return current;
 				}
 		});
-		return filtered[0]
+		return filtered[0];
 	},
 });
 Template.ctrlpanel.events({
@@ -929,8 +929,8 @@ Template.singlePayment.helpers({
 				});
 			
 				if(filtered[0]){
-					let staff = g.Staffs.findOne({"meteorIdInStaff":filtered[0].addedBy});
-						staff?filtered[0].staffName=staff.lastName+" "+staff.firstName:filtered[0].staffName="Super Admin";
+					let payer = g.Staffs.findOne({"meteorIdInStaff":filtered[0].addedBy}) || g.Students.findOne({"meteorIdInStudent":filtered[0].addedBy});
+						payer?filtered[0].payerName=payer.lastName+" "+payer.firstName:filtered[0].payerName="Super Admin";
 					return filtered[0];
 				}
 			}
@@ -991,7 +991,7 @@ Template.singlePayment.events({
 });
 Template.updatePayment.helpers({
 	paymentFor:function(){
-		let s = g.setting();if(!s)return;//review
+		let s = g.setting();
 		let	id = s.settingId,session = s.session,term = s.term,
 			stInfo = Session.get('st.info');//get session.
 			stInfo.term = term //current term
@@ -1156,12 +1156,7 @@ Template.newMessage.events({
 			msgClass = $('#msgClass input:checked').map(function(){return this.value}).get(),
 			msgTitle = e.target.title.value,
 			msgBody = e.target.body.value;
-			
-		if(msgStaff.length && msgClass.length){
-			g.notice('Cannot send the same message to staff and student at the same time.', 8000);
-			return;
-		}
-		let msgObj = {"to":msgStaff.concat(msgClass),"subject":msgTitle,"content":msgBody,"staffName":staffName};
+		let msgObj = {"toStaff":msgStaff,"toClass":msgClass,"subject":msgTitle,"content":msgBody,"staffName":staffName};
 		g.meteorCall("newMessage",{doc:msgObj,
 				successMsg:"Your message was sent successfully.",
 				redirect:"singleMessage"});
@@ -1176,11 +1171,11 @@ Template.inboxMessage.helpers({
 		let userId = Meteor.userId(),
 			inboxFilter = Session.get("inboxFilter"),inbox;
 			if(inboxFilter==="unread"){
-				inbox = g.Messages.find({"to":userId,"readBy":{$ne:userId}}).fetch().reverse();
+				inbox = g.Messages.find({"toStaff":userId,"readBy":{$ne:userId}}).fetch().reverse();
 			}else if(inboxFilter==="read"){
-				inbox = g.Messages.find({"to":userId,"readBy":userId}).fetch().reverse();
+				inbox = g.Messages.find({"toStaff":userId,"readBy":userId}).fetch().reverse();
 			}else{
-				inbox = g.Messages.find({"to":userId}).fetch().reverse();
+				inbox = g.Messages.find({"toStaff":userId}).fetch().reverse();
 			}
 			if(inbox){
 				inbox.forEach(function(msg){
@@ -1197,8 +1192,8 @@ Template.inboxMessage.helpers({
 	},
 	inboxCount: function(){
 		let userId = Meteor.userId();
-		let count = g.Messages.find({"to":userId}).count();
-		let read = g.Messages.find({"to":userId,"readBy":userId}).count();
+		let count = g.Messages.find({"toStaff":userId}).count();
+		let read = g.Messages.find({"toStaff":userId,"readBy":userId}).count();
 		let unread = count - read;
 		return {'count':count,'unread':unread,'read':read};
 	}
@@ -1290,10 +1285,14 @@ Template.newSms.helpers({
 			$ne:Meteor.userId()}}).fetch().map(function(st){
 				if(st.phone){
 					st.phone = st.phone[0];				
+					return st;
 				}
-				return st;
+				// return st;
 			});
 	},
+	studentCount:function(currentClass){
+		return g.Students.find({"currentClass":currentClass}).count();
+	}
 });
 Template.newSms.events({
 	'change input.all_staff':function(){

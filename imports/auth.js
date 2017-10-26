@@ -82,9 +82,6 @@ var TemplateEvents = {
     }
 };
 var TemplateOnRendered = function(){
-	var element = document.getElementById("sidebar");
-	new slimScroll(element);
-	// $("#sidebar").perfectScrollbar({suppressScrollX:true});
 	$(window).resize(function(){
 		$("#sidebar").removeClass("default-sidebar no-sidebar icon-sidebar");
 		$("#sidebar li.menu-item").children("a").children("span.fa").removeClass("fa-chevron-down").addClass("fa-chevron-right");
@@ -121,9 +118,11 @@ Template.stDashboard.onCreated(function(){
 			self.subscribe("log.list");
 			self.subscribe("student.result");
 			self.subscribe('student.info');
+			self.subscribe('graduate.info');
 			self.subscribe("student.payment");
 			self.subscribe('staff.name');
 			self.subscribe("student.assignment");
+			self.subscribe("stMessage.list");
 			self.subscribe("st.staffName");
 		});
 });

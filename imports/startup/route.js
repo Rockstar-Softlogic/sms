@@ -373,6 +373,12 @@ studentRoute.route('/payment', {
 		BlazeLayout.render('stDashboard', {stContent: 'stPayment'});
 	}
 });
+studentRoute.route('/payment/new', {
+	name: 'stNewPayment',
+	action(){
+		BlazeLayout.render('stDashboard', {stContent: 'stNewPayment'});
+	}
+});
 studentRoute.route('/assignment', {
 	name: 'stAssignment',
 	action(){
@@ -389,6 +395,12 @@ studentRoute.route('/message', {
 	name: 'stMessage',
 	action(){
 		BlazeLayout.render('stDashboard', {stContent: 'stMessage'});
+	}
+});
+studentRoute.route('/message/:id', {
+	name: 'stSingleMessage',
+	action(){
+		BlazeLayout.render('stDashboard', {stContent: 'stSingleMessage'});
 	}
 });
 studentRoute.route('/logs', {

@@ -179,6 +179,7 @@ Meteor.methods({
 						data['session'] = setting.session;
 						data['term'] = setting.term;
 						data['addedBy'] = this.userId;
+						data['createdAt'] = (new Date()).toString();
 						for(var i in data){
 							if(typeof data[i] === 'object'){
 								data[i]["total"] = data[i].ca + data[i].exam;

@@ -722,11 +722,20 @@ g.Schemas.Message = new SimpleSchema({
 				type: 'hidden',
 			},
 		},
-		to:{
+		toClass:{
 			type: Array,
 			minCount: 1,
+			optional:true,
 		},
-			'to.$':{
+			'toClass.$':{
+				type: String,
+			},
+		toStaff:{
+			type: Array,
+			minCount: 1,
+			optional:true,
+		},
+			'toStaff.$':{
 				type: String,
 			},
 		staffName:{

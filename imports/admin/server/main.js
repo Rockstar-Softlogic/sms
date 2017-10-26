@@ -14,7 +14,7 @@ Meteor.publish({
 	'editor.list':function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ["admin"])){
-			let editor = Meteor.users.find({roles: "editor"});
+			let editor = Meteor.users.find({roles: "editor"},{fields:{roles:1}});
 				if(editor){
 					return editor;
 				}
@@ -110,7 +110,7 @@ Meteor.publish({
 	'message.list': function(){
 			let userId = this.userId;
 				if(Roles.userIsInRole(userId, ['admin', 'editor', 'staff'])){
-					let messages = g.Messages.find({$or:[{"senderId":userId},{"to":userId}]});	
+					let messages = g.Messages.find({$or:[{"senderId":userId},{"toStaff":userId}]});	
 						if(messages){
 							return messages;
 						}
@@ -175,53 +175,67 @@ Meteor.methods({
 				console.log(addAdmin);
 				return addAdmin;
 			}else{
-				throw new Meteor.Error(500, "Request not understood!");
+				throw new Meteor.Error(400, "Request not understood!");
 			}
 	},
 	newStudent: function(data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
-				throw new Meteor.Error('500', 'Unauthorized Operation');
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor', 'staff'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let requiredFields = ["firstName","lastName","gender","currentClass","studentId","parentOrGuardian"];
+		for(let i = 0; i < requiredFields.length; i++){
+			if(!data[requiredFields[i]]){
+				throw new Meteor.Error(401, `required field ${requiredFields[i]} is missing.`);
 			}
-			// let duplicateId,duplicateEmail;
-				// duplicateId = Accounts.findUserByUsername(data.studentId);
-				// duplicateEmail = Accounts.findUserByEmail(data.email);
-				let pwd = "@012345#",
-					newUser = {username:data.studentId,password:pwd};
-				if(data.email){
-					newUser.email = data.email;
+		}//end for
+		// check parentOrGuardian name && phone
+		if(!data.parentOrGuardian.name || !data.parentOrGuardian.phone){
+			throw new Meteor.Error(401, `Parent or Guardian name or phone is missing.`);
+		}//end if
+		//everything is fine, process
+			let pwd = "12345",
+				newUser = {username:data.studentId,password:pwd};
+			if(data.email){
+				newUser.email = data.email;
+			}
+			let insertToUser = Accounts.createUser(newUser);
+			if(insertToUser){
+				Roles.addUsersToRoles(insertToUser, ['student']);
+				data.meteorIdInStudent = insertToUser;
+				data['firstName'] = g.sentenceCase(data.firstName);
+				data['lastName'] = g.sentenceCase(data.lastName);
+				data['otherName'] = g.sentenceCase(data.otherName)||"";
+				if(data.nok){
+					data.nok['name'] = g.sentenceCase(data.nok.name);
 				}
-				let insertToUser = Accounts.createUser(newUser);
-				if(insertToUser){
-					Roles.addUsersToRoles(insertToUser, ['student']);
-					data.meteorIdInStudent = insertToUser;
-					data['firstName'] = g.sentenceCase(data.firstName);
-					data['lastName'] = g.sentenceCase(data.lastName);
-					data['otherName'] = g.sentenceCase(data.otherName)||"";
-					if(data.nok){
-						data.nok['name'] = g.sentenceCase(data.nok.name);
-					}
-					g.Students.insert(data);
-					let resultAndPaymentRecord = {
-							meteorIdInStudent: data.meteorIdInStudent,
-							studentId: data.studentId,
-							email: data.email||"",
-							firstName: data.firstName,
-							lastName: data.lastName,
-							otherName: data.otherName,
-							currentClass: data.currentClass,
-						};
-					g.Results.insert(resultAndPaymentRecord);
-					g.Payments.insert(resultAndPaymentRecord);
-					Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
-					return insertToUser;
-				}
+				let insertToStudent = g.Students.insert(data);
+				let resultAndPaymentRecord = {
+						meteorIdInStudent: data.meteorIdInStudent,
+						studentId: data.studentId,
+						email: data.email||"",
+						firstName: data.firstName,
+						lastName: data.lastName,
+						otherName: data.otherName,
+						currentClass: data.currentClass,
+					};
+				g.Results.insert(resultAndPaymentRecord);
+				g.Payments.insert(resultAndPaymentRecord);
+				Meteor.call("log",("Added new student to "+data.currentClass+" with id "+data.studentId));
+				return insertToUser;
+			}
 		}, //end insertStudent method
 		//insert staff and Editor by admin and editor only
 	newStaff: function(data){
-			if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
-				throw new Meteor.Error('500', 'Unauthorized Operation');
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin', 'editor'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let requiredFields = ["firstName","lastName","gender","staffId"];
+		for(let i = 0; i < requiredFields.length; i++){
+			if(!data[requiredFields[i]]){
+				throw new Meteor.Error(401, `required field ${requiredFields[i]} is missing.`);
 			}
-			let pwd = "@012345#",
+		}//end for
+			let pwd = "12345",
 				newUser = {username:data.staffId,password:pwd};
 			if(data.email){
 				newUser.email = data.email;

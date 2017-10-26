@@ -564,7 +564,13 @@
 						<td>{{staffId}}</td>
 						<td>{{subjectTaught}} <br/></td> 
 						<td>{{gender}}</td>
-						<td><a href="{{pathFor 'singleStaff'}}/{{staffId}}" class="btn btn-info btn-sm"> <span class="fa fa-info-circle"></span> More Details</a></td>
+						<td class="text-center">
+							{{#if isCurrentUser meteorIdInStaff}}
+								<a href="{{pathFor 'profile'}}" class="btn btn-success btn-sm">You!</a>
+							{{else}}
+							<a href="{{pathFor 'singleStaff'}}/{{staffId}}" class="btn btn-info btn-sm"> <span class="fa fa-info-circle"></span> More Details</a>
+							{{/if}}
+						</td>
 					</tr>
 				{{/each}}
 				</tbody>
@@ -577,10 +583,16 @@
 </template>
 <template name="singleStaff">
 	{{#with staff}}	
-	<h5>{{lastName}}, {{firstName}} {{otherName}} Profile 
+	<h5>{{lastName}}, {{firstName}} {{otherName}} Profile  
 		{{#if isInRole 'admin'}}
-		<span class="btn btn-danger btn-sm" id="removeAdmin">Remove Admin</span>
-		<span class="btn btn-danger btn-sm" id="makeAdmin">Make Admin</span>
+			{{#if checkRole meteorIdInStaff}}
+				<span class="badge badge-info">staff, editor</span>
+				<button class="btn btn-danger btn-sm" id="removeAdmin">Remove Admin</button>
+				
+			{{else}}
+				<span class="badge badge-info">staff</span>
+				<button class="btn btn-danger btn-sm" id="makeAdmin">Make Admin</button>
+			{{/if}}
 		{{/if}}
 	</h5><hr/>
 	<div class="row">
@@ -1267,7 +1279,6 @@
 					<option value="staffs">Staffs</option>
 					<option value="students">Students</option>
 					<option value="graduated">Graduated Student</option>
-					<option value="results">Results</option>
 				</select>
 				<select name="class" style="display:none;">
 					<option disabled selected>Select class</option>
@@ -1506,6 +1517,13 @@
 				{{#each subjects}}
 					{{>afQuickField name=this}}
 				{{/each}}
+				<div class="col-sm-12">
+					<div class="form-group">										
+						<button type="reset" class="btn btn-danger">Reset</button>
+								&nbsp;&nbsp;&nbsp;
+						<button type="submit" class="btn btn-primary btn-lg">Submit</button>
+					</div>
+				</div>
 			{{/autoForm}}
 		</div>
 	</div>
@@ -1733,8 +1751,8 @@
 								<td>{{transactionId}}</td>
 							</tr>
 							<tr>
-								<td>Receiver's Name</td>
-								<td>{{staffName}}</td>
+								<td>Payer</td>
+								<td>{{payerName}}</td>
 							</tr>
 							</tbody>
 					</table>
@@ -2216,7 +2234,8 @@
 		{{#with message}}
 			<h4>{{subject}}</h4><hr/>
 			<span><b>Sender: </b>{{senderName}}</span><br/>
-			<span><b>Receiver: </b>{{staffName}}</span><br/>
+			<span><b>Receiver (Staff): </b><small>{{staffName}}</small></span><br/>
+			<span><b>Receiver (Class): </b>{{toClass}}</span><br/>
 			<span><b>Date: </b>{{dateFormat createdAt}}</span><br/>
 			<span><b>Replies: </b>{{count}}</span><br/><hr/>
 			<article style="padding:1em;line-height:2;">
@@ -2297,7 +2316,7 @@
 			</div>
 
 			<button type="submit" class="btn btn-primary">Send message</button>
-			<button type="button" class="btn btn-danger">Save to draft</button>
+			<button type="button" class="btn btn-danger" disabled>Save to draft</button>
 		</form><br/>
 	</div>
 </template>
@@ -2328,7 +2347,7 @@
 				<label class="text-info">Showing only staffs with phone number.</label>
 				<select name="staff" class="form-control smsStaff" multiple="true">
 					{{#each staff}}
-						<option value="{{phone}}">{{lastName}} {{firstName}} ({{phone}})</option>
+						<option value="{{phone}}">{{lastName}} {{firstName}} {{phone}}</option>
 					{{/each}}
 				</select>
 			</div>
@@ -2336,7 +2355,7 @@
 				<label>Class of students (<small>if SMS is for one or more classes</small>)</label> <br/>
 				{{#each classes}}
 				<span class="checkbox-inline">
-					<input type="checkbox" name="class" value="{{this}}">{{this}}(73)
+					<input type="checkbox" name="class" value="{{this}}">{{this}} ({{studentCount this}})
 				</span>
 				{{/each}}
 			</div><br/>
@@ -2606,16 +2625,5 @@
 				{{/each}}	
 			</ol>
 		</div>
-	</div>
-	<div class="col-sm-12" id="subjectMgmt">
-		
-		<section class="col-sm-6 ">
-			
-			
-			
-		</section>
-		<section class="col-sm-6 ">
-			
-		</section>
 	</div>
 </template>

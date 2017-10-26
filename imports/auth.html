@@ -16,31 +16,25 @@
                 <ul class="nav float-right">
                     <li class="nav-item dropdown-notification">
                         <span class="fa fa-bell-o"></span>
-                        <span class="badge badge-pill badge-danger"><small>5</small></span>
+                        <span class="badge badge-pill badge-danger"><small>{{assignment.unmarked}}</small></span>
                         <article class="notification dropdown-notice" style="display:none;">
-                            <h6>NOTIFICATIONS <span class="badge badge-danger float-right">5 NEW</span></h6>
+                            <h6>ASSIGNMENT <span class="badge badge-danger float-right">{{assignment.unmarked}} NEW</span></h6>
                             <ul>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                {{#each assignment.recent}}
+                                    <li><a href="{{pathFor 'singleAssignment'}}/{{_id}}">{{title}}</a></li>
+                                {{/each}}
                             </ul>
                         </article>
                     </li>
                     <li class="nav-item dropdown-inbox">
                          <span class="fa fa-envelope-o"></span>
-                        <span class="badge badge-info"><small>9</small></span>  
+                        <span class="badge badge-info"><small>{{inboxMessage.unread}}</small></span>  
                         <article class="inbox dropdown-notice" style="display:none;">
-                            <h6>INBOX <span class="badge badge-info float-right">9 NEW</span></h6>
+                            <h6>INBOX <span class="badge badge-info float-right">{{inboxMessage.unread}} NEW</span></h6>
                             <ul>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                
+                                {{#each inboxMessage.inbox}}
+                                    <li><a href="{{pathFor 'message'}}/{{_id}}">{{subject}}</a></li>
+                                {{/each}}
                             </ul>
                         </article>
                     </li>   
@@ -161,31 +155,25 @@
                 <ul class="nav float-right">
                     <li class="nav-item dropdown-notification">
                         <span class="fa fa-bell-o"></span>
-                        <span class="badge badge-pill badge-danger"><small>3</small></span>
+                        <span class="badge badge-pill badge-danger"><small>{{assignment.unanswered}}</small></span>
                         <article class="notification dropdown-notice" style="display:none;">
-                            <h6>NOTIFICATIONS <span class="badge badge-danger float-right">3 NEW</span></h6>
+                            <h6>ASSIGNMENT <span class="badge badge-danger float-right">{{assignment.unanswered}} NEW</span></h6>
                             <ul>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
-                                <li><a href="#">You have new physics assignment submitted.</a></li>
+                                {{#each assignment.recent}}
+                                    <li><a href="{{pathFor 'stSingleAssignment'}}/{{_id}}">{{title}}</a></li>
+                                {{/each}}
                             </ul>
                         </article>
                     </li>
                     <li class="nav-item dropdown-inbox">
                          <span class="fa fa-envelope-o"></span>
-                        <span class="badge badge-info"><small>7</small></span>  
+                        <span class="badge badge-info"><small>{{inboxMessage.unread}}</small></span>  
                         <article class="inbox dropdown-notice" style="display:none;">
-                            <h6>INBOX <span class="badge badge-info float-right">7 NEW</span></h6>
+                            <h6>INBOX <span class="badge badge-info float-right">{{inboxMessage.unread}} NEW</span></h6>
                             <ul>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                <li><a href="#">Message from Student25. Title: Explanation on last assignment.</a></li>
-                                
+                                 {{#each inboxMessage.inbox}}
+                                    <li><a href="{{pathFor 'stMessage'}}/{{_id}}">{{subject}}</a></li>
+                                {{/each}}
                             </ul>
                         </article>
                     </li>   
@@ -194,7 +182,7 @@
                         <span style="margin:0;padding:0;font-size:10px;" class="fa fa-chevron-down"></span>
                         <ul style="display:none;">
                             <li><a href="{{pathFor 'studentProfile'}}"><span class="fa fa-user"></span>Profile</a></li>
-                            <li><a href="{{pathFor 'message'}}"><span class="fa fa-envelope-o"></span>My Inbox</a></li>
+                            <li><a href="{{pathFor 'stMessage'}}"><span class="fa fa-envelope-o"></span>My Inbox</a></li>
                             <li><a href="#"><span class="fa fa-angle-double-up"></span>Update Email</a></li>
                             <li><a href="{{pathFor 'stLogs'}}"><span class="fa fa-angle-double-up"></span>Log</a></li>
                             <li class="dropdown-divider"></li>
@@ -226,7 +214,7 @@
                     <a href="{{pathFor 'stMessage'}}"><i class="fa fa-envelope"></i><span>Messages</span></a>
                 </li>
                  <li class="menu-item">
-                    <a href="#"><i class="fa fa-envelope"></i><span>Performance</span></a>
+                    <a href="#"><i class="fa fa-bar-chart"></i><span>Performance</span></a>
                 </li>
                 <li class="menu-item">
                     <a href="{{pathFor 'feedback'}}"><i class="fa fa-comment"></i><span>Feedback</span></a>
