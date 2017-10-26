@@ -7,12 +7,6 @@ App.info({
   email: 'wisdomabioye@gmail.com',
   website: 'lovelampsys.com'
 });
-// Set up resources such as icons and launch screens.
-// App.icons({
-//   'iphone_2x': 'icons/icon-60@2x.png',
-//   'iphone_3x': 'icons/icon-60@3x.png',
-//   // More screen sizes and platforms...
-// });
 App.launchScreens({
   // 'iphone_2x': 'splash/Default@2x~iphone.png',
   // 'iphone5': 'splash/Default~iphone5.png',
