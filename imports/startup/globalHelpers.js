@@ -79,7 +79,7 @@ registerGlobalHelpers({
         return date.toString().substr(0,21);
     },
     dayMonthYear:function(date){
-         return date.toString().substr(0,16);
+         return date?date.toString().substr(0,16):"";
     },
     getObjectKey:function(object){
         return g.getObjectKey(object);

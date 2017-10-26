@@ -4,7 +4,6 @@ import '../imports/student/server/main.js';
 Meteor.startup(() => {
   // code to run on server at startup
   	initAdmin();
-	fakeAdmin();
 	initSubject();
 });
 function initAdmin(){
@@ -21,26 +20,6 @@ function initAdmin(){
 				"meteorIdInStaff":admin
 			});
 			console.log("Admin created and added to roles");
-		}
-	}else{
-		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);
-	}
-}
-
-function fakeAdmin(){
-	let lookUp = Meteor.users.findOne({username:"admin", "emails.0.address":"admin@rssl.com", roles:'admin'});
-	if(!lookUp){
-		let admin = Accounts.createUser({username:"admin", email:"admin@gmail.com", password: "12345"});
-		if(admin){
-			Roles.addUsersToRoles(admin, ['staff','editor','admin']);
-			g.Staffs.insert({
-				"firstName":"Admin First Name",
-				"lastName":"Admin Last Name",
-				"staffId":"admin",
-				"gender":"Male",
-				"meteorIdInStaff":admin
-			});
-			console.log("Fake admin created and added to roles");
 		}
 	}else{
 		console.log(lookUp.username,lookUp.emails[0].address, " already a ",lookUp.roles);

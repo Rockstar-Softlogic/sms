@@ -1,5 +1,6 @@
 {
   "name": "sms",
+  "version": "1.0",
   "private": true,
   "scripts": {
     "start": "meteor run"
